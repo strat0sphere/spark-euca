@@ -499,7 +499,6 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   if opts.os_type == "Ubuntu":
       ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
       ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
-      ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0'  >> ~/.profile")
       ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0'  >> ~/.bash_profile")#spark_euca needs it on bash_profile
       #ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz") #the tar file is needed as well
       #ssh(master, opts, pkg_mngr + " install scala")
@@ -509,7 +508,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
       ssh(master, opts, "mv scala-2.11.1 scala")
       ssh(master, opts, "echo 'export SCALA_HOME=/root/scala' >> ~/.bash_profile")
       #ssh(master, opts, "ln -f -s /usr/lib/scala-2.11.1/ /usr/lib/scala")
-      ssh(master, opts, "echo 'export PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> ~/.profile")
+      ssh(master, opts, "echo 'export PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> ~/.bash_profile")
     
   elif opts.os_type == "Centos":
     ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
