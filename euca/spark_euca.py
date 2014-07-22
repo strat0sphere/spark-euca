@@ -514,6 +514,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   elif opts.os_type == "Centos":
     ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
     ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64' >> ~/.bash_profile")
+    ssh(master, opts, pkg_mngr + " install wget")
     ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
     ssh(master, opts, "tar xvf scala-2.11.1.tgz")
     ssh(master, opts, "mv scala-2.11.1 /usr/lib")
