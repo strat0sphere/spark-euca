@@ -512,13 +512,14 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
     
   elif opts.os_type == "Centos":
     ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
-    ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64' >> ~/.bash_profile")
+    ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64/ /usr/lib/jvm/java-1.7.0/")
+    ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0'  >> ~/.bash_profile")#spark_euca needs it on bash_profile
     ssh(master, opts, pkg_mngr + " install wget")
     ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
     ssh(master, opts, "tar xvf scala-2.11.1.tgz")
-    ssh(master, opts, "mv scala-2.11.1 /usr/lib")
-    ssh(master, opts, "ln -f -s /usr/lib/scala-2.11.1/ /usr/lib/scala")
-    ssh(master, opts, "export PATH=$PATH:/usr/lib/scala/bin/")
+    ssh(master, opts, "mv scala-2.11.1 scala")
+    #ssh(master, opts, "ln -f -s /usr/lib/scala-2.11.1/ /usr/lib/scala")
+    ssh(master, opts, "echo 'export PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> ~/.bash_profile")
   
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
   ssh(master, opts, "wget http://www.apache.org/dist/spark/spark-1.0.0/spark-1.0.0-bin-hadoop1.tgz")
