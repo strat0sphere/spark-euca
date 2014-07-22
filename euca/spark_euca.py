@@ -518,7 +518,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
   ssh(master, opts, "wget http://tachyon-project.org/downloads/tachyon-0.4.1-bin.tar.gz")
   #ssh(master, opts, "git clone https://github.com/strat0sphere/spark-testing.git") #necessary scripts to install prerequisites on slaves
-  #ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") #seems shark has a dependency on hive
+  ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") #seems shark has a dependency on hive
   
   #ssh(master, opts,  "source ~/.bash_profile")
   # NOTE: We should clone the repository before running deploy_files to
@@ -544,7 +544,7 @@ def setup_spark_cluster(master, opts):
   #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
   ssh(master, opts, "chmod u+x spark-euca/setup.sh")
   ssh(master, opts, "spark-euca/setup.sh")
-   #ssh(master, opts, "/root/spark/sbin/start-all.sh")
+  ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
 
   print "Spark standalone cluster started at http://%s:8080" % master
 
