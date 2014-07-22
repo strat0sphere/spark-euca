@@ -552,6 +552,8 @@ def setup_spark_cluster(master, opts):
   #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
   ssh(master, opts, "chmod u+x spark-euca/setup.sh")
   ssh(master, opts, "spark-euca/setup.sh")
+  ssh(master, opts, "Starting-all...")
+  ssh(master, opts, "source ~/.bash_profile")
   ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
 
   print "Spark standalone cluster started at http://%s:8080" % master

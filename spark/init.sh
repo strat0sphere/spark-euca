@@ -7,6 +7,8 @@ if [ -d "spark" ]; then
   return
 fi
 
+echo "DEBUG:: SPARK_VERSION=$SPARK_VERSION"
+echo "DEBUG:: HADOOP_MAJOR_VERSION=$HADOOP_MAJOR_VERSION"
 # Github tag:
 if [[ "$SPARK_VERSION" == *\|* ]]
 then
@@ -80,6 +82,8 @@ else
       return
   esac
 
+  #Make sure there is a spark copy
+  wget http://www.apache.org/dist/spark/spark-1.0.0/spark-1.0.0-bin-hadoop1.tgz
   echo "Unpacking Spark"
   tar xvzf spark-*.tgz > /tmp/spark-euca_spark.log
   rm spark-*.tgz
