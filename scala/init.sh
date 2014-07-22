@@ -17,6 +17,6 @@ echo "Unpacking Scala"
 wget http://www.scala-lang.org/files/archive/scala-$SCALA_VERSION.tgz
 tar xvzf scala-*.tgz > /tmp/spark-euca_scala.log
 rm scala-*.tgz
-mv `ls -d scala-* | grep -v ec2` scala
+mv `ls -d scala-* | grep -v euca` scala
 
 popd

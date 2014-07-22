@@ -545,7 +545,7 @@ def setup_spark_cluster(master, opts):
   ssh(master, opts, "chmod u+x spark-euca/setup.sh")
   ssh(master, opts, "spark-euca/setup.sh")
    #ssh(master, opts, "/root/spark/sbin/start-all.sh")
-  
+
   print "Spark standalone cluster started at http://%s:8080" % master
 
   if opts.ganglia:

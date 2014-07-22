@@ -83,7 +83,7 @@ else
   echo "Unpacking Spark"
   tar xvzf spark-*.tgz > /tmp/spark-euca_spark.log
   rm spark-*.tgz
-  mv `ls -d spark-* | grep -v ec2` spark
+  mv `ls -d spark-* | grep -v euca` spark
 fi
 
 popd

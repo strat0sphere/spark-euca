@@ -106,22 +106,22 @@ ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-slave.sh" & sleep 0.3
 done
 wait
 
-echo "RSYNC'ing /root/spark-testing to other cluster nodes..."
-for node in $SLAVES $OTHER_MASTERS; do
-echo $node
-rsync -e "ssh $SSH_OPTS" -az /root/spark-testing $node:/root &
-scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
-sleep 0.3
-done
-wait
+#echo "RSYNC'ing /root/spark-testing to other cluster nodes..."
+#for node in $SLAVES $OTHER_MASTERS; do
+#echo $node
+#rsync -e "ssh $SSH_OPTS" -az /root/spark-testing $node:/root &
+#scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
+#sleep 0.3
+#done
+#wait
 
 echo "Setting up Spark on `hostname`..."
 #installing required packages to slave nodes
 echo "Installing required packages to slave nodes..."
 for node in $SLAVES $OTHER_MASTERS; do
 echo $node
-ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-testing/prepare-slaves-ubuntu.sh" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$node "/root/spark-testing/prepare-slaves-ubuntu.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/prepare-slaves-ubuntu.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/prepare-slaves-ubuntu.sh" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0/' >> ~/.bash_profile"
 ssh -t -t $SSH_OPTS root@$node "echo 'export SCALA_HOME=/usr/share/java/' >> ~/.bash_profile"
 ssh -t -t $SSH_OPTS root@$node "source ~/.bash_profile"
@@ -160,7 +160,7 @@ source ./$module/setup.sh
 sleep 1
 cd /root/spark-euca  # guard against setup.sh changing the cwd
 done
-echo "Running setup.sh from spark-testing/persistent-hdfs"
-source /root/spark-testing/persistent-hdfs/setup.sh
-cd /root/spark-euca  # guard against setup.sh changing the cwd
-sleep 1
+#echo "Running setup.sh from spark-testing/persistent-hdfs"
+#source /root/spark-testing/persistent-hdfs/setup.sh
+#cd /root/spark-euca  # guard against setup.sh changing the cwd
+#sleep 1
