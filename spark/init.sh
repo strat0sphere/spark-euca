@@ -7,8 +7,8 @@ if [ -d "spark" ]; then
   return
 fi
 
-echo "DEBUG:: SPARK_VERSION=$SPARK_VERSION"
-echo "DEBUG:: HADOOP_MAJOR_VERSION=$HADOOP_MAJOR_VERSION"
+#echo "DEBUG:: SPARK_VERSION=$SPARK_VERSION"
+#echo "DEBUG:: HADOOP_MAJOR_VERSION=$HADOOP_MAJOR_VERSION"
 # Github tag:
 if [[ "$SPARK_VERSION" == *\|* ]]
 then
@@ -87,10 +87,10 @@ else
   echo "Unpacking Spark"
   tar xvzf spark-*.tgz > /tmp/spark-euca_spark.log
   rm spark-*.tgz
-  mv `ls -d spark-* | grep -v euca` spark/
+  mv `ls -d spark-* | grep -v euca` spark
   ls -al
   #Makes sure the name is changed
-  mv spark-1.0.0-bin-hadoop1/ spark/
+  mv spark-1.0.0-bin-hadoop1 spark #If the above works this should be redundant and fail
 fi
 
 popd
