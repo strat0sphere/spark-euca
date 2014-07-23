@@ -498,8 +498,6 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #ssh(master, opts, pkg_mngr + " install wget")
   ssh(master, opts, pkg_mngr + " install git")
   
-  #ssh(master, opts, "export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/; export PATH=${PATH}:${JAVA_HOME}/bin") #For unknown reason this doesn't work
-  
   if opts.os_type == "ubuntu":
       ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
       ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
@@ -518,13 +516,9 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   ssh(master, opts, "source ~/.bash_profile")
        
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
-  #ssh(master, opts, "wget http://www.apache.org/dist/spark/spark-1.0.0/spark-1.0.0-bin-hadoop1.tgz")
   ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
-  #ssh(master, opts, "wget http://tachyon-project.org/downloads/tachyon-0.4.1-bin.tar.gz")
-  #ssh(master, opts, "git clone https://github.com/strat0sphere/spark-testing.git") #necessary scripts to install prerequisites on slaves
   ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") #seems shark has a dependency on hive
   
-  #ssh(master, opts,  "source ~/.bash_profile")
   # NOTE: We should clone the repository before running deploy_files to
   # prevent ec2-variables.sh from being overwritten
   ssh(master, opts, "rm -rf spark-euca && git clone https://github.com/strat0sphere/spark-euca.git")
