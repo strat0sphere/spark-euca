@@ -479,6 +479,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   if opts.hadoop_major_version == "1":
     modules = filter(lambda x: x != "mapreduce", modules)
 
+  """
   if opts.ganglia:
     modules.append('ganglia')
     
@@ -522,14 +523,14 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   # NOTE: We should clone the repository before running deploy_files to
   # prevent ec2-variables.sh from being overwritten
   ssh(master, opts, "rm -rf spark-euca && git clone https://github.com/strat0sphere/spark-euca.git")
-
+  """
   print "Deploying files to master..."
   deploy_files(conn, "deploy.generic", opts, master_nodes, slave_nodes, modules)
 
   print "Running setup on master..."
   ssh(master, opts, "echo '****************'; ls -al")
   #setup_standalone_cluster(master, slave_nodes, opts)
-  setup_spark_cluster(master, opts)
+  #setup_spark_cluster(master, opts)
   print "Done!"
 
 def setup_standalone_cluster(master, slave_nodes, opts):
@@ -630,7 +631,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
     spark_v = "%s|%s" % (opts.spark_git_repo, opts.spark_version)
     shark_v = ""
     modules = filter(lambda x: x != "shark", modules)
-
+   
   template_vars = {
     "master_list": '\n'.join([i.public_dns_name for i in master_nodes]),
     "active_master": active_master,
