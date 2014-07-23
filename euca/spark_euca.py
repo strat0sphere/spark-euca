@@ -503,15 +503,11 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   if opts.os_type == "ubuntu":
       ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
       ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/"
-      #ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz") #the tar file is needed as well
-      #ssh(master, opts, pkg_mngr + " install scala")
-      #ssh(master, opts, "echo 'export SCALA_HOME=/usr/share/java/' >> ~/.bash_profile")
-      #ssh(master, opts, "ln -f -s /usr/lib/scala-2.11.1/ /usr/lib/scala")    
   elif opts.os_type == "centos":
-    ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
-    ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64/ /usr/lib/jvm/java-1.7.0/")
-    ssh(master, opts, pkg_mngr + " install wget")
-    #ssh(master, opts, "ln -f -s /usr/lib/scala-2.11.1/ /usr/lib/scala")
+      ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
+      ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64/ /usr/lib/jvm/java-1.7.0/")
+      ssh(master, opts, pkg_mngr + " install wget")
+      #ssh(master, opts, "ln -f -s /usr/lib/scala-2.11.1/ /usr/lib/scala")
  
   ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
   ssh(master, opts, "tar xvf scala-2.11.1.tgz")
