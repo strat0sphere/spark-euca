@@ -116,7 +116,7 @@ def parse_args():
   parser.add_option("--user-data-file", type="string", default="",
       help="User data-file to pass to the instances created")
   parser.add_option("--os-type", type="string", default="",
-      help="Type of the OS (Ubuntu/ Centos)")
+      help="Type of the OS (ubuntu/ centos)")
 
 
 
@@ -482,49 +482,51 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   if opts.ganglia:
     modules.append('ganglia')
     
-  if opts.os_type == "Ubuntu":
+  if opts.os_type == "ubuntu":
       pkg_mngr = "apt-get --yes --force-yes"
-  elif opts.os_type == "Centos":
+  elif opts.os_type == "centos":
       pkg_mngr = "yum -y"
      
 
   #ssh(master, opts, "sudo su")
   #ssh(master, opts, "sudo cp /home/ubuntu/.ssh/authorized_keys /root/.ssh")
+  #Fixing issue with disallowing logins after updateing pam
+  if opts.os_type == "centos":
+      ssh(master, opts, "echo 'exclude=pam*' >> /etc/yum.conf")
+      
   ssh(master, opts, pkg_mngr + " update")
   #ssh(master, opts, pkg_mngr + " install wget")
   ssh(master, opts, pkg_mngr + " install git")
   
   #ssh(master, opts, "export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/; export PATH=${PATH}:${JAVA_HOME}/bin") #For unknown reason this doesn't work
   
-  if opts.os_type == "Ubuntu":
+  if opts.os_type == "ubuntu":
       ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
-      ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
-      ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0'  >> ~/.bash_profile")#spark_euca needs it on bash_profile
+      ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/"
       #ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz") #the tar file is needed as well
       #ssh(master, opts, pkg_mngr + " install scala")
       #ssh(master, opts, "echo 'export SCALA_HOME=/usr/share/java/' >> ~/.bash_profile")
-      ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
-      ssh(master, opts, "tar xvf scala-2.11.1.tgz")
-      ssh(master, opts, "mv scala-2.11.1 scala")
-      ssh(master, opts, "echo 'export SCALA_HOME=/root/scala' >> ~/.bash_profile")
       #ssh(master, opts, "ln -f -s /usr/lib/scala-2.11.1/ /usr/lib/scala")
-      ssh(master, opts, "echo 'export PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> ~/.bash_profile")
     
-  elif opts.os_type == "Centos":
+  elif opts.os_type == "centos":
     ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
     ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64/ /usr/lib/jvm/java-1.7.0/")
-    ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0'  >> ~/.bash_profile")#spark_euca needs it on bash_profile
     ssh(master, opts, pkg_mngr + " install wget")
-    ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
-    ssh(master, opts, "tar xvf scala-2.11.1.tgz")
-    ssh(master, opts, "mv scala-2.11.1 scala")
     #ssh(master, opts, "ln -f -s /usr/lib/scala-2.11.1/ /usr/lib/scala")
-    ssh(master, opts, "echo 'export PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> ~/.bash_profile")
+ 
+  ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
+  ssh(master, opts, "tar xvf scala-2.11.1.tgz")
+  ssh(master, opts, "mv scala-2.11.1 scala")
   
+  ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0'  >> ~/.bash_profile")
+  ssh(master, opts, "echo 'export SCALA_HOME=/root/scala' >> ~/.bash_profile")
+  ssh(master, opts, "echo 'export PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> ~/.bash_profile")
+  ssh(master, opts, "source ~/.bash_profile")
+       
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
-  ssh(master, opts, "wget http://www.apache.org/dist/spark/spark-1.0.0/spark-1.0.0-bin-hadoop1.tgz")
+  #ssh(master, opts, "wget http://www.apache.org/dist/spark/spark-1.0.0/spark-1.0.0-bin-hadoop1.tgz")
   ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
-  ssh(master, opts, "wget http://tachyon-project.org/downloads/tachyon-0.4.1-bin.tar.gz")
+  #ssh(master, opts, "wget http://tachyon-project.org/downloads/tachyon-0.4.1-bin.tar.gz")
   #ssh(master, opts, "git clone https://github.com/strat0sphere/spark-testing.git") #necessary scripts to install prerequisites on slaves
   ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") #seems shark has a dependency on hive
   
@@ -553,7 +555,6 @@ def setup_spark_cluster(master, opts):
   ssh(master, opts, "chmod u+x spark-euca/setup.sh")
   ssh(master, opts, "spark-euca/setup.sh")
   ssh(master, opts, "echo 'Starting-all...'")
-  ssh(master, opts, "source ~/.bash_profile")
   ssh(master, opts, "/root/spark/sbin/start-all.sh")
   #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
 
