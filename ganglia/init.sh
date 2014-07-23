@@ -24,3 +24,9 @@ for node in $SLAVES $OTHER_MASTERS; do
   ssh -t -t $SSH_OPTS root@$node "if ! rpm --quiet -q $GANGLIA_PACKAGES; then yum install -q -y $GANGLIA_PACKAGES; fi" & sleep 0.3
 done
 wait
+
+#Dirty hack - Repeat for ubuntu - If centos will just fail
+apt-get --yes --force-yes install ganglia-monitor rrdtool gmetad ganglia-webfrontend
+
+for node in $SLAVES $OTHER_MASTERS; do
+  ssh -t -t $SS_OPTS root@$node "apt-get --yes --force-yes install ganglia-monitor rrdtool gmetad ganglia-webfrontend" & sleep 0.3
