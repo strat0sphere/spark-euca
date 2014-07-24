@@ -119,6 +119,7 @@ echo "Setting up Spark on `hostname`..."
 #installing required packages to slave nodes
 echo "Installing required packages to slave nodes..."
 distribution=$1 #ubuntu or centos
+echo "distribution: $distribution"
 for node in $SLAVES $OTHER_MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
