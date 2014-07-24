@@ -6,7 +6,7 @@ case "$HADOOP_MAJOR_VERSION" in
     echo "Nothing to initialize for MapReduce in Hadoop 1"
     ;;
   2) 
-    wget http://s3.amazonaws.com/spark-related-packages/mr1-2.0.0-mr1-cdh4.2.0.tar.gz 
+    wget http://php.cs.ucsb.edu/spark-related-packages/mr1-2.0.0-mr1-cdh4.2.0.tar.gz 
     tar -xvzf mr1-*.tar.gz > /tmp/spark-euca_mapreduce.log
     rm mr1-*.tar.gz
     mv hadoop-2.0.0-mr1-cdh4.2.0/ mapreduce/

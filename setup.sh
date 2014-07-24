@@ -55,8 +55,7 @@ for master in $MASTERS; do
 echo $master
 ssh $SSH_OPTS $master echo -n &
 sleep 0.3
-#echo ++++++export http_proxy=http://$master:8080
-#ssh -t -t $SSH_OPTS root@$master "echo 'export http_proxy=http://$master:8080' >> ~/.bash_profile" & sleep 0.3
+
 done
 ssh $SSH_OPTS localhost echo -n &
 ssh $SSH_OPTS `hostname` echo -n &
@@ -100,20 +99,9 @@ wait
 echo "Running slave setup script on other cluster nodes..."
 for node in $SLAVES $OTHER_MASTERS; do
 echo $node
-#echo +++++++export http_proxy=http://$node:8080
-#ssh -t -t $SSH_OPTS root@$node "echo 'export http_proxy=http://$node:8080' >> ~/.bash_profile" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-slave.sh" & sleep 0.3
 done
 wait
-
-#echo "RSYNC'ing /root/spark-testing to other cluster nodes..."
-#for node in $SLAVES $OTHER_MASTERS; do
-#echo $node
-#rsync -e "ssh $SSH_OPTS" -az /root/spark-testing $node:/root &
-#scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
-#sleep 0.3
-#done
-#wait
 
 echo "Setting up Spark on `hostname`..."
 #installing required packages to slave nodes
@@ -121,15 +109,15 @@ echo "Installing required packages to slave nodes..."
 distribution=$1 #ubuntu or centos
 echo "distribution: $distribution"
 
-#for node in $SLAVES $OTHER_MASTERS; do
-#echo $node
-#ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
-#ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
-#ssh -t -t $SSH_OPTS root@$node "echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0' >> /etc/environment"
-#ssh -t -t $SSH_OPTS root@$node "echo 'SCALA_HOME=/root/scala' >> /etc/environment"
-#ssh -t -t $SSH_OPTS root@$node "echo 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment"
-#done
-#wait
+for node in $SLAVES $OTHER_MASTERS; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0' >> /etc/environment"
+ssh -t -t $SSH_OPTS root@$node "echo 'SCALA_HOME=/root/scala' >> /etc/environment"
+ssh -t -t $SSH_OPTS root@$node "echo 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment"
+done
+wait
 
 # Always include 'scala' module if it's not defined as a work around
 # for older versions of the scripts.
@@ -144,7 +132,6 @@ echo "Setting http_proxy for $master"
 ssh -t -t $SSH_OPTS root@$master "export http_proxy=http://$master:8080" & sleep 0.3
 done
 
-#export http_proxy=http://$master:8080
 # Install / Init module
 for module in $MODULES; do
 echo "Initializing $module"

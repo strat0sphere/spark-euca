@@ -29,52 +29,52 @@ else
   case "$SPARK_VERSION" in
     0.7.3)
       if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.7.3-prebuilt-hadoop1.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.7.3-prebuilt-hadoop1.tgz
       else
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.7.3-prebuilt-cdh4.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.7.3-prebuilt-cdh4.tgz
       fi
       ;;    
     0.8.0)
       if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.8.0-incubating-bin-hadoop1.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.8.0-incubating-bin-hadoop1.tgz
       else
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.8.0-incubating-bin-cdh4.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.8.0-incubating-bin-cdh4.tgz
       fi
       ;;    
     0.8.1)
       if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.8.1-incubating-bin-hadoop1.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.8.1-incubating-bin-hadoop1.tgz
       else
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.8.1-incubating-bin-cdh4.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.8.1-incubating-bin-cdh4.tgz
       fi
       ;;    
     0.9.0)
       if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.9.0-incubating-bin-hadoop1.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.9.0-incubating-bin-hadoop1.tgz
       else
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.9.0-incubating-bin-cdh4.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.9.0-incubating-bin-cdh4.tgz
       fi
       ;;
     0.9.1)
       if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.9.1-bin-hadoop1.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.9.1-bin-hadoop1.tgz
       else
-        wget http://s3.amazonaws.com/spark-related-packages/spark-0.9.1-bin-cdh4.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-0.9.1-bin-cdh4.tgz
       fi
       ;;
     1.0.0)
       if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
         #wget http://www.apache.org/dist/spark/spark-1.0.0/spark-1.0.0-bin-hadoop1.tgz
-	wget http://s3.amazonaws.com/spark-related-packages/spark-1.0.0-bin-hadoop1.tgz
+	wget http://php.cs.ucsb.edu/spark-related-packages/spark-1.0.0-bin-hadoop1.tgz
       else
-        wget http://s3.amazonaws.com/spark-related-packages/spark-1.0.0-bin-cdh4.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-1.0.0-bin-cdh4.tgz
       fi
       ;;
     1.0.1)
       if [[ "$HADOOP_MAJOR_VERSION" == "1" ]]; then
-        wget http://s3.amazonaws.com/spark-related-packages/spark-1.0.1-bin-hadoop1.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-1.0.1-bin-hadoop1.tgz
       else
-        wget http://s3.amazonaws.com/spark-related-packages/spark-1.0.1-bin-cdh4.tgz
+        wget http://php.cs.ucsb.edu/spark-related-packages/spark-1.0.1-bin-cdh4.tgz
       fi
       ;;
     *)

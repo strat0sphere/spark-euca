@@ -18,13 +18,14 @@ then
 else
   case "$TACHYON_VERSION" in
     0.3.0)
-      wget https://s3.amazonaws.com/Tachyon/tachyon-0.3.0-bin.tar.gz
+      wget http://php.cs.ucsb.edu/spark-related-packages/tachyon-0.3.0-bin.tar.gz
       ;;
     0.4.0)
-      wget https://s3.amazonaws.com/Tachyon/tachyon-0.4.0-bin.tar.gz
+      wget http://php.cs.ucsb.edu/spark-related-packages/tachyon-0.4.0-bin.tar.gz
       ;;
     0.4.1)
-	wget https://s3.amazonaws.com/Tachyon/tachyon-0.4.1-bin.tar.gz
+	wget http://php.cs.ucsb.edu/spark-related-packages/tachyon-0.4.1-bin.tar.gz
+	#wget https://s3.amazonaws.com/Tachyon/tachyon-0.4.1-bin.tar.gz
       	#wget --output-document="tachyon-0.4.1-bin.tar.gz" https://github.com/amplab/tachyon/archive/v0.4.1.tar.gz
       ;;
     0.5.0)
