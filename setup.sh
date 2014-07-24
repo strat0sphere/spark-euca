@@ -124,10 +124,9 @@ for node in $SLAVES $OTHER_MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$node "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0' >> ~/.bash_profile"
-ssh -t -t $SSH_OPTS root@$node "echo 'export SCALA_HOME=/root/scala' >> ~/.bash_profile"
-ssh -t -t $SSH_OPTS root@$node "echo 'export PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> ~/.bash_profile"
-ssh -t -t $SSH_OPTS root@$node "source ~/.bash_profile"
+ssh -t -t $SSH_OPTS root@$node "echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0' >> /etc/environment"
+ssh -t -t $SSH_OPTS root@$node "echo 'SCALA_HOME=/root/scala' >> /etc/environment"
+ssh -t -t $SSH_OPTS root@$node "echo 'PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment"
 done
 wait
 

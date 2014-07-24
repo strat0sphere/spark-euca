@@ -511,10 +511,9 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   ssh(master, opts, "tar xvf scala-2.11.1.tgz")
   ssh(master, opts, "mv scala-2.11.1 scala")
   
-  ssh(master, opts, "echo 'export JAVA_HOME=/usr/lib/jvm/java-1.7.0'  >> ~/.bash_profile")
-  ssh(master, opts, "echo 'export SCALA_HOME=/root/scala' >> ~/.bash_profile")
-  ssh(master, opts, "echo 'export PATH=$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> ~/.bash_profile")
-  ssh(master, opts, "source ~/.bash_profile")
+  ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
+  ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")
+  ssh(master, opts, "echo PATH='$PATH:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment")
        
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
   ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
