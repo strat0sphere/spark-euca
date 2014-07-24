@@ -519,7 +519,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
   #:q
   #ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
-  #ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") #seems shark has a dependency on hive
+  ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") #seems shark has a dependency on hive
   
   # NOTE: We should clone the repository before running deploy_files to
   # prevent ec2-variables.sh from being overwritten
