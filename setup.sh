@@ -143,7 +143,7 @@ echo "Setting http_proxy for $master"
 ssh -t -t $SSH_OPTS root@$master "export http_proxy=http://$master:8080" & sleep 0.3
 done
 
-export http_proxy=http://$master:8080
+#export http_proxy=http://$master:8080
 # Install / Init module
 for module in $MODULES; do
 echo "Initializing $module"
