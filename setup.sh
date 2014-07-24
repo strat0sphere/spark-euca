@@ -136,6 +136,8 @@ if [[ ! $MODULES =~ *scala* ]]; then
 MODULES=$(printf "%s\n%s\n" "scala" $MODULES)
 fi
 
+#Ensure that $http_proxy is set to be able to download packages from s3.amazonaws
+export http_proxy=http://$master:8080
 # Install / Init module
 for module in $MODULES; do
 echo "Initializing $module"
@@ -144,6 +146,8 @@ source $module/init.sh
 fi
 cd /root/spark-euca  # guard against init.sh changing the cwd
 done
+
+unset http_proxy #Unset to avoid issues caused with other wgets
 
 # Deploy templates
 # TODO: Move configuring templates to a per-module ?

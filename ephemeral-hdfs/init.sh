@@ -9,7 +9,8 @@ fi
 
 case "$HADOOP_MAJOR_VERSION" in
   1)
-    wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz
+    wget http://s3.amazonaws.com/spark-related-packages/hadoop-1.0.4.tar.gz
+    #wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz
     echo "Unpacking Hadoop"
     tar xvzf hadoop-1.0.4.tar.gz > /tmp/spark-euca_hadoop.log
     rm hadoop-*.tar.gz
@@ -17,7 +18,8 @@ case "$HADOOP_MAJOR_VERSION" in
     sed -i 's/-jvm server/-server/g' /root/ephemeral-hdfs/bin/hadoop
     ;;
   2) 
-    wget --output-document="hadoop-2.0.0-cdh4.2.0.tar.gz" http://archive.cloudera.com/cdh4/cdh/4/bigtop-jsvc-1.0.10-cdh4.2.0.tar.gz
+    wget http://s3.amazonaws.com/spark-related-packages/hadoop-2.0.0-cdh4.2.0.tar.gz
+    #wget --output-document="hadoop-2.0.0-cdh4.2.0.tar.gz" http://archive.cloudera.com/cdh4/cdh/4/bigtop-jsvc-1.0.10-cdh4.2.0.tar.gz
     echo "Unpacking Hadoop"
     tar xvzf hadoop-*.tar.gz > /tmp/spark-euca_hadoop.log
     rm hadoop-*.tar.gz

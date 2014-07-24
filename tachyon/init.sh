@@ -24,7 +24,11 @@ else
       wget https://s3.amazonaws.com/Tachyon/tachyon-0.4.0-bin.tar.gz
       ;;
     0.4.1)
-      	wget --output-document="tachyon-0.4.1-bin.tar.gz" https://github.com/amplab/tachyon/archive/v0.4.1.tar.gz
+	wget https://s3.amazonaws.com/Tachyon/tachyon-0.4.1-bin.tar.gz
+      	#wget --output-document="tachyon-0.4.1-bin.tar.gz" https://github.com/amplab/tachyon/archive/v0.4.1.tar.gz
+      ;;
+    0.5.0)
+	#file already in directory
       ;;
     *)
       echo "ERROR: Unknown Tachyon version"
