@@ -120,15 +120,16 @@ echo "Setting up Spark on `hostname`..."
 echo "Installing required packages to slave nodes..."
 distribution=$1 #ubuntu or centos
 echo "distribution: $distribution"
-for node in $SLAVES $OTHER_MASTERS; do
-echo $node
-ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$node "echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0' >> /etc/environment"
-ssh -t -t $SSH_OPTS root@$node "echo 'SCALA_HOME=/root/scala' >> /etc/environment"
-ssh -t -t $SSH_OPTS root@$node "echo 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment"
-done
-wait
+
+#for node in $SLAVES $OTHER_MASTERS; do
+#echo $node
+#ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
+#ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
+#ssh -t -t $SSH_OPTS root@$node "echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0' >> /etc/environment"
+#ssh -t -t $SSH_OPTS root@$node "echo 'SCALA_HOME=/root/scala' >> /etc/environment"
+#ssh -t -t $SSH_OPTS root@$node "echo 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment"
+#done
+#wait
 
 # Always include 'scala' module if it's not defined as a work around
 # for older versions of the scripts.
@@ -137,6 +138,11 @@ MODULES=$(printf "%s\n%s\n" "scala" $MODULES)
 fi
 
 #Ensure that $http_proxy is set to be able to download packages from s3.amazonaws
+for master in $MASTERS; do
+echo "Setting http_proxy for $master"
+ssh -t -t $SSH_OPTS root@$master "export http_proxy=http://$master:8080" & sleep 0.3
+done
+
 export http_proxy=http://$master:8080
 # Install / Init module
 for module in $MODULES; do
@@ -147,7 +153,11 @@ fi
 cd /root/spark-euca  # guard against init.sh changing the cwd
 done
 
-unset http_proxy #Unset to avoid issues caused with other wgets
+#Unset to avoid issues caused with other wgets
+for master in $MASTERS; do
+echo "Unsetting http_proxy for $master"
+ssh -t -t $SSH_OPTS root@$master "unset http_proxy" & sleep 0.3
+done
 
 # Deploy templates
 # TODO: Move configuring templates to a per-module ?
