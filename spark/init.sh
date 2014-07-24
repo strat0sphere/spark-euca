@@ -90,7 +90,7 @@ else
   mv `ls -d spark-* | grep -v euca` spark
   ls -al
   #Makes sure the name is changed
-  mv spark-1.0.0-bin-hadoop1 spark #If the above works this should be redundant and fail
+  #mv spark-1.0.0-bin-hadoop1 spark #If the above works this should be redundant and fail
 fi
 
 popd

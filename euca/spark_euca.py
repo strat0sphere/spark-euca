@@ -74,7 +74,7 @@ def parse_args():
            "slaves across multiple (an additional $0.01/Gb for bandwidth" +
            "between zones applies)")
   parser.add_option("-a", "--ami", help="Amazon Machine Image ID to use")
-  parser.add_option("-v", "--spark-version", default="1.0.0",
+  parser.add_option("-v", "--spark-version", default="1.0.1",
       help="Version of Spark to use: 'X.Y.Z' or a specific git hash")
   parser.add_option("--spark-git-repo",
       default="https://github.com/apache/spark",
@@ -178,7 +178,7 @@ def is_active(instance):
 # Return correct versions of Spark and Shark, given the supplied Spark version
 def get_spark_shark_version(opts):
   spark_shark_map = {"0.7.3": "0.7.1", "0.8.0": "0.8.0", "0.8.1": "0.8.1", "0.9.0": "0.9.0", 
-    "0.9.1": "0.9.1", "1.0.0": "1.0.0"}
+    "0.9.1": "0.9.1", "1.0.0": "1.0.0", "1.0.1":"1.0.1"}
   version = opts.spark_version.replace("v", "")
   if version not in spark_shark_map:
     print >> stderr, "Don't know about Spark version: %s" % version
@@ -493,7 +493,8 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #ssh(master, opts, "sudo cp /home/ubuntu/.ssh/authorized_keys /root/.ssh")
   #Fixing issue with disallowing logins after updateing pam
   if opts.os_type == "centos":
-      ssh(master, opts, "echo 'exclude=pam*' >> /etc/yum.conf")
+      #ssh(master, opts, "echo 'exclude=pam*' >> /etc/yum.conf")
+      ssh(master, opts, "setenforce 0") #turns off selinux without a reboot
       
   ssh(master, opts, pkg_mngr + " update")
   #ssh(master, opts, pkg_mngr + " install wget")
