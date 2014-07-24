@@ -107,7 +107,6 @@ echo "Setting up Spark on `hostname`..."
 #installing required packages to slave nodes
 echo "Installing required packages to slave nodes..."
 distribution=$1 #ubuntu or centos
-echo "distribution: $distribution"
 
 for node in $SLAVES $OTHER_MASTERS; do
 echo $node
@@ -125,13 +124,6 @@ if [[ ! $MODULES =~ *scala* ]]; then
 MODULES=$(printf "%s\n%s\n" "scala" $MODULES)
 fi
 
-#Ensure that $http_proxy is set to be able to download packages from s3.amazonaws
-echo "Setting http_proxy to masters"
-for master in $MASTERS; do
-echo "Setting http_proxy for $master"
-ssh -t -t $SSH_OPTS root@$master "export http_proxy=http://$master:8080" & sleep 0.3
-done
-
 # Install / Init module
 for module in $MODULES; do
 echo "Initializing $module"
@@ -139,13 +131,6 @@ if [[ -e $module/init.sh ]]; then
 source $module/init.sh
 fi
 cd /root/spark-euca  # guard against init.sh changing the cwd
-done
-
-echo "Unsetting http_proxy to masters"
-#Unset to avoid issues caused with other wgets
-for master in $MASTERS; do
-echo "Unsetting http_proxy for $master"
-ssh -t -t $SSH_OPTS root@$master "unset http_proxy" & sleep 0.3
 done
 
 # Deploy templates
