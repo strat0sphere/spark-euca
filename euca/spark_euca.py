@@ -486,7 +486,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   if opts.os_type == "ubuntu":
       pkg_mngr = "apt-get --yes --force-yes"
   elif opts.os_type == "centos":
-      pkg_mngr = "yum -y"
+      pkg_mngr = "yum --assumeyes"
      
 
   #ssh(master, opts, "sudo su")
