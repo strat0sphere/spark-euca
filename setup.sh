@@ -54,7 +54,7 @@ source /root/spark-euca/setup-slave.sh
 echo "SSH'ing to master machine(s) to approve key(s)..."
 for master in $MASTERS; do
 echo $master
-ssh $SHH_OPTS $master echo "PUBLIC_DNS=$master" >> /etc/environment
+ssh $SHH_OPTS $master "echo 'PUBLIC_DNS=$master' >> /etc/environment"
 ssh $SSH_OPTS $master echo -n &
 sleep 0.3
 
