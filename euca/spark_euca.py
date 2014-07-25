@@ -511,6 +511,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
   ssh(master, opts, "tar xvf scala-2.11.1.tgz")
   ssh(master, opts, "mv scala-2.11.1 scala")
+  ssh(master, opts, "rm scala-2.11.1.tgz")
   
   ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
   ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")
@@ -519,7 +520,8 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
   #:q
   #ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
-  ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") #seems shark has a dependency on hive
+  ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") # shark 0.8.* needs hive and the shark/setup.sh script tries to rsync hive* regardless of the version used
+
   
   # NOTE: We should clone the repository before running deploy_files to
   # prevent ec2-variables.sh from being overwritten
