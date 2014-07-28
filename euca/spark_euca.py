@@ -397,11 +397,6 @@ def launch_cluster(conn, opts, cluster_name):
         print "Launched %d slaves in %s, regid = %s" % (num_slaves_this_zone,
                                                         zone, slave_res.id)
         
-        if opts.vol_size > 0:
-            print "Creating volume with size ", opts.vol_size, " in zone: ", zone
-            vol = conn.create_volume(opts.vol_size, zone)
-            print "Attaching volume with id ", vol.id, " to slave instance with id: ", slave_res.id
-            conn.attach_volume (vol.id, slave_res.id, "/dev/vdb")
       i += 1
 
   # Launch or resume masters
@@ -427,12 +422,6 @@ def launch_cluster(conn, opts, cluster_name):
                            user_data = opts.user_data)
     master_nodes = master_res.instances
     print "Launched master in %s, regid = %s" % (zone, master_res.id)
-    
-    if opts.vol_size > 0:
-        print "Creating volume with size ", opts.vol_size, " in zone: ", zone
-        vol = conn.create_volume(opts.vol_size, zone)
-        print "Attaching colume with id ", vol.id, " to master instance with id: ", master_res.id
-        conn.attach_volume (vol.id, master_res.id, "/dev/vdb")
 
   # Return all the instances
   return (master_nodes, slave_nodes)
@@ -780,7 +769,15 @@ def get_partition(total, num_partitions, current_partitions):
     num_slaves_this_zone += 1
   return num_slaves_this_zone
 
-
+def attach_volumes(conn, nodes, vol_size, device_name="/dev/vdb"):
+    for node in nodes:
+        print "Creating volume with size ", vol_size, " in zone: ", node.placement
+        vol = conn.create_volume(vol_size, node.placement)
+        print "Attaching volume with id ", vol.id, " to instance with id: ", node.id
+        status = conn.attach_volume (vol.id, node.id, device_name)
+        print "Status = ", status
+        
+        
 def real_main():
   (opts, action, cluster_name) = parse_args()
   try:
@@ -817,6 +814,9 @@ def real_main():
       (master_nodes, slave_nodes) = launch_cluster(
           conn, opts, cluster_name)
       wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes)
+      if opts.vol_size > 0:
+          attach_volumes(conn, master_nodes, opts.vol_size)
+          attach_volumes(conn, slave_nodes, opts.vol_size)
     setup_cluster(conn, master_nodes, slave_nodes, opts, True)
 
   elif action == "destroy":
