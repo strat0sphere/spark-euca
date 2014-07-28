@@ -91,6 +91,9 @@ def parse_args():
       help="Attach a new EBS volume of size SIZE (in GB) to each node as " +
            "/vol. The volumes will be deleted when the instances terminate. " +
            "Only possible on EBS-backed AMIs.")
+  parser.add_option("--vol-size", metavar="SIZE", type="int", default=0,
+      help="Attach a new volume of size SIZE (in GB) to each node as " +
+           "/vol.")
   parser.add_option("--swap", metavar="SWAP", type="int", default=1024,
       help="Swap space to set up per node, in MB (default: 1024)")
   parser.add_option("--spot-price", metavar="PRICE", type="float",
@@ -393,13 +396,19 @@ def launch_cluster(conn, opts, cluster_name):
         slave_nodes += slave_res.instances
         print "Launched %d slaves in %s, regid = %s" % (num_slaves_this_zone,
                                                         zone, slave_res.id)
+        
+        if opts.vol_size > 0:
+            print "Creating volume with size ", opts.vol_size, " in zone: ", zone
+            vol = conn.create_volume(opts.vol_size, zone)
+            print "Attaching volume with id ", vol.id, " to slave instance with id: ", slave_res.id
+            conn.attach_volume (vol.id, slave_res.id, "/dev/vdb")
       i += 1
 
   # Launch or resume masters
   if existing_masters:
     print "Starting master..."
     for inst in existing_masters:
-      if inst.state not in ["shutting-down", "terminated"]:
+      if inst.state not in ["shutting-down", "terminated"]:  
         inst.start()
     master_nodes = existing_masters
   else:
@@ -418,6 +427,12 @@ def launch_cluster(conn, opts, cluster_name):
                            user_data = opts.user_data)
     master_nodes = master_res.instances
     print "Launched master in %s, regid = %s" % (zone, master_res.id)
+    
+    if opts.vol_size > 0:
+        print "Creating volume with size ", opts.vol_size, " in zone: ", zone
+        vol = conn.create_volume(opts.vol_size, zone)
+        print "Attaching colume with id ", vol.id, " to master instance with id: ", master_res.id
+        conn.attach_volume (vol.id, master_res.id, "/dev/vdb")
 
   # Return all the instances
   return (master_nodes, slave_nodes)
