@@ -26,12 +26,13 @@ if [[ -e /dev/vdb ]]; then
   echo "/dev/vdb exists!"
   # Check if /dev/vdb is already formatted
   if ! blkid /dev/vdb; then
-    echo "/dev/vdb already formatted - creating /vol!"
+    echo "/dev/vdb not formatted - Formatting..."
     mkdir /vol
     if mkfs.ext3 -q /dev/vdb; then
       echo "Mounting /dev/vdb to /vol"
       #mount -o $XFS_MOUNT_OPTS /dev/vdb /vol
-      mount -o $EXT3_MOUNT_OPTS /dev/vdb /vol
+      e2label /dev/vdb /attached_vol
+      mount -L /attached_vol /vol
       chmod -R a+w /vol
     else
       # mkfs.xfs is not installed on this machine or has failed;
@@ -41,13 +42,14 @@ if [[ -e /dev/vdb ]]; then
       rmdir /vol
     fi
   else
-    echo "EBS volume exists and already formatted"
+    echo "Volume exists and already formatted"
     # EBS volume is already formatted. Mount it if its not mounted yet.
     if ! grep -qs '/vol' /proc/mounts; then
       echo "Creating /vol and mounting /dev/vdb"
       mkdir /vol
       #mount -o $XFS_MOUNT_OPTS /dev/vdb /vol
-      mount -o $EXT3_MOUNT_OPTS /dev/vdb /vol
+      e2label /dev/vdb /attached_vol
+      mount -L /attached_vol /vol
       chmod -R a+w /vol
     fi
   fi

@@ -777,10 +777,11 @@ def attach_volumes(conn, nodes, vol_size, device_name="/dev/vdb"):
         print "Creating volume with size ", vol_size, " in zone: ", node.placement
         vol = conn.create_volume(vol_size, node.placement)
         print "Attaching volume with id ", vol.id, " to instance with id: ", node.id
-        status = conn.attach_volume (vol.id, node.id, device_name)
+        time.sleep(10)
+        status = conn.attach_volume(vol.id, node.id, device_name)
+        time.sleep(10)
         print "Status = ", status
-        
-        
+
 def real_main():
   (opts, action, cluster_name) = parse_args()
   try:
@@ -818,8 +819,10 @@ def real_main():
       wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes)
       if opts.vol_size > 0:
           attach_volumes(conn, master_nodes, opts.vol_size)
+          time.sleep(10)
           attach_volumes(conn, slave_nodes, opts.vol_size)
-    #setup_cluster(conn, master_nodes, slave_nodes, opts, True)
+          time.sleep(10)
+    setup_cluster(conn, master_nodes, slave_nodes, opts, True)
 
   elif action == "destroy":
     response = raw_input("Are you sure you want to destroy the cluster " +
