@@ -19,6 +19,7 @@ echo "Setting up slave on `hostname`..."
 # Mount options to use for ext3 and xfs disks (the ephemeral disks
 # are ext3, but we use xfs for EBS volumes to format them faster)
 XFS_MOUNT_OPTS="defaults,noatime,nodiratime,allocsize=8m"
+EXT3_MOUNT_OPTS=""
 
 # Format and mount EBS volume (/dev/vdb) as /vol if the device exists
 if [[ -e /dev/vdb ]]; then
@@ -27,9 +28,10 @@ if [[ -e /dev/vdb ]]; then
   if ! blkid /dev/vdb; then
     echo "/dev/vdb already formatted - creating /vol!"
     mkdir /vol
-    if mkfs.xfs -q /dev/vdb; then
+    if mkfs.ext3 -q /dev/vdb; then
       echo "Mounting /dev/vdb to /vol"
-      mount -o $XFS_MOUNT_OPTS /dev/vdb /vol
+      #mount -o $XFS_MOUNT_OPTS /dev/vdb /vol
+      mount -o $EXT3_MOUNT_OPTS /dev/vdb /vol
       chmod -R a+w /vol
     else
       # mkfs.xfs is not installed on this machine or has failed;
@@ -44,7 +46,8 @@ if [[ -e /dev/vdb ]]; then
     if ! grep -qs '/vol' /proc/mounts; then
       echo "Creating /vol and mounting /dev/vdb"
       mkdir /vol
-      mount -o $XFS_MOUNT_OPTS /dev/vdb /vol
+      #mount -o $XFS_MOUNT_OPTS /dev/vdb /vol
+      mount -o $EXT3_MOUNT_OPTS /dev/vdb /vol
       chmod -R a+w /vol
     fi
   fi
