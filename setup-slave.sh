@@ -20,16 +20,16 @@ echo "Setting up slave on `hostname`..."
 # are ext3, but we use xfs for EBS volumes to format them faster)
 XFS_MOUNT_OPTS="defaults,noatime,nodiratime,allocsize=8m"
 
-# Format and mount EBS volume (/dev/sdv) as /vol if the device exists
-if [[ -e /dev/sdv ]]; then
-  echo "/dev/sdv exists!"
-  # Check if /dev/sdv is already formatted
-  if ! blkid /dev/sdv; then
-    echo "/dev/sdv already formatted - creating /vol!"
+# Format and mount EBS volume (/dev/vdb) as /vol if the device exists
+if [[ -e /dev/vdb ]]; then
+  echo "/dev/vdb exists!"
+  # Check if /dev/vdb is already formatted
+  if ! blkid /dev/vdb; then
+    echo "/dev/vdb already formatted - creating /vol!"
     mkdir /vol
-    if mkfs.xfs -q /dev/sdv; then
-      echo "Mounting /dev/sdv to /vol"
-      mount -o $XFS_MOUNT_OPTS /dev/sdv /vol
+    if mkfs.xfs -q /dev/vdb; then
+      echo "Mounting /dev/vdb to /vol"
+      mount -o $XFS_MOUNT_OPTS /dev/vdb /vol
       chmod -R a+w /vol
     else
       # mkfs.xfs is not installed on this machine or has failed;
@@ -42,9 +42,9 @@ if [[ -e /dev/sdv ]]; then
     echo "EBS volume exists and already formatted"
     # EBS volume is already formatted. Mount it if its not mounted yet.
     if ! grep -qs '/vol' /proc/mounts; then
-      echo "Creating /vol and mounting /dev/sdv"
+      echo "Creating /vol and mounting /dev/vdb"
       mkdir /vol
-      mount -o $XFS_MOUNT_OPTS /dev/sdv /vol
+      mount -o $XFS_MOUNT_OPTS /dev/vdb /vol
       chmod -R a+w /vol
     fi
   fi
