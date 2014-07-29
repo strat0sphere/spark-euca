@@ -525,7 +525,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #:q
   #ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
   ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") # shark 0.8.* needs hive and the shark/setup.sh script tries to rsync hive* regardless of the version used
-  
+  ssh(master, opts, pkg_mngr + " install libgfortran3") #Required to run MLlib
   #If we want to format the attached volume with xfs the following should not be in comments & prepare-slaves.sh should be modified as well
   #if opts.vol_size > 0:
   #    ssh(master, opts, pkg_mngr + " install xfsprogs")
