@@ -1,3 +1,7 @@
+Scripts on this repo are under current development and constantly change- Might not work for yo    ur system!*
+Has been tested with boto version 2.31.1
+Eucalyptus is API compatible with Amazon EC2. So, the scripts are a modified version of the spar    k-ec2 tools that you can find here: https://github.com/mesos/spark-ec2i
+
 spark-euca
 =========
 

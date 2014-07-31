@@ -1,3 +1,5 @@
+*Scripts on this repo are under current development and constantly change- Might not work for your system!*
 This folder contains a script, spark-euca, for launching Spark clusters on
-Eucalyptus.
+Eucalyptus. 
 Has been tested with boto version 2.31.1
+Eucalyptus is API compatible with Amazon EC2. So, the scripts are a modified version of the spark-ec2 tools that you can find here: https://github.com/mesos/spark-ec2  
