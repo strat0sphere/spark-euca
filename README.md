@@ -6,9 +6,7 @@ spark-euca
 =========
 
 This repository contains the set of scripts used to setup a Spark cluster on
-EC2. These scripts are intended to be used by the default Spark AMI and is *not*
-expected to work on other AMIs. If you wish to start a cluster using Spark,
-please refer to http://spark-project.org/docs/latest/ec2-scripts.html 
+Eucalyptus.  It requires that Eycaluptus is already installed and then creates the instances to run your cluster according to the EMI you specify.
 
 ### Details
 
