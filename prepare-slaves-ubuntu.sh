@@ -12,3 +12,6 @@ rm scala-2.11.1.tgz
 #apt-get --yes --force-yes install xfsprogs
 
 apt-get --yes --force-yes install libgfortran3
+#apt-get install libatlas3-base libopenblas-base
+#update-alternatives --config libblas.so.3
+#update-alternatives --config liblapack.so.3
