@@ -1,23 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+"""
+example run;
+./spark-euca -
+i ~/vagrant_euca/stratos.pem 
+-k stratos 
+-s 1 
+-a m1.small 
+--no-ganglia 
+--user-data ~/vagrant_euca/clear-key-ubuntu.sh 
+--os-type ubuntu 
+launch spark-test
+"""
 
 from __future__ import with_statement
 
@@ -525,7 +520,13 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #:q
   #ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
   ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") # shark 0.8.* needs hive and the shark/setup.sh script tries to rsync hive* regardless of the version used
-  ssh(master, opts, pkg_mngr + " install libgfortran3") #Required to run MLlib
+  
+  #Required packets to run MLlib
+  ssh(master, opts, pkg_mngr + " install gfortran")
+  ssh(master, opts, pkg_mngr + " install libgfortran3")
+  ssh(master, opts, pkg_mngr + " libatlas3gf-base libopenblas-base")
+  ssh(master, opts, "update-alternatives --config libblas.so.3gf --skip-auto")
+  ssh(master, opts, "update-alternatives --config liblapack.so.3gf --skip-auto")
   #If we want to format the attached volume with xfs the following should not be in comments & prepare-slaves.sh should be modified as well
   #if opts.vol_size > 0:
   #    ssh(master, opts, pkg_mngr + " install xfsprogs")
@@ -785,7 +786,7 @@ def attach_volumes(conn, nodes, vol_size, device_name="/dev/vdb"):
 def real_main():
   (opts, action, cluster_name) = parse_args()
   try:
-    euca_ec2_host="eucalyptus.race.cs.ucsb.edu"
+    euca_ec2_host="eucalyptus.race.cs.ucsb.edu" #TODO: Replace with opts.euca-ec2-host
     euca_id=os.getenv('AWS_ACCESS_KEY')
     euca_key=os.getenv('AWS_SECRET_KEY')
     euca_region = RegionInfo(name="eucalyptus", endpoint=euca_ec2_host)
