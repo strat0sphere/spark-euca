@@ -7,7 +7,7 @@ example run;
 i ~/vagrant_euca/stratos.pem 
 -k stratos 
 -s 1 
--a m1.small 
+-a x2.2xlarge 
 --no-ganglia 
 --user-data ~/vagrant_euca/clear-key-ubuntu.sh 
 --os-type ubuntu 
