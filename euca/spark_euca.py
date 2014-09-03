@@ -4,14 +4,14 @@
 """
 example run;
 ./spark-euca -
-i ~/vagrant_euca/stratos.pem 
--k stratos 
+i xxxx.pem 
+-k xxxx 
 -s 1 
 -a-56CB3EE9
 -t x2.2xlarge 
 --no-ganglia 
---user-data ~/vagrant_euca/clear-key-ubuntu.sh 
---os-type ubuntu 
+--os-type ubuntu
+--user-data zzzz.sh  
 launch spark-test
 """
 
