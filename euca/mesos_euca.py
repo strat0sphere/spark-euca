@@ -539,7 +539,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   
   # NOTE: We should clone the repository before running deploy_files to
   # prevent ec2-variables.sh from being overwritten
-  ssh(master, opts, "rm -rf spark-euca && git clone https://github.com/strat0sphere/spark-euca.git")
+  ssh(master, opts, "rm -rf spark-euca && git clone -b mesos https://github.com/strat0sphere/spark-euca.git")
   
   print "Deploying files to master..."
   deploy_files(conn, "deploy.generic", opts, master_nodes, slave_nodes, modules)
@@ -572,6 +572,7 @@ def setup_mesos_cluster(master, opts):
   #ssh(master, opts, "chmod u+x ~/spark-testing/setup.sh")
   #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
   ssh(master, opts, "chmod u+x spark-euca/setup-mesos.sh")
+  #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
   #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
   #ssh(master, opts, "spark-euca/setup-mesos.sh " + opts.os_type)
   #ssh(master, opts, "echo 'Starting-all...'")
