@@ -389,7 +389,8 @@ def launch_cluster(conn, opts, cluster_name):
     print "Launched master in %s, regid = %s" % (zone, master_res.id)
     
   # Launch ZooKeeper nodes if required
-  if opts.ft > 1:
+  if int(opts.ft) > 1:
+    print "Running " + opts.ft + " zookeepers"
     zoo_res = image.run(key_name = opts.key_pair,
                         security_groups = [zoo_group],
                         instance_type = opts.instance_type,
@@ -578,7 +579,7 @@ def setup_mesos_cluster(master, opts):
   ssh(master, opts, "chmod u+x spark-euca/setup-mesos.sh")
   #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
   #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
-  #ssh(master, opts, "spark-euca/setup-mesos.sh " + opts.os_type)
+  ssh(master, opts, "spark-euca/setup-mesos.sh " + opts.os_type)
   #ssh(master, opts, "echo 'Starting-all...'")
   #ssh(master, opts, "/root/spark/sbin/start-all.sh")
   #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
@@ -874,10 +875,11 @@ def real_main():
         inst.terminate()
       print "Terminating slaves..."
       for inst in slave_nodes:
-        print "Terminating slave intance... ", inst   
+        print "Terminating slave instance... ", inst   
         inst.terminate()
-      print "Terminating zoo...", inst
+      print "Terminating zookeepers..."
       for inst in zoo_nodes:
+          print "Terminating zoo instance...", inst
           inst.terminate()
 
       # Delete security groups as well
