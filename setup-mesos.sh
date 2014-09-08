@@ -18,7 +18,7 @@ PRIVATE_DNS=hostname
 echo $PRIVATE_DNS > /etc/hostname
 export HOSTNAME=$PRIVATE_DNS  # Fix the bash built-in hostname variable too
 
-echo "Setting up Spark on `hostname`..."
+echo "Setting up Mesos on `hostname`..."
 
 # Set up the masters, slaves, etc files based on cluster env variables
 echo "$MASTERS" > masters

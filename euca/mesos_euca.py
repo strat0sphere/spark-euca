@@ -426,7 +426,7 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
         master_nodes.append(inst)
       elif group_name == cluster_name + "-slaves":
         slave_nodes.append(inst)
-      elif group_name == cluster_name + "-zoos":
+      elif group_name == cluster_name + "-zoo":
         zoo_nodes.append(inst)
                   
   if any((master_nodes, slave_nodes, zoo_nodes)):
@@ -550,6 +550,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   print "Running setup on master..."
   ssh(master, opts, "echo '****************'; ls -al")
   
+  print "opts.installation_type: " + opts.installation_type
   if(opts.installation_type == "mesos"):
       setup_mesos_cluster(master, opts)
   elif(opts.installation_type == "spark-standalone"):
@@ -875,10 +876,8 @@ def real_main():
       for inst in slave_nodes:
         print "Terminating slave intance... ", inst   
         inst.terminate()
-        
-      if zoo_nodes != []:
-        print "Terminating zoo..."
-        for inst in zoo_nodes:
+      print "Terminating zoo...", inst
+      for inst in zoo_nodes:
           inst.terminate()
 
       # Delete security groups as well
@@ -970,6 +969,12 @@ def real_main():
     for inst in master_nodes:
       if inst.state not in ["shutting-down", "terminated"]:
         inst.start()
+    if zoo_nodes != []:
+      print "Starting zoo..."
+      for inst in zoo_nodes:
+        if inst.state not in ["shutting-down", "terminated"]:
+          inst.start()
+          
     wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes, zoo_nodes)
     setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, False)
 
