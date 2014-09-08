@@ -123,7 +123,10 @@ def parse_args():
   parser.add_option("--os-type", type="string", default="",
       help="Type of the OS (ubuntu/ centos)"),
   parser.add_option("--installation-type", type="string", default="spark-standalone",
-      help="Type of installation (spark-standalone /  mesos)")
+      help="Type of installation (spark-standalone /  mesos)"),
+  parser.add_option("-f", "--ft", metavar="NUM_MASTERS", default="1", 
+      help="Number of masters to run. Default is 1. Greater values " + 
+           "make Mesos run in fault-tolerant mode with ZooKeeper.")
 
 
 
