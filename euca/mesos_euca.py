@@ -444,7 +444,7 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
 
 # Deploy configuration files and run setup scripts on a newly launched
 # or started EC2 cluster.
-def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
+def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_key):
   master = master_nodes[0].public_dns_name
   if deploy_ssh_key:
     print "Generating cluster's SSH key on master..."
@@ -545,7 +545,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   ssh(master, opts, "rm -rf spark-euca && git clone -b mesos https://github.com/strat0sphere/spark-euca.git")
   
   print "Deploying files to master..."
-  deploy_files(conn, "deploy.generic", opts, master_nodes, slave_nodes, modules)
+  deploy_files(conn, "deploy.generic", opts, master_nodes, slave_nodes, zoo_nodes, modules)
 
   print "Running setup on master..."
   ssh(master, opts, "echo '****************'; ls -al")
@@ -852,13 +852,13 @@ def real_main():
           conn, opts, cluster_name)
     else:
       (master_nodes, slave_nodes, zoo_nodes) = launch_cluster(conn, opts, cluster_name)
-      wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes)
+      wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes, zoo_nodes)
       if opts.vol_size > 0:
           attach_volumes(conn, master_nodes, opts.vol_size)
           time.sleep(10)
           attach_volumes(conn, slave_nodes, opts.vol_size)
           time.sleep(10)
-    setup_cluster(conn, master_nodes, slave_nodes, opts, True)
+    setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, True)
 
   elif action == "destroy":
     response = raw_input("Are you sure you want to destroy the cluster " +
@@ -970,8 +970,8 @@ def real_main():
     for inst in master_nodes:
       if inst.state not in ["shutting-down", "terminated"]:
         inst.start()
-    wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes)
-    setup_cluster(conn, master_nodes, slave_nodes, opts, False)
+    wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes, zoo_nodes)
+    setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, False)
 
   else:
     print >> stderr, "Invalid action: %s" % action
