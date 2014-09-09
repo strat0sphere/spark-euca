@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt-get --yes --force-yes install build-essential
-apt-get --yes --force-yes install openjdk-6-jdk
+#apt-get --yes --force-yes install openjdk-6-jdk
 apt-get --yes --force-yes install python-dev python-boto
 apt-get --yes --force-yes install libcurl4-nss-dev
 apt-get --yes --force-yes install libsasl2-dev
@@ -32,6 +32,8 @@ make
 #make check
 
 # Install (***Optional***).
-make install
+mkdir /root/mesos-installation/
+make install --prefix /root/mesos-installation/
 
-#/root/spark-euca/copy-dir /root/mesos
+/root/spark-euca/copy-dir /root/mesos
+/root/spark-euca/copy-dir /root/mesos-installation/

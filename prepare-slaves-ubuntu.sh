@@ -16,5 +16,5 @@ apt-get --yes --force-yes install libgfortran3
 #update-alternatives --config libblas.so.3
 #update-alternatives --config liblapack.so.3
 
-.~/spark-euca/mesos/setup.sh #FIX this. Change target dirs and just copy compiled files to slaves instead of running setup again
+#.~/spark-euca/mesos/setup.sh #FIX this. Change target dirs and just copy compiled files to slaves instead of running setup again
 

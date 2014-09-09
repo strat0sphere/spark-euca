@@ -78,5 +78,5 @@ echo 1 > /proc/sys/vm/overcommit_memory
 
 # Add github to known hosts to get git@github.com clone to work
 # TODO(shivaram): Avoid duplicate entries ?
-cat /root/spark-euca/github.hostkey >> /root/.ssh/known_hosts
+#cat /root/spark-euca/github.hostkey >> /root/.ssh/known_hosts
 

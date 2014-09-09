@@ -270,7 +270,7 @@ def launch_cluster(conn, opts, cluster_name):
     master_group.authorize(src_group=zoo_group)
     master_group.authorize('tcp', 22, 22, '0.0.0.0/0')
     master_group.authorize('tcp', 8080, 8081, '0.0.0.0/0')
-    master_group.authorize('tcp', 5050, 5050, '0.0.0.0/0')
+    master_group.authorize('tcp', 5050, 5051, '0.0.0.0/0')
     master_group.authorize('tcp', 19999, 19999, '0.0.0.0/0')
     master_group.authorize('tcp', 50030, 50030, '0.0.0.0/0')
     master_group.authorize('tcp', 50070, 50070, '0.0.0.0/0')
@@ -285,7 +285,7 @@ def launch_cluster(conn, opts, cluster_name):
     slave_group.authorize(src_group=zoo_group)
     slave_group.authorize('tcp', 22, 22, '0.0.0.0/0')
     slave_group.authorize('tcp', 8080, 8081, '0.0.0.0/0')
-    slave_group.authorize('tcp', 5050, 5050, '0.0.0.0/0')
+    slave_group.authorize('tcp', 5050, 5051, '0.0.0.0/0')
     slave_group.authorize('tcp', 50060, 50060, '0.0.0.0/0')
     slave_group.authorize('tcp', 50075, 50075, '0.0.0.0/0')
     slave_group.authorize('tcp', 60060, 60060, '0.0.0.0/0')
@@ -509,6 +509,8 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
   ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")
   ssh(master, opts, "echo PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment")
+  #   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
+  ssh(master, opts, "echo LD_LIBRARY_PATH='/root/mesos/build/src/.libs/' >> /etc/environment")
        
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
   #:q
