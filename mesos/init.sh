@@ -14,5 +14,4 @@ tar xvzf mesos-$MESOS_VERSION.tar.gz > /tmp/spark-euca_mesos.log
 rm mesos-$MESOS_VERSION.tar.gz
 mv mesos-$MESOS_VERSION/ mesos/
 
-/root/spark-euca/copy-dir /root/mesos
 popd

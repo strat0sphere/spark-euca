@@ -1,5 +1,5 @@
 #!/bin/bash
-
+apt-get update
 apt-get --yes --force-yes install build-essential
 #apt-get --yes --force-yes install openjdk-6-jdk
 apt-get --yes --force-yes install python-dev python-boto
@@ -17,7 +17,7 @@ fi
 
 #Building Mesos
 # Change working directory.
-cd mesos
+cd /root/mesos
 
 # Bootstrap (***Skip this if you are not building from git repo***).
 #./bootstrap
@@ -25,15 +25,15 @@ cd mesos
 # Configure and build.
 mkdir build
 cd build
-../configure
+../configure --prefix=/root/mesos-installation/
 make
-
-# Run test suite -- Also builds example frameworks
-#make check
 
 # Install (***Optional***).
 mkdir /root/mesos-installation/
-make install --prefix /root/mesos-installation/
+make install
+
+# Run test suite -- Also builds example frameworks
+make check #Run make check at the end because some tests fail
 
 /root/spark-euca/copy-dir /root/mesos
 /root/spark-euca/copy-dir /root/mesos-installation/
