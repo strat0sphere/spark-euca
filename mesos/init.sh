@@ -12,6 +12,6 @@ wget http://archive.apache.org/dist/mesos/$MESOS_VERSION/mesos-$MESOS_VERSION.ta
 echo "Unpacking Mesos"
 tar xvzf mesos-$MESOS_VERSION.tar.gz > /tmp/spark-euca_mesos.log
 rm mesos-$MESOS_VERSION.tar.gz
-mv mesos-$MESOS_VERSION/ mesos/
+#mv mesos-$MESOS_VERSION/ mesos/
 
 popd
