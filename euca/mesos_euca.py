@@ -19,6 +19,23 @@
 # limitations under the License.
 #
 
+
+"""
+#example run
+./mesos-euca -i ~/vagrant_euca/stratos.pem 
+-k stratos 
+-s 1 
+-a emi-56CB3EE9 
+-t m2.2xlarge 
+--no-ganglia 
+-w 120 
+--user-data-file ~/vagrant_euca/clear-key-ubuntu.sh 
+--os-type ubuntu 
+--installation-type mesos 
+--mesos-version 0.18.1 
+--vol-size 5 
+launch mesos-cluster-x
+"""
 from __future__ import with_statement
 
 import base64
