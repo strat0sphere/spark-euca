@@ -17,7 +17,7 @@ fi
 
 #Building Mesos
 # Change working directory.
-cd /root/mesos-$MESOS_VERSION
+cd /root/mesos-$MESOS_SETUP_VERSION
 
 # Bootstrap (***Skip this if you are not building from git repo***).
 #./bootstrap
@@ -36,5 +36,5 @@ make install
 # Run test suite -- Also builds example frameworks
 #make check #Run make check at the end because some tests fail
 
-/root/spark-euca/copy-dir /root/mesos-$MESOS_VERSION
+/root/spark-euca/copy-dir /root/mesos-$MESOS_SETUP_VERSION
 /root/spark-euca/copy-dir /root/mesos-installation/
