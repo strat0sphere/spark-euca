@@ -613,10 +613,17 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     
   cluster_url = "master@%s:5050" % active_master
    
+  # self.private_ip_address = None
+  # self.ip_address = None 
+  # self.public_dns_name = None
+  # self.private_dns_name = None
+  # self.dns_name = None
   template_vars = {
     "master_list": '\n'.join([i.public_dns_name for i in master_nodes]),
     "active_master": active_master,
     "slave_list": '\n'.join([i.public_dns_name for i in slave_nodes]),
+    "slaves_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.dns_name]) for i in slave_nodes]),
+    "masters_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.dns_name]) for i in master_nodes]),
     "zoo_list": zoo_list,
     "cluster_url": cluster_url,
     "hdfs_data_dirs": hdfs_data_dirs,
