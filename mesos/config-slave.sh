@@ -22,4 +22,4 @@ nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --mast
 #--work_dir=VALUE                           #Where to place framework work directories (default: /tmp/mesos)
 
 #For Mesos 0.20.0 with Zookeeper
-nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --master=zk://10.2.24.25:2181/mesos </dev/null >/dev/null 2>&1 &
+nohup /mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master=zk://10.2.24.25:2181/mesos </dev/null >/dev/null 2>&1 &
