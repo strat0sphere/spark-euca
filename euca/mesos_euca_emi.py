@@ -24,18 +24,16 @@
 #example run
 ./mesos-euca-emi -i ~/vagrant_euca/stratos.pem
 -k stratos 
--s 1
+-s 2
 -m emi-A2393554
--a emi-56CB3EE9 
+-a emi-8E7435AC  
 -t m2.2xlarge 
 --no-ganglia 
 -w 120 
---user-data-file ~/vagrant_euca/clear-key-ubuntu.sh 
---os-type ubuntu 
---installation-type mesos 
---mesos-version 0.18.1 
---vol-size 5 
-launch mesos-cluster-x
+--user-data-file ~/vagrant_euca/clear-key-ubuntu.sh
+--installation-type mesos-emi
+--mesos-version 0.20.0
+launch mesos-cluster-emi
 """
 from __future__ import with_statement
 
