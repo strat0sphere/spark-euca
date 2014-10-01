@@ -53,12 +53,20 @@ worker_instances = int(os.getenv("SPARK_WORKER_INSTANCES", 1)) #Unecessary for M
 # Distribute equally cpu cores among worker instances
 worker_cores = max(slave_cpus / worker_instances, 1)
 
+#get local IP address
+#/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'
+#get hostname
+#hostname
+#get fqdn hostname
+#hostname --fqdn
+
 template_vars = {
   "master_list": os.getenv("MASTERS"),
   "active_master": os.getenv("MASTERS").split("\n")[0],
-  "active_master_ip": os.
   "slave_list": os.getenv("SLAVES"),
   "zoo_list": os.getenv("ZOOS"),
+  "masters_dns_mappings": os.getenv("MASTER_DNS_MAPPINGS"),
+  "slaves_dns_mappings": os.getenv("SLAVE_DNS_MAPPINGS"),
   "hdfs_data_dirs": os.getenv("HDFS_DATA_DIRS"),
   "mapred_local_dirs": os.getenv("MAPRED_LOCAL_DIRS"),
   "spark_local_dirs": os.getenv("SPARK_LOCAL_DIRS"),
