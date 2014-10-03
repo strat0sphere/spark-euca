@@ -85,8 +85,8 @@ def parse_args():
       help="Availability zone to launch instances in, or 'all' to spread " +
            "slaves across multiple (an additional $0.01/Gb for bandwidth" +
            "between zones applies)")
-  parser.add_option("-em", "--emi-master", default="", help="Eucalyptus Machine Image ID to use for the master instance")
-  parser.add_option("-eo", "--emi-zoo", default="", help="Eucalyptus Machine Image ID to use for the zoo instance")
+  parser.add_option("--emi-master", default="", help="Eucalyptus Machine Image ID to use for the master instance")
+  parser.add_option("--emi-zoo", default="", help="Eucalyptus Machine Image ID to use for the zoo instance")
   parser.add_option("-e", "--emi", help="Eucalyptus Machine Image ID to use")
   parser.add_option("-v", "--spark-version", default="1.0.1",
       help="Version of Spark to use: 'X.Y.Z' or a specific git hash")
@@ -269,11 +269,25 @@ def launch_cluster(conn, opts, cluster_name):
 
   try:
     image = conn.get_all_images(image_ids=[opts.emi])[0]
-    image_master = conn.get_all_images(image_ids=[opts.emi-master])[0]
-    image_zoo = conn.get_all_images(image_ids=[opts.emi-zoo])[0]
   except:
     print >> stderr, "Could not find emi " + opts.emi
     sys.exit(1)
+    
+  try:
+    image_master = conn.get_all_images(image_ids=[opts.emi_master])[0]
+  except:
+    print >> stderr, "Could not find emi " + opts.emi_master
+    sys.exit(1)
+  
+  if (opts.emi_zoo != ""):  
+      try:
+        image_zoo = conn.get_all_images(image_ids=[opts.emi_zoo])[0]
+      except:
+        print >> stderr, "Could not find emi " + opts.emi_zoo
+        sys.exit(1)     
+    
+    
+    
 
   # Create block device mapping so that we can add an EBS volume if asked to
   logging.debug( "Calling boto BlockDeviceMapping()...")
@@ -573,13 +587,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "cluster_url": cluster_url,
     "hdfs_data_dirs": hdfs_data_dirs,
     "mapred_local_dirs": mapred_local_dirs,
-    "spark_local_dirs": spark_local_dirs,
     "swap": str(opts.swap),
     "modules": '\n'.join(modules),
-    "spark_version": spark_v,
-    "shark_version": shark_v,
-    "hadoop_major_version": opts.hadoop_major_version,
-    "spark_worker_instances": "%d" % opts.worker_instances,
     "spark_master_opts": opts.master_opts,
     "mesos_version": opts.mesos_version,
     "cluster_name": opts.cluster_name
