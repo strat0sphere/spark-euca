@@ -25,8 +25,8 @@
 ./mesos-euca-emi -i ~/vagrant_euca/stratos.pem
 -k stratos 
 -s 2
--m emi-A2393554
--a emi-8E7435AC  
+-em emi-A2393554
+-e emi-8E7435AC  
 -t m2.2xlarge 
 --no-ganglia 
 -w 120 
@@ -85,7 +85,9 @@ def parse_args():
       help="Availability zone to launch instances in, or 'all' to spread " +
            "slaves across multiple (an additional $0.01/Gb for bandwidth" +
            "between zones applies)")
-  parser.add_option("-a", "--emi", help="Eucalyptus Machine Image ID to use")
+  parser.add_option("-em", "--emi-master", default="", help="Eucalyptus Machine Image ID to use for the master instance")
+  parser.add_option("-eo", "--emi-zoo", default="", help="Eucalyptus Machine Image ID to use for the zoo instance")
+  parser.add_option("-e", "--emi", help="Eucalyptus Machine Image ID to use")
   parser.add_option("-v", "--spark-version", default="1.0.1",
       help="Version of Spark to use: 'X.Y.Z' or a specific git hash")
   parser.add_option("--spark-git-repo",
@@ -267,6 +269,8 @@ def launch_cluster(conn, opts, cluster_name):
 
   try:
     image = conn.get_all_images(image_ids=[opts.emi])[0]
+    image_master = conn.get_all_images(image_ids=[opts.emi-master])[0]
+    image_zoo = conn.get_all_images(image_ids=[opts.emi-zoo])[0]
   except:
     print >> stderr, "Could not find emi " + opts.emi
     sys.exit(1)
@@ -329,7 +333,7 @@ def launch_cluster(conn, opts, cluster_name):
       master_type = opts.instance_type
     if opts.zone == 'all':
       opts.zone = random.choice(conn.get_all_zones()).name
-    master_res = image.run(key_name = opts.key_pair,
+    master_res = image_master.run(key_name = opts.key_pair,
                            security_groups = [master_group],
                            instance_type = master_type,
                            placement = opts.zone,
@@ -343,7 +347,7 @@ def launch_cluster(conn, opts, cluster_name):
   # Launch ZooKeeper nodes if required
   if int(opts.ft) > 1:
     print "Running " + opts.ft + " zookeepers"
-    zoo_res = image.run(key_name = opts.key_pair,
+    zoo_res = image_zoo.run(key_name = opts.key_pair,
                         security_groups = [zoo_group],
                         instance_type = opts.instance_type,
                         placement = opts.zone,
