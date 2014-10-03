@@ -7,7 +7,7 @@ cd /root/spark-euca
 source /root/.bash_profile
 
 # Load the cluster variables set by the deploy script
-source setup_cluster.sh
+source ec2-variables.sh
 
 # Set hostname based on EC2 private DNS name, so that it is set correctly
 # even if the instance is restarted with a different private DNS name

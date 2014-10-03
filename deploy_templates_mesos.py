@@ -60,6 +60,8 @@ worker_cores = max(slave_cpus / worker_instances, 1)
 #get fqdn hostname
 #hostname --fqdn
 
+
+#TODO: Many of the following are not needed
 template_vars = {
   "master_list": os.getenv("MASTERS"),
   "active_master": os.getenv("MASTERS").split("\n")[0],

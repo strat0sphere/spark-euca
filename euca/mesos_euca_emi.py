@@ -25,8 +25,8 @@
 ./mesos-euca-emi -i ~/vagrant_euca/stratos.pem
 -k stratos 
 -s 2
--em emi-A2393554
--e emi-8E7435AC  
+-emi-master emi-40BE34DE
+-e emi-C4E534C3  
 -t m2.2xlarge 
 --no-ganglia 
 -w 120 
