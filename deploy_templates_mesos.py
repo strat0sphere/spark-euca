@@ -76,7 +76,7 @@ template_vars = {
   "spark_master_opts": os.getenv("SPARK_MASTER_OPTS", ""),
   "spark_version": os.getenv("SPARK_VERSION"),
   "shark_version": os.getenv("SHARK_VERSION"),
-  "mesos_version": os.getenv("MESOS_VERSION"),
+  "mesos_version": os.getenv("MESOS_INSTALL_VERSION"),
   "hadoop_major_version": os.getenv("HADOOP_MAJOR_VERSION"),
   "java_home": os.getenv("JAVA_HOME"),
   "default_tachyon_mem": "%dMB" % tachyon_mb,

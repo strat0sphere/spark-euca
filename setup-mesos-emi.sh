@@ -30,6 +30,7 @@ NUM_MASTERS=`cat masters | wc -l`
 OTHER_MASTERS=`cat masters | sed '1d'`
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
+CLUSTER_NAME=``
 
 if [[ $ZOOS = *NONE* ]]; then
 NUM_ZOOS=0
@@ -128,6 +129,17 @@ done
 wait
 
 echo "Setting up Mesos on `hostname`..."
+
+echo "Configuring HDFS on `hostname`..."
+
+#Create hdfs name node directories on masters
+for node in $MASTERS $OTHER_MASTERS; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh" & sleep 0.3
+
+
+
 #installing required packages to slave nodes
 #echo "Installing required packages to slave nodes..."
 #distribution=$1 #ubuntu or centos
@@ -151,13 +163,13 @@ echo "Setting up Mesos on `hostname`..."
 #fi
 
 # Install / Init module
-for module in $MODULES; do
-echo "Initializing $module"
-if [[ -e $module/init.sh ]]; then
-source $module/init.sh
-fi
-cd /root/spark-euca  # guard against init.sh changing the cwd
-done
+#for module in $MODULES; do
+#echo "Initializing $module"
+#if [[ -e $module/init.sh ]]; then
+#source $module/init.sh
+#fi
+#cd /root/spark-euca  # guard against init.sh changing the cwd
+#done
 
 
 ##TODO: Start zookeeper from wherever is actually located
@@ -175,18 +187,63 @@ done
 echo "Creating local config files..."
 ./deploy_templates_mesos.py
 
+
+#Create hdfs data node directories on slaves
+for node in $SLAVES; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/create-datanode-dirs.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-dirs.sh" & sleep 0.3
+done
+
+
+#Startup HDFS + Zookeeper
+for node in $MASTERS; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode start" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 0.3
+done
+
+for node in $SLAVES; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 0.3
+done
+
+
+#Startup Mesos
+#TODO: Multiple masters?
+for node in $MASTERS; do
+echo $node
+nohup /root/mesos-installation/sbin/mesos-master --cluster=$CLUSTER_NAME --log_dir=/mnt/mesos-logs --zk=zk://$ACTIVE_MASTER:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
+
+for node in $SLAVES; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master=zk://$ACTIVE_MASTER:2181/mesos </dev/null >/dev/null 2>&1 &" & sleep 0.3
+done
+
+
+
+
 # Copy spark conf by default
 #echo "Deploying spark config files..."
 #chmod u+x /root/spark/conf/spark-env.sh #TODO: Is this needed?
 #/root/spark-euca/copy-dir /root/spark/conf
 
 # Setup each module
-for module in $MODULES; do
-echo "Setting up $module"
-source ./$module/setup.sh
-sleep 1
-cd /root/spark-euca  # guard against setup.sh changing the cwd
-done
+#for module in $MODULES; do
+#echo "Setting up $module"
+#source ./$module/setup.sh
+#sleep 1
+#cd /root/spark-euca  # guard against setup.sh changing the cwd
+#done
+
+#Startup each module
+#for module in $MODULES; do
+#echo "Setting up $module"
+#source ./$module/setup.sh
+#sleep 1
+#cd /root/spark-euca  # guard against setup.sh changing the cwd
+#done
+
 #echo "Running setup.sh from spark-testing/persistent-hdfs"
 #source /root/spark-testing/persistent-hdfs/setup.sh
 #cd /root/spark-euca  # guard against setup.sh changing the cwd

@@ -32,7 +32,6 @@
 -w 120 
 --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh
 --installation-type mesos-emi
---mesos-version 0.20.0
 launch mesos-cluster-emi
 """
 from __future__ import with_statement
@@ -61,7 +60,7 @@ class UsageError(Exception):
   pass
 
 # A URL prefix from which to fetch AMI information
-#AMI_PREFIX = "https://raw.github.com/mesos/spark-euca/v2/ami-list"
+AMI_PREFIX = "https://raw.github.com/mesos/spark-euca/v2/ami-list"
 
 # Configure and parse our command-line arguments
 def parse_args():
@@ -634,7 +633,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "hadoop_major_version": opts.hadoop_major_version,
     "spark_worker_instances": "%d" % opts.worker_instances,
     "spark_master_opts": opts.master_opts,
-    "mesos_version": opts.mesos_version
+    "mesos_version": opts.mesos_version,
+    "cluster_name": opts.cluster_name
   }
 
 
@@ -762,6 +762,8 @@ def attach_volumes(conn, nodes, vol_size, device_name="/dev/vdb"):
 
 def real_main():
   (opts, action, cluster_name) = parse_args()
+  opts.cluster_name = cluster_name #set cluster name
+  
   try:
     euca_ec2_host="eucalyptus.race.cs.ucsb.edu" #TODO: Replace with opts.euca-ec2-host
     euca_id=os.getenv('AWS_ACCESS_KEY')
