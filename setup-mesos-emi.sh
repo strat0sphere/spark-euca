@@ -131,12 +131,15 @@ wait
 echo "Setting up Mesos on `hostname`..."
 
 echo "Configuring HDFS on `hostname`..."
+echo "Creating Namenode directories on master..."
 
 #Create hdfs name node directories on masters
 for node in $MASTERS $OTHER_MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh" & sleep 0.3
+done
+wait
 
 
 
@@ -188,6 +191,7 @@ echo "Creating local config files..."
 ./deploy_templates_mesos.py
 
 
+echo "Creating Datanode directories on slaves..."
 #Create hdfs data node directories on slaves
 for node in $SLAVES; do
 echo $node
@@ -196,25 +200,31 @@ ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-d
 done
 
 
+echo "Starting up Zookeeper, HDFS and Jobtracker..."
 #Startup HDFS + Zookeeper
 for node in $MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode start" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker start" & sleep 0.3
 done
 
+
+echo "Starting up datanodes..."
 for node in $SLAVES; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 0.3
 done
 
-
+echo "Starting Mesos-master..."
 #Startup Mesos
 #TODO: Multiple masters?
 for node in $MASTERS; do
 echo $node
 nohup /root/mesos-installation/sbin/mesos-master --cluster=$CLUSTER_NAME --log_dir=/mnt/mesos-logs --zk=zk://$ACTIVE_MASTER:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
+done
 
+echo "Starting Mesos-slaves..."
 for node in $SLAVES; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master=zk://$ACTIVE_MASTER:2181/mesos </dev/null >/dev/null 2>&1 &" & sleep 0.3
