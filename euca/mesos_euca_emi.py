@@ -59,9 +59,6 @@ from boto.ec2.regioninfo import RegionInfo
 class UsageError(Exception):
   pass
 
-# A URL prefix from which to fetch AMI information
-AMI_PREFIX = "https://raw.github.com/mesos/spark-euca/v2/ami-list"
-
 # Configure and parse our command-line arguments
 def parse_args():
   parser = OptionParser(usage="mesos-euca [options] <action> <cluster_name>"
@@ -88,7 +85,7 @@ def parse_args():
       help="Availability zone to launch instances in, or 'all' to spread " +
            "slaves across multiple (an additional $0.01/Gb for bandwidth" +
            "between zones applies)")
-  parser.add_option("-a", "--ami", help="Amazon Machine Image ID to use")
+  parser.add_option("-a", "--emi", help="Eucalyptus Machine Image ID to use")
   parser.add_option("-v", "--spark-version", default="1.0.1",
       help="Version of Spark to use: 'X.Y.Z' or a specific git hash")
   parser.add_option("--spark-git-repo",
@@ -99,7 +96,7 @@ def parse_args():
   parser.add_option("--mesos-version", default="0.18.2",
       help="Major version of Hadoop (default: 1)")
   parser.add_option("-D", metavar="[ADDRESS:]PORT", dest="proxy_port",
-      help="Use SSH dynamic port forwarding to create a SOCKS proxy at " +
+      help="Use SSH dynemic port forwarding to create a SOCKS proxy at " +
             "the given local address (for use with login)")
   parser.add_option("--resume", action="store_true", default=False,
       help="Resume installation on a previously launched cluster " +
@@ -107,7 +104,7 @@ def parse_args():
   parser.add_option("--ebs-vol-size", metavar="SIZE", type="int", default=0,
       help="Attach a new EBS volume of size SIZE (in GB) to each node as " +
            "/vol. The volumes will be deleted when the instances terminate. " +
-           "Only possible on EBS-backed AMIs.")
+           "Only possible on EBS-backed emis.")
   parser.add_option("--vol-size", metavar="SIZE", type="int", default=0,
       help="Attach a new volume of size SIZE (in GB) to each node as " +
            "/vol.")
@@ -201,56 +198,6 @@ def is_active(instance):
   return (instance.state in ['pending', 'running', 'stopping', 'stopped'])
 
 
-# Attempt to resolve an appropriate AMI given the architecture and
-# region of the request.
-def get_ami(opts):
-  instance_types = {
-    "m1.small":    "pvm",
-    "m1.medium":   "pvm",
-    "m1.large":    "pvm",
-    "m1.xlarge":   "pvm",
-    "t1.micro":    "pvm",
-    "c1.medium":   "pvm",
-    "c1.xlarge":   "pvm",
-    "m2.xlarge":   "pvm",
-    "m2.2xlarge":  "pvm",
-    "m2.4xlarge":  "pvm",
-    "cc1.4xlarge": "hvm",
-    "cc2.8xlarge": "hvm",
-    "cg1.4xlarge": "hvm",
-    "hs1.8xlarge": "hvm",
-    "hi1.4xlarge": "hvm",
-    "m3.xlarge":   "hvm",
-    "m3.2xlarge":  "hvm",
-    "cr1.8xlarge": "hvm",
-    "i2.xlarge":   "hvm",
-    "i2.2xlarge":  "hvm",
-    "i2.4xlarge":  "hvm",
-    "i2.8xlarge":  "hvm",
-    "c3.large":    "pvm",
-    "c3.xlarge":   "pvm",
-    "c3.2xlarge":  "pvm",
-    "c3.4xlarge":  "pvm",
-    "c3.8xlarge":  "pvm"
-  }
-  if opts.instance_type in instance_types:
-    instance_type = instance_types[opts.instance_type]
-  else:
-    instance_type = "pvm"
-    print >> stderr,\
-        "Don't recognize %s, assuming type is pvm" % opts.instance_type
-
-  ami_path = "%s/%s/%s" % (AMI_PREFIX, opts.region, instance_type)
-  print "ami_path = ", ami_path
-  try:
-    ami = urllib2.urlopen(ami_path).read().strip()
-    print "Spark AMI: " + ami
-  except:
-    print >> stderr, "Could not resolve AMI at: " + ami_path
-    sys.exit(1)
-
-  return ami
-
 # Launch a cluster of the given name, by setting up its security groups,
 # and then starting new instances in them.
 # Returns a tuple of EC2 reservation objects for the master and slaves
@@ -316,15 +263,12 @@ def launch_cluster(conn, opts, cluster_name):
         "group %s or %s" % (master_group.name, slave_group.name, zoo_group.name))
     sys.exit(1)
 
-  # Figure out Spark AMI
-  if opts.ami is None:
-    opts.ami = get_ami(opts)
   print "Launching instances..."
 
   try:
-    image = conn.get_all_images(image_ids=[opts.ami])[0]
+    image = conn.get_all_images(image_ids=[opts.emi])[0]
   except:
-    print >> stderr, "Could not find AMI " + opts.ami
+    print >> stderr, "Could not find emi " + opts.emi
     sys.exit(1)
 
   # Create block device mapping so that we can add an EBS volume if asked to
