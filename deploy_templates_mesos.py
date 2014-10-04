@@ -62,6 +62,8 @@ worker_cores = max(slave_cpus / worker_instances, 1)
 
 
 #TODO: Many of the following are not needed
+print "master_dns_mapping" + os.getenv("MASTER_DNS_MAPPINGS")
+
 template_vars = {
   "master_list": os.getenv("MASTERS"),
   "active_master": os.getenv("MASTERS").split("\n")[0],
@@ -81,7 +83,7 @@ template_vars = {
   "mesos_version": os.getenv("MESOS_INSTALL_VERSION"),
   "hadoop_major_version": os.getenv("HADOOP_MAJOR_VERSION"),
   "java_home": os.getenv("JAVA_HOME"),
-  "default_tachyon_mem": "%dMB" % tachyon_mb,
+  "default_tachyon_mem": "%dMB" % tachyon_mb
 }
 
 template_dir="/root/spark-euca/templates"
@@ -99,6 +101,7 @@ for path, dirs, files in os.walk(template_dir):
             print "Configuring " + dest_file
             text = src.read()
             for key in template_vars:
+              print "Replacing " +key+ " with: " + template_vars[key]
               text = text.replace("{{" + key + "}}", template_vars[key])
             dest.write(text)
             dest.close()

@@ -221,7 +221,7 @@ echo "Starting Mesos-master..."
 #TODO: Multiple masters?
 for node in $MASTERS; do
 echo $node
-nohup /root/mesos-installation/sbin/mesos-master --cluster=$CLUSTER_NAME --log_dir=/mnt/mesos-logs --zk=zk://$ACTIVE_MASTER:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
+ssh -t -t $SSH_OPTS root@$node  "nohup /root/mesos-installation/sbin/mesos-master --cluster=$CLUSTER_NAME --log_dir=/mnt/mesos-logs --zk=zk://$ACTIVE_MASTER:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &" & sleep 0.3
 done
 
 echo "Starting Mesos-slaves..."

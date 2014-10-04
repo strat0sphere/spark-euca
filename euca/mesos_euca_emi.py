@@ -577,6 +577,9 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   # self.public_dns_name = None
   # self.private_dns_name = None
   # self.dns_name = None
+  
+  
+  
   template_vars = {
     "master_list": '\n'.join([i.public_dns_name for i in master_nodes]),
     "active_master": active_master,
@@ -594,7 +597,9 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "cluster_name": opts.cluster_name
   }
 
-
+ 
+  print "mesos_euca_emi - master_dns_mapping" + template_vars["master_dns_mapping"]
+ 
   # Create a temp directory in which we will place all the files to be
   # deployed after we substitue template parameters in them
   tmp_dir = tempfile.mkdtemp()
