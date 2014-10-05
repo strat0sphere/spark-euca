@@ -262,7 +262,7 @@ def launch_cluster(conn, opts, cluster_name):
                                                            die_on_error=False)
   if existing_slaves or (existing_masters and not opts.use_existing_master):
     print >> stderr, ("ERROR: There are already instances running in " +
-        "group %s or %s" % (master_group.name, slave_group.name, zoo_group.name))
+        "group %s or %s or %s" % (master_group.name, slave_group.name, zoo_group.name))
     sys.exit(1)
 
   print "Launching instances..."
