@@ -552,6 +552,7 @@ def get_num_disks(instance_type):
 # script to be run on that instance to copy them to other nodes.
 def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, modules):
   active_master = master_nodes[0].public_dns_name
+  active_master_private = master_nodes[0].private_dns_name
 
   num_disks = get_num_disks(opts.instance_type)
   hdfs_data_dirs = "/mnt/ephemeral-hdfs/data" #TODO: Not using - delete or change to cloudera-hdfs and data dirs
@@ -583,6 +584,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   template_vars = {
     "master_list": '\n'.join([i.public_dns_name for i in master_nodes]),
     "active_master": active_master,
+    "active_master_private": active_master_private,
     "slave_list": '\n'.join([i.public_dns_name for i in slave_nodes]),
     "slaves_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in slave_nodes]),
     "masters_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in master_nodes]),
@@ -595,7 +597,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   }
 
  
-  print "mesos_euca_emi - master_dns_mapping: " + template_vars["masters_dns_mappings"]
+  #print "mesos_euca_emi - master_dns_mapping: " + template_vars["masters_dns_mappings"]
  
   # Create a temp directory in which we will place all the files to be
   # deployed after we substitue template parameters in them

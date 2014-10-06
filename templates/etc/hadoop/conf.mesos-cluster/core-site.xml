@@ -20,7 +20,7 @@
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://{{active_master}}:9000</value>
+        <value>hdfs://{{active_master_private}}:9000</value>
     </property>
     <!--
     <property>

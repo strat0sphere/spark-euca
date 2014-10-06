@@ -198,22 +198,24 @@ wait
 # TODO: Move configuring templates to a per-module ?
 echo "Creating local config files..."
 ./deploy_templates_mesos.py
+/root/spark-euca/copy-dir /etc/hadoop/
+
 
 
 echo "Starting up Zookeeper, HDFS and Jobtracker..."
 #Startup HDFS + Zookeeper
 for node in $MASTERS; do
 echo $node
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode start" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker start" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode start" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 2.0
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker start" & sleep 10.0
 done
 
 
 echo "Starting up datanodes..."
 for node in $SLAVES; do
 echo $node
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 10.0
 done
 
 echo "Starting Mesos-master..."
