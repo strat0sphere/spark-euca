@@ -198,8 +198,12 @@ wait
 # TODO: Move configuring templates to a per-module ?
 echo "Creating local config files..."
 ./deploy_templates_mesos.py
-/root/spark-euca/copy-dir /etc/hadoop/
 
+#Deploy all /etc/hadoop configuration
+/root/spark-euca/copy-dir /etc/hadoop
+
+#Deploy hosts-configuration
+/root/spark-euca/copy-dir /etc/hosts
 
 
 echo "Starting up Zookeeper, HDFS and Jobtracker..."
@@ -215,6 +219,7 @@ done
 echo "Starting up datanodes..."
 for node in $SLAVES; do
 echo $node
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" & sleep 10.0 #TODO: Clean up the cluster to avoid having this running
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 10.0
 done
 
