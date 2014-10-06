@@ -223,15 +223,15 @@ echo "Starting Mesos-master..."
 #TODO: Multiple masters?
 for node in $MASTERS; do
 echo $node
-#echo  "ACTIVE_MASTER: $ACTIVE_MASTER"
-ssh -t -t $SSH_OPTS root@$node  "nohup /root/mesos-installation/sbin/mesos-master --cluster=$CLUSTER_NAME --log_dir=/mnt/mesos-logs --zk=zk://$ACTIVE_MASTER:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &" & sleep 0.3
+#echo  "ACTIVE_MASTER_PRIVATE: $ACTIVE_MASTER_PRIVATE"
+ssh -t -t $SSH_OPTS root@$node  "nohup /root/mesos-installation/sbin/mesos-master --cluster=$CLUSTER_NAME --log_dir=/mnt/mesos-logs --zk=zk://$ACTIVE_MASTER_PRIVATE:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &" & sleep 0.3
 done
 
 echo "Starting Mesos-slaves..."
 for node in $SLAVES; do
 echo $node
-#echo  "ACTIVE_MASTER: $ACTIVE_MASTER"
-ssh -t -t $SSH_OPTS root@$node "nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master=zk://$ACTIVE_MASTER:2181/mesos </dev/null >/dev/null 2>&1 &" & sleep 0.3
+#echo  "ACTIVE_MASTER_PRIVATE: $ACTIVE_MASTER_PRIVATE"
+ssh -t -t $SSH_OPTS root@$node "nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master=zk://$ACTIVE_MASTER_PRIVATE:2181/mesos </dev/null >/dev/null 2>&1 &" & sleep 0.3
 done
 
 
