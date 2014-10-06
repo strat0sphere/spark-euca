@@ -206,13 +206,14 @@ echo "Creating local config files..."
 /root/spark-euca/copy-dir /etc/hosts
 
 
+#TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
 echo "Starting up Zookeeper, HDFS and Jobtracker..."
 #Startup HDFS + Zookeeper
 for node in $MASTERS; do
 echo $node
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode start" & sleep 10.0
-ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 2.0
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker start" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode restart" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "service zookeeper-server restart" & sleep 2.0
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
 done
 
 
