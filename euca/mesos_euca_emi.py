@@ -588,11 +588,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "masters_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in master_nodes]),
     "zoo_list": zoo_list,
     "cluster_url": cluster_url,
-    "hdfs_data_dirs": hdfs_data_dirs,
-    "mapred_local_dirs": mapred_local_dirs,
     "swap": str(opts.swap),
     "modules": '\n'.join(modules),
-    "spark_master_opts": opts.master_opts,
     "mesos_version": opts.mesos_version,
     "cluster_name": opts.cluster_name
   }
