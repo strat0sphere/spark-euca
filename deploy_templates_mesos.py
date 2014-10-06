@@ -62,6 +62,8 @@ worker_cores = max(slave_cpus / worker_instances, 1)
 
 
 #TODO: Many of the following are not needed
+
+print "masters" + os.getenv("MASTERS")
 print "master_dns_mapping" + os.getenv("MASTER_DNS_MAPPINGS")
 
 template_vars = {

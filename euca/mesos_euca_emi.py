@@ -598,7 +598,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   }
 
  
-  print "mesos_euca_emi - master_dns_mapping" + template_vars["master_dns_mapping"]
+  print "mesos_euca_emi - master_dns_mapping" + template_vars["masters_dns_mappings"]
  
   # Create a temp directory in which we will place all the files to be
   # deployed after we substitue template parameters in them

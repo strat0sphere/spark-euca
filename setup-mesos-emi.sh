@@ -14,9 +14,10 @@ source ec2-variables.sh
 #PRIVATE_DNS=`wget -q -O - http://instance-data.ec2.internal/latest/meta-data/local-hostname`
 #PUBLIC_DNS=`wget -q -O - http://instance-data.ec2.internal/latest/meta-data/hostname`
 #hostname $PRIVATE_DNS
-PRIVATE_DNS=hostname
-echo $PRIVATE_DNS > /etc/hostname
-export HOSTNAME=$PRIVATE_DNS  # Fix the bash built-in hostname variable too
+#PRIVATE_DNS=hostname
+#echo $PRIVATE_DNS > /etc/hostname
+#export HOSTNAME=$PRIVATE_DNS  # Fix the bash built-in hostname variable too
+echo $HOSTNAME > /ETC/hostname
 
 echo "Setting up Mesos on `hostname`..."
 
