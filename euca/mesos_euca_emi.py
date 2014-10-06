@@ -584,8 +584,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "master_list": '\n'.join([i.public_dns_name for i in master_nodes]),
     "active_master": active_master,
     "slave_list": '\n'.join([i.public_dns_name for i in slave_nodes]),
-    "slaves_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.dns_name]) for i in slave_nodes]),
-    "masters_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.dns_name]) for i in master_nodes]),
+    "slaves_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.key_name]) for i in slave_nodes]),
+    "masters_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.key_name]) for i in master_nodes]),
     "zoo_list": zoo_list,
     "cluster_url": cluster_url,
     "hdfs_data_dirs": hdfs_data_dirs,
@@ -598,7 +598,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   }
 
  
-  print "mesos_euca_emi - master_dns_mapping" + template_vars["masters_dns_mappings"]
+  print "mesos_euca_emi - master_dns_mapping: " + template_vars["masters_dns_mappings"]
  
   # Create a temp directory in which we will place all the files to be
   # deployed after we substitue template parameters in them

@@ -63,16 +63,16 @@ worker_cores = max(slave_cpus / worker_instances, 1)
 
 #TODO: Many of the following are not needed
 
-print "masters" + os.getenv("MASTERS")
-print "master_dns_mapping" + os.getenv("MASTER_DNS_MAPPINGS")
+print "masters: " + os.getenv("MASTERS")
+print "master_dns_mapping: " + os.getenv("MASTERS_DNS_MAPPINGS")
 
 template_vars = {
   "master_list": os.getenv("MASTERS"),
   "active_master": os.getenv("MASTERS").split("\n")[0],
   "slave_list": os.getenv("SLAVES"),
   "zoo_list": os.getenv("ZOOS"),
-  "masters_dns_mappings": os.getenv("MASTER_DNS_MAPPINGS"),
-  "slaves_dns_mappings": os.getenv("SLAVE_DNS_MAPPINGS"),
+  "masters_dns_mappings": os.getenv("MASTERS_DNS_MAPPINGS"),
+  "slaves_dns_mappings": os.getenv("SLAVES_DNS_MAPPINGS"),
   "hdfs_data_dirs": os.getenv("HDFS_DATA_DIRS"),
   "mapred_local_dirs": os.getenv("MAPRED_LOCAL_DIRS"),
   "spark_local_dirs": os.getenv("SPARK_LOCAL_DIRS"),
