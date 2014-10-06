@@ -94,8 +94,8 @@ def parse_args():
       default="https://github.com/apache/spark",
       help="Github repo from which to checkout supplied commit hash")
   parser.add_option("--hadoop-major-version", default="1",
-      help="Major version of Hadoop (default: 0.18.2)")
-  parser.add_option("--mesos-version", default="0.18.2",
+      help="Major version of Hadoop (default: 0.20.0)")
+  parser.add_option("--mesos-version", default="0.20.0",
       help="Major version of Hadoop (default: 1)")
   parser.add_option("-D", metavar="[ADDRESS:]PORT", dest="proxy_port",
       help="Use SSH dynemic port forwarding to create a SOCKS proxy at " +
@@ -599,6 +599,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   }
 
  
+  #print "cluster_name: " + template_vars["cluster_name"]
   #print "mesos_euca_emi - master_dns_mapping: " + template_vars["masters_dns_mappings"]
  
   # Create a temp directory in which we will place all the files to be
