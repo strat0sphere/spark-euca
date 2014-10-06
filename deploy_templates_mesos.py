@@ -74,6 +74,8 @@ template_vars = {
   "zoo_list": os.getenv("ZOOS"),
   "masters_dns_mappings": os.getenv("MASTERS_DNS_MAPPINGS"),
   "slaves_dns_mappings": os.getenv("SLAVES_DNS_MAPPINGS"),
+  "masters_dns_mappings_public": os.getenv("MASTERS_DNS_MAPPINGS_PUBLIC"),
+  "slaves_dns_mappings_public": os.getenv("SLAVES_DNS_MAPPINGS_PUBLIC"),
   "mesos_version": os.getenv("MESOS_INSTALL_VERSION"),
   "java_home": os.getenv("JAVA_HOME"),
   "cluster_name": os.getenv("CLUSTER_NAME")

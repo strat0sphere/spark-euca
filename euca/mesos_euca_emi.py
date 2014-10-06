@@ -588,6 +588,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "slave_list": '\n'.join([i.public_dns_name for i in slave_nodes]),
     "slaves_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in slave_nodes]),
     "masters_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in master_nodes]),
+    "slaves_dns_mappings_public": '\n'.join([' '.join([i.ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in slave_nodes]),
+    "masters_dns_mappings_public": '\n'.join([' '.join([i.ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in master_nodes]),
     "zoo_list": zoo_list,
     "cluster_url": cluster_url,
     "swap": str(opts.swap),

@@ -3,8 +3,12 @@
 #Master DNS mappings
 {{masters_dns_mappings}}
 
+{{masters_dns_mappings_public}}
+
 #Slave DNS mappings
 {{slaves_dns_mappings}}
+
+{{slaves_dns_mappings_public}}
 
 # The following lines are desirable for IPv6 capable hosts
 ::1 ip6-localhost ip6-loopback
