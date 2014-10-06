@@ -28,6 +28,7 @@ export MESOS_INSTALL_VERSION="{{mesos_version}}"
 export SWAP_MB="{{swap}}"
 export CLUSTER_NAME="{{cluster_name}}"
 export ACTIVE_MASTER="{{active_master}}"
+export ACTIVE_MASTER_PRIVATE="{{active_master_private}}"
 export MASTERS_DNS_MAPPINGS="{{masters_dns_mappings}}"
 export SLAVES_DNS_MAPPINGS="{{slaves_dns_mappings}}"
 export PRIVATE_IP_ADDRESS="{{private_ip_address}}" #TODO: Set this
