@@ -103,7 +103,8 @@ for path, dirs, files in os.walk(template_dir):
             print "Configuring " + dest_file
             text = src.read()
             for key in template_vars:
-              print "Replacing " +key+ " with: " + template_vars[key]
+              if (template_vars[key] != None):  
+                  print "Replacing " +key+ " with: " + template_vars[key]
               text = text.replace("{{" + key + "}}", template_vars[key])
             dest.write(text)
             dest.close()
