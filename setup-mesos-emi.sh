@@ -31,7 +31,6 @@ NUM_MASTERS=`cat masters | wc -l`
 OTHER_MASTERS=`cat masters | sed '1d'`
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
-CLUSTER_NAME=``
 
 if [[ $ZOOS = *NONE* ]]; then
 NUM_ZOOS=0
@@ -222,14 +221,14 @@ echo "Starting Mesos-master..."
 #TODO: Multiple masters?
 for node in $MASTERS; do
 echo $node
-echo  "ACTIVE_MASTER: $ACTIVE_MASTER"
+#echo  "ACTIVE_MASTER: $ACTIVE_MASTER"
 ssh -t -t $SSH_OPTS root@$node  "nohup /root/mesos-installation/sbin/mesos-master --cluster=$CLUSTER_NAME --log_dir=/mnt/mesos-logs --zk=zk://$ACTIVE_MASTER:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &" & sleep 0.3
 done
 
 echo "Starting Mesos-slaves..."
 for node in $SLAVES; do
 echo $node
-echo  "ACTIVE_MASTER: $ACTIVE_MASTER"
+#echo  "ACTIVE_MASTER: $ACTIVE_MASTER"
 ssh -t -t $SSH_OPTS root@$node "nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master=zk://$ACTIVE_MASTER:2181/mesos </dev/null >/dev/null 2>&1 &" & sleep 0.3
 done
 

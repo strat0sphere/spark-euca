@@ -85,7 +85,8 @@ template_vars = {
   "mesos_version": os.getenv("MESOS_INSTALL_VERSION"),
   "hadoop_major_version": os.getenv("HADOOP_MAJOR_VERSION"),
   "java_home": os.getenv("JAVA_HOME"),
-  "default_tachyon_mem": "%dMB" % tachyon_mb
+  "default_tachyon_mem": "%dMB" % tachyon_mb,
+  "cluster_name": os.getenv("CLUSTER_NAME"),
 }
 
 template_dir="/root/spark-euca/templates"
@@ -103,6 +104,7 @@ for path, dirs, files in os.walk(template_dir):
             print "Configuring " + dest_file
             text = src.read()
             for key in template_vars:
+              print "key: " + key
               if (template_vars[key] != None):  
                   print "Replacing " +key+ " with: " + template_vars[key]
               text = text.replace("{{" + key + "}}", template_vars[key])
