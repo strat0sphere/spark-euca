@@ -212,7 +212,7 @@ echo "Starting up Zookeeper, HDFS and Jobtracker..."
 for node in $MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode restart" & sleep 10.0
-ssh -t -t $SSH_OPTS root@$node "service zookeeper-server restart" & sleep 2.0
+ssh -t -t $SSH_OPTS root@$node "service zookeeper-server restart" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
 done
 
