@@ -33,4 +33,3 @@ export MASTERS_DNS_MAPPINGS="{{masters_dns_mappings}}"
 export SLAVES_DNS_MAPPINGS="{{slaves_dns_mappings}}"
 export MASTERS_DNS_MAPPINGS_PUBLIC="{{masters_dns_mappings_public}}"
 export SLAVES_DNS_MAPPINGS_PUBLIC="{{slaves_dns_mappings_public}}"
-export PRIVATE_IP_ADDRESS="{{private_ip_address}}" #TODO: Set this
