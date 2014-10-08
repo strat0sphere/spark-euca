@@ -151,6 +151,7 @@ ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-d
 done
 wait
 
+$run_tests=$2
 
 #installing required packages to slave nodes
 #echo "Installing required packages to slave nodes..."
@@ -173,15 +174,6 @@ wait
 #if [[ ! $MODULES =~ *scala* ]]; then
 #MODULES=$(printf "%s\n%s\n" "scala" $MODULES)
 #fi
-
-# Install / Init module
-#for module in $MODULES; do
-#echo "Initializing $module"
-#if [[ -e $module/init.sh ]]; then
-#source $module/init.sh
-#fi
-#cd /root/spark-euca  # guard against init.sh changing the cwd
-#done
 
 
 ##TODO: Start zookeeper from wherever is actually located
@@ -225,6 +217,7 @@ ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" 
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 10.0
 done
 
+
 echo "Starting Mesos-master..."
 #Startup Mesos
 #TODO: Multiple masters?
@@ -255,6 +248,15 @@ done
 #chmod u+x /root/spark/conf/spark-env.sh #TODO: Is this needed?
 #/root/spark-euca/copy-dir /root/spark/conf
 
+# Install / Init module
+for module in $MODULES; do
+echo "Initializing $module"
+if [[ -e $module/init.sh ]]; then
+source $module/init.sh
+fi
+cd /root/spark-euca  # guard against init.sh changing the cwd
+done
+
 # Setup each module
 #for module in $MODULES; do
 #echo "Setting up $module"
@@ -262,6 +264,28 @@ done
 #sleep 1
 #cd /root/spark-euca  # guard against setup.sh changing the cwd
 #done
+
+# Add test code
+for module in $MODULES; do
+echo "Adding test code for $module"
+if [[ -e $module/setup-test.sh ]]; then
+source $module/setup-test.sh
+fi
+cd /root/spark-euca  # guard against init.sh changing the cwd
+done
+
+
+# Test modules
+
+if [ "$run_tests" == "True" ]; then
+for module in $MODULES; do
+echo "Running tests $module"
+if [[ -e $module/run-test.sh ]]; then
+source $module/run-test.sh
+fi
+cd /root/spark-euca  # guard against init.sh changing the cwd
+done
+fi
 
 #Startup each module
 #for module in $MODULES; do
