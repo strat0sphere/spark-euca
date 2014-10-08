@@ -236,6 +236,7 @@ for node in $MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "$START_MASTER_COMMAND" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node $START_MASTER_COMMAND & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "ps -ef | grep mesos" & slepp 0.3
 done
 
 echo "Starting Mesos-slaves..."
@@ -246,6 +247,7 @@ echo $START_SLAVE_COMMAND
 for node in $SLAVES; do
 ssh -t -t $SSH_OPTS root@$node "$START_SLAVE_COMMAND" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node $START_SLAVE_COMMAND & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "ps -ef | grep mesos" & slepp 0.3
 done
 
 
