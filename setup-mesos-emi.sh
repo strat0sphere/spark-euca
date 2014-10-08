@@ -235,14 +235,16 @@ echo $START_MASTER_COMMAND
 for node in $MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "$START_MASTER_COMMAND" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "$START_MASTER_COMMAND" & sleep 10.0
 done
 
 echo "Starting Mesos-slaves..."
 START_SLAVE_COMMAND="nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master=zk://$ACTIVE_MASTER_PRIVATE:2181/mesos </dev/null >/dev/null 2>&1 &"
 
-echo START_SLAVE_COMMAND
+echo $START_SLAVE_COMMAND
 
 for node in $SLAVES; do
+ssh -t -t $SSH_OPTS root@$node "$START_SLAVE_COMMAND" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node "$START_SLAVE_COMMAND" & sleep 10.0
 done
 
