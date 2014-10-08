@@ -98,7 +98,7 @@ def parse_args():
   parser.add_option("--mesos-version", default="0.20.0",
       help="Major version of Hadoop (default: 1)")
   parser.add_option("-D", metavar="[ADDRESS:]PORT", dest="proxy_port",
-      help="Use SSH dynemic port forwarding to create a SOCKS proxy at " +
+      help="Use SSH dynamic port forwarding to create a SOCKS proxy at " +
             "the given local address (for use with login)")
   parser.add_option("--resume", action="store_true", default=False,
       help="Resume installation on a previously launched cluster " +
