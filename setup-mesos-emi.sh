@@ -243,7 +243,8 @@ START_SLAVE_COMMAND="nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/
 echo $START_SLAVE_COMMAND
 
 for node in $SLAVES; do
-ssh $SSH_OPTS root@$node "$START_SLAVE_COMMAND" & sleep 0.3
+echo $node
+ssh $SSH_OPTS root@$node "$START_SLAVE_COMMAND" & sleep 10.0
 done
 
 
