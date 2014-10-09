@@ -250,8 +250,8 @@ done
 
 # Install / Init module
 for module in $MODULES; do
-echo "Initializing $module"
 if [[ -e $module/init.sh ]]; then
+echo "Initializing $module"
 source $module/init.sh
 fi
 cd /root/spark-euca  # guard against init.sh changing the cwd
@@ -268,9 +268,11 @@ done
 
 #Startup each module
 for module in $MODULES; do
+if [[ -e $module/setup.sh ]]; then
 echo "Setting up $module"
 source ./$module/setup.sh
 sleep 1
+fi
 cd /root/spark-euca  # guard against setup.sh changing the cwd
 done
 
