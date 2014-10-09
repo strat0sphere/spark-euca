@@ -61,10 +61,10 @@ worker_cores = max(slave_cpus / worker_instances, 1)
 #hostname --fqdn
 
 
-#TODO: Many of the following are not needed
+#TODO: some of the following are not needed
 
-print "masters: " + os.getenv("MASTERS")
-print "master_dns_mapping: " + os.getenv("MASTERS_DNS_MAPPINGS")
+#print "masters: " + os.getenv("MASTERS")
+#print "master_dns_mapping: " + os.getenv("MASTERS_DNS_MAPPINGS")
 
 template_vars = {
   "master_list": os.getenv("MASTERS"),
@@ -97,8 +97,8 @@ for path, dirs, files in os.walk(template_dir):
             text = src.read()
             for key in template_vars:
               print "key: " + key
-              if (template_vars[key] != None):  
-                  print "Replacing " +key+ " with: " + template_vars[key]
+              #if (template_vars[key] != None):  
+              #    print "Replacing " +key+ " with: " + template_vars[key]
               text = text.replace("{{" + key + "}}", template_vars[key])
             dest.write(text)
             dest.close()
