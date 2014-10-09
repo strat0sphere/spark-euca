@@ -3,7 +3,7 @@
 mkdir /executor_tars
 wget -P /executor_tars http://php.cs.ucsb.edu/spark-related-packages/executor_tars/spark-1.1.0-bin-2.3.0.tgz
 
-chown -R /executor_tars
+chown -R hdfs:hadoop /executor_tars
 
 echo "Putting spark-1.1.0-bin-2.3.0.tgz to HDFS..."
 #/executor_tars directory already exists on the emi
