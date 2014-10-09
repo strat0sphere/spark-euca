@@ -435,7 +435,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
 
   #modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs', 'mapreduce', 'spark-standalone', 'tachyon']
 
-  modules = ["hadoop-on-mesos", "spark-on-mesos"]
+  modules = ["spark-on-mesos", "hadoop-on-mesos"]
 
   ssh(master, opts, "rm -rf spark-euca && git clone -b mesos-emi https://github.com/strat0sphere/spark-euca.git")
 
