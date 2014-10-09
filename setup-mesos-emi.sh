@@ -151,7 +151,7 @@ ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-d
 done
 wait
 
-$run_tests=$2
+$run_tests=$1
 
 #installing required packages to slave nodes
 #echo "Installing required packages to slave nodes..."

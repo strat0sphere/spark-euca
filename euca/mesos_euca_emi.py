@@ -141,7 +141,7 @@ def parse_args():
   parser.add_option("-f", "--ft", metavar="NUM_MASTERS", default="1", 
       help="Number of masters to run. Default is 1. Greater values " + 
            "make Mesos run in fault-tolerant mode with ZooKeeper."),
-  parser.add_option("", "--run-tests", type="string", default="False", 
+  parser.add_option("--run-tests", type="string", default="False", 
       help="Set True if you want to run module tests") 
 
 
@@ -488,7 +488,7 @@ def setup_mesos_emi_cluster(master, opts):
     ssh(master, opts, "chmod u+x spark-euca/setup-mesos-emi.sh")
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
-    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.os_type + " "+ opts.run_tests)
+    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests)
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
     #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
