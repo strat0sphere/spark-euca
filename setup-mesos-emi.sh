@@ -265,6 +265,20 @@ done
 #cd /root/spark-euca  # guard against setup.sh changing the cwd
 #done
 
+
+#Startup each module
+for module in $MODULES; do
+echo "Setting up $module"
+source ./$module/setup.sh
+sleep 1
+cd /root/spark-euca  # guard against setup.sh changing the cwd
+done
+
+# Test modules
+
+echo "run_tests=$run_tests"
+if [ "$run_tests" == "True" ]; then
+
 # Add test code
 for module in $MODULES; do
 echo "Adding test code for $module"
@@ -274,10 +288,6 @@ fi
 cd /root/spark-euca  # guard against init.sh changing the cwd
 done
 
-
-# Test modules
-
-if [ "$run_tests" == "True" ]; then
 for module in $MODULES; do
 echo "Running tests $module"
 if [[ -e $module/run-test.sh ]]; then
@@ -287,15 +297,6 @@ cd /root/spark-euca  # guard against init.sh changing the cwd
 done
 fi
 
-#Startup each module
-#for module in $MODULES; do
-#echo "Setting up $module"
-#source ./$module/setup.sh
-#sleep 1
-#cd /root/spark-euca  # guard against setup.sh changing the cwd
-#done
 
-#echo "Running setup.sh from spark-testing/persistent-hdfs"
-#source /root/spark-testing/persistent-hdfs/setup.sh
-#cd /root/spark-euca  # guard against setup.sh changing the cwd
-#sleep 1
+
+
