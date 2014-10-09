@@ -32,6 +32,7 @@
 -w 120 
 --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh
 --installation-type mesos-emi
+--run-tests True
 launch mesos-cluster-emi
 """
 from __future__ import with_statement
