@@ -287,7 +287,7 @@ echo "Adding test code for $module"
 if [[ -e $module/setup-test.sh ]]; then
 source $module/setup-test.sh
 fi
-cd /root/spark-euca  # guard against init.sh changing the cwd
+cd /root/spark-euca  # guard against setup-test.sh changing the cwd
 done
 
 for module in $MODULES; do
@@ -295,7 +295,7 @@ echo "Running tests $module"
 if [[ -e $module/run-test.sh ]]; then
 source $module/run-test.sh
 fi
-cd /root/spark-euca  # guard against init.sh changing the cwd
+cd /root/spark-euca  # guard against run-test.sh changing the cwd
 done
 fi
 
