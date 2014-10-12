@@ -218,26 +218,22 @@ ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 10.0
 done
 
 
-echo "Starting Mesos-master..."
+echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 #Startup Mesos
 #TODO: Multiple masters?
-START_MASTER_COMMAND="nohup /root/mesos-installation/sbin/mesos-master --cluster=$CLUSTER_NAME --log_dir=/mnt/mesos-logs --zk=zk://$ACTIVE_MASTER_PRIVATE:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &"
-
-echo $START_MASTER_COMMAND
 
 for node in $MASTERS; do
 echo $node
-ssh $SSH_OPTS root@$node "$START_MASTER_COMMAND" & sleep 0.3
+ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh start-mesos-master; update-rc.d start-mesos-master defaults; service start-mesos-master" & sleep 10.0
 done
 
-echo "Starting Mesos-slaves..."
-START_SLAVE_COMMAND="nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master=zk://$ACTIVE_MASTER_PRIVATE:2181/mesos </dev/null >/dev/null 2>&1 &"
 
-echo $START_SLAVE_COMMAND
+echo "Adding slave startup script to /etc/init.d and starting Mesos-slave..."
 
 for node in $SLAVES; do
 echo $node
-ssh $SSH_OPTS root@$node "$START_SLAVE_COMMAND" & sleep 10.0
+chmod +x /root/mesos-installation/start-mesos-slave.sh
+ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-slave.sh start-mesos-slave; update-rc.d start-mesos-slave defaults; service start-mesos-slave" & sleep 10.0
 done
 
 
