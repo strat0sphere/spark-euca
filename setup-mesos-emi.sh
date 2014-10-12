@@ -218,6 +218,14 @@ ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 10.0
 done
 
 
+echo "RSYNC'ing /root/mesos-installation to other cluster nodes..."
+for node in $SLAVES $OTHER_MASTERS; do
+echo $node
+rsync -e "ssh $SSH_OPTS" -az /root/mesos-installation $node:/root &
+sleep 0.3
+done
+wait
+
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 #Startup Mesos
 #TODO: Multiple masters?
