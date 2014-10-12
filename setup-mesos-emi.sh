@@ -224,6 +224,7 @@ echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 
 for node in $MASTERS; do
 echo $node
+chmod +x /root/mesos-installation/start-mesos-master.sh
 ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh start-mesos-master; update-rc.d start-mesos-master defaults; service start-mesos-master" & sleep 10.0
 done
 
