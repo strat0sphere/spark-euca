@@ -241,8 +241,7 @@ echo "Adding slave startup script to /etc/init.d and starting Mesos-slave..."
 
 for node in $SLAVES; do
 echo $node
-chmod +x /root/mesos-installation/start-mesos-slave.sh
-ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-slave.sh start-mesos-slave; update-rc.d start-mesos-slave defaults; service start-mesos-slave" & sleep 10.0
+ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-slave.sh start-mesos-slave; update-rc.d start-mesos-slave defaults; service start-mesos-slave" & sleep 10.0
 done
 
 
