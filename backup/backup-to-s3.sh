@@ -4,7 +4,7 @@ rm -rf /mnt/hdfs-backup #delete previous backups
 mkdir -p /mnt/hdfs-backup
 chown -R hdfs:hadoop /mnt/hdfs-backup
 
-hadoop fs -get / /mnt/hdfs-backup/hdfs #copy everything from HDFS to local dirs
+hadoop fs -get / /mnt/hdfs-backup/ #copy everything from HDFS to local dirs
 
 
 #Rsyncing the file. For more options check here: http://s3tools.org/usage
