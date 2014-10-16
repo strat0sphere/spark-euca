@@ -418,7 +418,7 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
 
 # Deploy configuration files and run setup scripts on a newly launched
 # or started EC2 cluster.
-def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_key):
+def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_key, s3conn):
   master = master_nodes[0].public_dns_name
   if deploy_ssh_key:
     print "Generating cluster's SSH key on master..."
@@ -436,12 +436,12 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
 
   #modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs', 'mapreduce', 'spark-standalone', 'tachyon']
 
-  modules = ["spark-on-mesos", "hadoop-on-mesos"]
+  modules = ["spark-on-mesos", "hadoop-on-mesos", "s3cmd"]
 
   ssh(master, opts, "rm -rf spark-euca && git clone -b mesos-emi https://github.com/strat0sphere/spark-euca.git")
 
   print "Deploying files to master..."
-  deploy_files(conn, "deploy.mesos-emi", opts, master_nodes, slave_nodes, zoo_nodes, modules)
+  deploy_files(conn, "deploy.mesos-emi", opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn)
 
   print "Running setup on master..."
   #ssh(master, opts, "echo '****************'; ls -al")
@@ -554,7 +554,7 @@ def get_num_disks(instance_type):
 # cluster (e.g. lists of masters and slaves). Files are only deployed to
 # the first master instance in the cluster, and we expect the setup
 # script to be run on that instance to copy them to other nodes.
-def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, modules):
+def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn):
   active_master = master_nodes[0].public_dns_name
   active_master_private = master_nodes[0].private_dns_name
 
@@ -599,7 +599,11 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "swap": str(opts.swap),
     "modules": '\n'.join(modules),
     "mesos_version": opts.mesos_version,
-    "cluster_name": opts.cluster_name
+    "cluster_name": opts.cluster_name,
+    "aws_access_key": s3conn.aws_access_key,
+    "aws_secret_key": s3conn.aws_secret_key,
+    "walrus_ip": s3conn.walrus_ip
+    
   }
 
  
@@ -737,6 +741,10 @@ def real_main():
     euca_id=os.getenv('AWS_ACCESS_KEY')
     euca_key=os.getenv('AWS_SECRET_KEY')
     euca_region = RegionInfo(name="eucalyptus", endpoint=euca_ec2_host)
+    
+    #Parameters needed for S3 connection
+    s3conn = {'walrus_ip' : os.getenv('WARLUS_IP'), 'aws_access_key' : euca_id, 'aws_secret_key' : euca_key}
+    
     ec2conn = boto.connect_ec2(
         aws_access_key_id=euca_id,
         aws_secret_access_key=euca_key, 
@@ -770,7 +778,7 @@ def real_main():
           time.sleep(10)
           attach_volumes(conn, slave_nodes, opts.vol_size)
           time.sleep(10)
-    setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, True)
+    setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, True, s3conn)
 
   elif action == "destroy":
     response = raw_input("Are you sure you want to destroy the cluster " +
@@ -888,7 +896,7 @@ def real_main():
           inst.start()
           
     wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes, zoo_nodes)
-    setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, False)
+    setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, False, s3conn)
 
   else:
     print >> stderr, "Invalid action: %s" % action

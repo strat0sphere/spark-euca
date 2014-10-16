@@ -78,7 +78,10 @@ template_vars = {
   "slaves_dns_mappings_public": os.getenv("SLAVES_DNS_MAPPINGS_PUBLIC"),
   "mesos_version": os.getenv("MESOS_INSTALL_VERSION"),
   "java_home": os.getenv("JAVA_HOME"),
-  "cluster_name": os.getenv("CLUSTER_NAME")
+  "cluster_name": os.getenv("CLUSTER_NAME"),
+  "aws_access_key": os.getenv("AWS_ACCESS_KEY"),
+  "aws_secret_key": os.getenv("AWS_SECRET_KEY"),
+  "walrus_ip": os.getenv("WALRUS_IP")
 }
 
 template_dir="/root/spark-euca/templates"
