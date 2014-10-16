@@ -1,7 +1,7 @@
 #!/bin/sh
 
 rm -rf /mnt/hdfs-backup #delete previous backups
-mkdir -P /mnt/hdfs-backup
+mkdir -p /mnt/hdfs-backup
 chown -R hdfs:hadoop /mnt/hdfs-backup
 
 hadoop fs -get / /mnt/hdfs-backup/hdfs #copy everything from HDFS to local dirs
@@ -10,6 +10,7 @@ hadoop fs -get / /mnt/hdfs-backup/hdfs #copy everything from HDFS to local dirs
 #Rsyncing the file. For more options check here: http://s3tools.org/usage
 s3cmd -c /etc/s3cmd/s3cfg --disable-multipart --delete-removed --delete-after --skip-existing sync /mnt/hdfs-backup s3://$CLUSTER_NAME/#will skip files that already exist on the destination but will first check the md5 checksums
 
+echo "backup completed" >> /etc/hdfs-backup/backup.log
 ### Alternative ways to backup ###
 
 #Faster but more prune to error

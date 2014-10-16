@@ -1,13 +1,13 @@
 #!/bin/sh
 
 #Create the backup dirs
-mkdir -P /mnt/hdfs-backup
+mkdir -p /mnt/hdfs-backup
 chown -R hdfs:hadoop /mnt/hdfs-backup
 
 
 
 #Get the file from S3
-s3cmd -c /etc/s3cmd/s3cfg get --recursive s3://$CLUSTER_NAME/hdfs-backup/
+s3cmd -c /root/s3cmd/s3cfg get --recursive --disable-multipart s3://$CLUSTER_NAME/hdfs-backup/ /mnt/hdfs-backup/
 
 hadoop fs -put /mnt/hdfs-backup/* /
 
