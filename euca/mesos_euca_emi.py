@@ -554,6 +554,7 @@ def get_num_disks(instance_type):
 # cluster (e.g. lists of masters and slaves). Files are only deployed to
 # the first master instance in the cluster, and we expect the setup
 # script to be run on that instance to copy them to other nodes.
+#This function fills up the variables on the ec3-variables.sh script
 def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn):
   active_master = master_nodes[0].public_dns_name
   active_master_private = master_nodes[0].private_dns_name
