@@ -143,7 +143,9 @@ def parse_args():
       help="Number of masters to run. Default is 1. Greater values " + 
            "make Mesos run in fault-tolerant mode with ZooKeeper."),
   parser.add_option("--run-tests", type="string", default="False", 
-      help="Set True if you want to run module tests") 
+      help="Set True if you want to run module tests")
+  parser.add_option("--restore", action="store_true", default=False, 
+      help="Restore HDFS from previous backup")  
 
 
 
@@ -436,7 +438,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
 
   #modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs', 'mapreduce', 'spark-standalone', 'tachyon']
 
-  modules = ["spark-on-mesos", "hadoop-on-mesos", "backup"]
+  modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"]
 
   ssh(master, opts, "rm -rf spark-euca && git clone -b mesos-emi https://github.com/strat0sphere/spark-euca.git")
 
@@ -490,7 +492,7 @@ def setup_mesos_emi_cluster(master, opts):
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
     #print "opts.run_tests: " + opts.run_tests
-    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests)
+    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore)
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
     #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
