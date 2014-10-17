@@ -603,9 +603,9 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "modules": '\n'.join(modules),
     "mesos_version": opts.mesos_version,
     "cluster_name": opts.cluster_name,
-    "aws_access_key": s3conn.aws_access_key,
-    "aws_secret_key": s3conn.aws_secret_key,
-    "walrus_ip": s3conn.walrus_ip
+    "aws_access_key": s3conn['aws_access_key'],
+    "aws_secret_key": s3conn['aws_secret_key'],
+    "walrus_ip": s3conn['walrus_ip']
     
   }
 
