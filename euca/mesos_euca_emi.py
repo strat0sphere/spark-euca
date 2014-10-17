@@ -144,7 +144,7 @@ def parse_args():
            "make Mesos run in fault-tolerant mode with ZooKeeper."),
   parser.add_option("--run-tests", type="string", default="False", 
       help="Set True if you want to run module tests")
-  parser.add_option("--restore", action="store_true", default=False, 
+  parser.add_option("--restore", type="string", default="False",  
       help="Restore HDFS from previous backup")  
 
 
@@ -631,7 +631,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
               text = src.read()
               for key in template_vars:
                   if (key is not None):
-                    print "key" + key
+                    #print "key" + key
                     text = text.replace("{{" + key + "}}", template_vars[key])
               dest.write(text)
               dest.close()
