@@ -748,7 +748,7 @@ def real_main():
     euca_region = RegionInfo(name="eucalyptus", endpoint=euca_ec2_host)
     
     #Parameters needed for S3 connection
-    s3conn = {'walrus_ip' : os.getenv('WARLUS_IP'), 'aws_access_key' : euca_id, 'aws_secret_key' : euca_key}
+    s3conn = {'walrus_ip' : os.getenv('WALRUS_IP'), 'aws_access_key' : euca_id, 'aws_secret_key' : euca_key}
     
     ec2conn = boto.connect_ec2(
         aws_access_key_id=euca_id,
