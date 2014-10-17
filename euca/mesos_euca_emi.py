@@ -630,7 +630,9 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
             with open(local_file, "w") as dest:
               text = src.read()
               for key in template_vars:
-                text = text.replace("{{" + key + "}}", template_vars[key])
+                  if (key is not None):
+                    print "key" + key
+                    text = text.replace("{{" + key + "}}", template_vars[key])
               dest.write(text)
               dest.close()
   
