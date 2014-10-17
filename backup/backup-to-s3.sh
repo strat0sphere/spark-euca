@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 rm -rf /mnt/hdfs-backup #delete previous backups
 mkdir -p /mnt/hdfs-backup

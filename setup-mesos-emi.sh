@@ -152,6 +152,9 @@ done
 wait
 
 run_tests=$1
+restore=$2
+
+export RESTORE=$restore #If it is a restore session the backup module will restore files from S3
 
 #installing required packages to slave nodes
 #echo "Installing required packages to slave nodes..."
