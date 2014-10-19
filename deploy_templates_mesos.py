@@ -94,6 +94,7 @@ template_dir="/root/spark-euca/templates"
 modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"]
 
 for path, dirs, files in os.walk(template_dir):
+  print "template_dir" + template_dir  
   if dirInModules(template_dir, modules):
       print template_dir + " in modules" 
       if path.find(".svn") == -1:
