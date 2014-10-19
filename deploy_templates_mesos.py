@@ -66,6 +66,12 @@ worker_cores = max(slave_cpus / worker_instances, 1)
 #print "masters: " + os.getenv("MASTERS")
 #print "master_dns_mapping: " + os.getenv("MASTERS_DNS_MAPPINGS")
 
+def dirInModules(local_dir, modules):
+    for mod in modules:
+        if mod == local_dir:
+            return True
+    return False
+
 template_vars = {
   "master_list": os.getenv("MASTERS"),
   "active_master": os.getenv("MASTERS").split("\n")[0],
@@ -110,9 +116,3 @@ for path, dirs, files in os.walk(template_dir):
                 dest.write(text)
                 dest.close()
 
-
-def dirInModules(local_dir, modules):
-    for mod in modules:
-        if mod == local_dir:
-            return True
-    return False
