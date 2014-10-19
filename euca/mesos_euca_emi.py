@@ -438,7 +438,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
 
   #modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs', 'mapreduce', 'spark-standalone', 'tachyon']
 
-  modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"]
+  modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"] #It is also defined on deploy_templates_mesos
 
   ssh(master, opts, "rm -rf spark-euca && git clone -b mesos-emi https://github.com/strat0sphere/spark-euca.git")
 
@@ -651,13 +651,6 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   subprocess.check_call(command)
   # Remove the temp directory we created above
   shutil.rmtree(tmp_dir)
-
-
-def dirInModules(local_dir, modules):
-    for mod in modules:
-        if mod == local_dir:
-            return True
-    return False
 
 def stringify_command(parts):
   if isinstance(parts, str):
