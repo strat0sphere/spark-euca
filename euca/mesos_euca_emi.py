@@ -623,7 +623,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
       dest_dir = os.path.join('/', path[len(root_dir):])
       local_dir = tmp_dir + dest_dir
       print "DEBUG: local_dir: " + local_dir
-      if not os.path.exists(local_dir) and dirInModules(local_dir, modules):
+      #and dirInModules(local_dir, modules)
+      if not os.path.exists(local_dir):
         os.makedirs(local_dir)
       for filename in files:
         if filename[0] not in '#.~' and filename[-1] != '~':
