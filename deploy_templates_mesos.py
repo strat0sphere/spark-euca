@@ -68,7 +68,7 @@ worker_cores = max(slave_cpus / worker_instances, 1)
 
 def dirInModules(local_dir, modules):
     for mod in modules:
-        if mod == local_dir:
+        if mod in local_dir:
             return True
     return False
 
@@ -95,13 +95,16 @@ modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"]
 
 for path, dirs, files in os.walk(template_dir):
   print "template_dir" + template_dir  
-  #if dirInModules(template_dir, modules):
-      #print template_dir + " in modules" 
+  
   if path.find(".svn") == -1:
     dest_dir = os.path.join('/', path[len(template_dir):])
     if not os.path.exists(dest_dir):
       print "DEBUG: dest_dir " + dest_dir
-      os.makedirs(dest_dir)
+      if not dirInModules(dest_dir, modules):
+          continue
+      else:
+       print dest_dir + " in modules" 
+       os.makedirs(dest_dir)
     for filename in files:
       if filename[0] not in '#.~' and filename[-1] != '~':
         dest_file = os.path.join(dest_dir, filename)
