@@ -562,14 +562,15 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   active_master_private = master_nodes[0].private_dns_name
 
   num_disks = get_num_disks(opts.instance_type)
-  hdfs_data_dirs = "/mnt/ephemeral-hdfs/data" #TODO: Not using - delete or change to cloudera-hdfs and data dirs
-  mapred_local_dirs = "/mnt/hadoop/mrlocal" #TODO: Not using - delete
-  spark_local_dirs = "/mnt/spark" #TODO: Not using - delete
-  if num_disks > 1:
-    for i in range(2, num_disks + 1):
-      hdfs_data_dirs += ",/mnt%d/ephemeral-hdfs/data" % i
-      mapred_local_dirs += ",/mnt%d/hadoop/mrlocal" % i
-      spark_local_dirs += ",/mnt%d/spark" % i
+  #hdfs_data_dirs = "/mnt/ephemeral-hdfs/data" #TODO: Not using - delete or change to cloudera-hdfs and data dirs
+  #mapred_local_dirs = "/mnt/hadoop/mrlocal" #TODO: Not using - delete
+  #spark_local_dirs = "/mnt/spark" #TODO: Not using - delete
+  
+  #if num_disks > 1:
+  #  for i in range(2, num_disks + 1):
+  #    hdfs_data_dirs += ",/mnt%d/ephemeral-hdfs/data" % i
+  #    mapred_local_dirs += ",/mnt%d/hadoop/mrlocal" % i
+  #    spark_local_dirs += ",/mnt%d/spark" % i
 
   if zoo_nodes != []:
     zoo_list = '\n'.join([i.public_dns_name for i in zoo_nodes])
@@ -616,6 +617,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   # Create a temp directory in which we will place all the files to be
   # deployed after we substitue template parameters in them
   tmp_dir = tempfile.mkdtemp()
+  print "DEBUG: tmp_dir " + tmp_dir
   for path, dirs, files in os.walk(root_dir):
     if path.find(".svn") == -1:
       dest_dir = os.path.join('/', path[len(root_dir):])
