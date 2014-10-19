@@ -95,25 +95,25 @@ modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"]
 
 for path, dirs, files in os.walk(template_dir):
   print "template_dir" + template_dir  
-  if dirInModules(template_dir, modules):
-      print template_dir + " in modules" 
-      if path.find(".svn") == -1:
-        dest_dir = os.path.join('/', path[len(template_dir):])
-        if not os.path.exists(dest_dir):
-          print "DEBUG: dest_dir " + dest_dir
-          os.makedirs(dest_dir)
-        for filename in files:
-          if filename[0] not in '#.~' and filename[-1] != '~':
-            dest_file = os.path.join(dest_dir, filename)
-            with open(os.path.join(path, filename)) as src:
-              with open(dest_file, "w") as dest:
-                print "Configuring " + dest_file
-                text = src.read()
-                for key in template_vars:
-                  print "key: " + key
-                  #if (template_vars[key] != None):  
-                  #    print "Replacing " +key+ " with: " + template_vars[key]
-                  text = text.replace("{{" + key + "}}", template_vars[key])
-                dest.write(text)
-                dest.close()
+  #if dirInModules(template_dir, modules):
+      #print template_dir + " in modules" 
+  if path.find(".svn") == -1:
+    dest_dir = os.path.join('/', path[len(template_dir):])
+    if not os.path.exists(dest_dir):
+      print "DEBUG: dest_dir " + dest_dir
+      os.makedirs(dest_dir)
+    for filename in files:
+      if filename[0] not in '#.~' and filename[-1] != '~':
+        dest_file = os.path.join(dest_dir, filename)
+        with open(os.path.join(path, filename)) as src:
+          with open(dest_file, "w") as dest:
+            print "Configuring " + dest_file
+            text = src.read()
+            for key in template_vars:
+              print "key: " + key
+              #if (template_vars[key] != None):  
+              #    print "Replacing " +key+ " with: " + template_vars[key]
+              text = text.replace("{{" + key + "}}", template_vars[key])
+            dest.write(text)
+            dest.close()
 
