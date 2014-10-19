@@ -1,9 +1,5 @@
-#!/bin/bassh
+#!/bin/bash
 
-pushd /root
-
-if [ "$RESTORE" == "True"]; then
-restore-from-s3.sh #run restore script
+if [[ "$RESTORE" == "True" ]]; then
+./restore-from-s3.sh #run restore script
 fi
-
-popd
