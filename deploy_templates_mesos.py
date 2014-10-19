@@ -86,15 +86,8 @@ template_vars = {
 
 template_dir="/root/spark-euca/templates"
 modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"]
-print "DEBUG modules: " + os.getenv["MODULES"]
-splitModules = os.getenv["MODULES"].split('\n')
-print "Splitted string: ", splitModules
-
 
 for path, dirs, files in os.walk(template_dir):
-  print "dir: ", template_dir  
-  if dirInModules(template_dir, splitModules):
-      print "True" 
   if dirInModules(template_dir, modules):
       print template_dir + " in modules" 
       if path.find(".svn") == -1:
