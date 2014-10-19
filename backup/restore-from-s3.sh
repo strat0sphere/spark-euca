@@ -10,7 +10,7 @@ echo "Geting files from S3..."
 s3cmd -c /etc/s3cmd/s3cfg get --recursive --disable-multipart s3://$CLUSTER_NAME/hdfs-backup/ /mnt/hdfs-backup/
 
 echo "Putting files on HDFS..."
-hadoop fs -put /mnt/hdfs-backup/* /
+sudo -u hdfs hadoop fs -put /mnt/hdfs-backup/* /
 
 rm -rf /mnt/hdfs-backup #delete previous backups
 mkdir -p /mnt/hdfs-backup
