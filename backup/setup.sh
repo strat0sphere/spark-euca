@@ -1,5 +1,5 @@
 #!/bin/bash
 
 if [[ "$RESTORE" == "True" ]]; then
-./restore-from-s3.sh #run restore script
+    /root/spark-euca/backup/restore-from-s3.sh #run restore script
 fi
