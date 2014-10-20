@@ -1,8 +1,8 @@
 #!/bin/bash
 pushd /root
 
-echo "I love racelab" > /tmp/file0
-echo "Do you love racelab?" > /tmp/file1
+echo "I love UCSB" > /tmp/file0
+echo "Do you love UCSB?" > /tmp/file1
 chown hdfs:hadoop /tmp/file0
 chown hdfs:hadoop /tmp/file1
 

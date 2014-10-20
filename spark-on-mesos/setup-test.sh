@@ -2,7 +2,7 @@
 
 pushd /root
 
-echo "I love racelab" > /tmp/file0
+echo "I love UCSB" > /tmp/file0
 chown hdfs:hadoop /tmp/file0
 
 hadoop fs -mkdir -p /user/foo/data
