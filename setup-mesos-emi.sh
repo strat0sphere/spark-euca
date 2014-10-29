@@ -290,19 +290,11 @@ if [ "$run_tests" == "True" ]; then
 
 # Add test code
 for module in $MODULES; do
-echo "Adding test code for $module"
-if [[ -e $module/setup-test.sh ]]; then
-source $module/setup-test.sh
+echo "Adding test code & running tests for $module"
+if [[ -e $module/test.sh ]]; then
+source $module/test.sh
 fi
 cd /root/spark-euca  # guard against setup-test.sh changing the cwd
-done
-
-for module in $MODULES; do
-echo "Running tests $module"
-if [[ -e $module/run-test.sh ]]; then
-source $module/run-test.sh
-fi
-cd /root/spark-euca  # guard against run-test.sh changing the cwd
 done
 fi
 
