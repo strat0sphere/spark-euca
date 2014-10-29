@@ -36,4 +36,40 @@
         <name>dfs.client.file-block-storage-locations.timeout</name>
         <value>3000</value>
     </property>
+    
+    <!--  jets3t properties to be used with hadoop distcp command -->
+<!-- 
+<property>
+<name>fs.s3.multipart.uploads.enabled</name>
+<value>true</value>
+</property>
+<property>
+<name>fs.s3.multipart.uploads.block.size</name>
+<value>67108864</value>
+</property>
+<property>
+<name>fs.s3.multipart.copy.block.size</name>
+<value>5368709120</value>
+</property>
+
+<property>
+    <name>fs.s3.awsAccessKeyId</name>
+    <value>Enter AWS AccessKey</value>
+</property>
+
+<property>
+    <name>fs.s3.awsSecretAccessKey</name>
+    <value>>Enter AWS AccessKey</value>
+</property>
+
+<property>
+    <name>fs.s3n.awsAccessKeyId</name>
+    <value>>Enter AWS AccessKey</value>
+</property>
+
+<property>
+    <name>fs.s3n.awsSecretAccessKey</name>
+    <value>>Enter AWS SecretKey</value>
+</property>
+-->
 </configuration>
