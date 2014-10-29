@@ -2,7 +2,7 @@
 
 pushd /root
 
-if [ -d "mesos" ]; then
+if [ -d "mesos-$MESOS_SETUP_VERSION" ]; then
 echo "Mesos seems to be installed. Exiting."
 return 0
 fi
