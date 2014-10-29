@@ -237,6 +237,8 @@ def launch_cluster(conn, opts, cluster_name):
     master_group.authorize('tcp', 60070, 60070, '0.0.0.0/0')
     master_group.authorize('tcp', 38090, 38090, '0.0.0.0/0')
     master_group.authorize('tcp', 4040, 4045, '0.0.0.0/0')
+    master_group.authorize('tcp', 40000, 40000, '0.0.0.0/0') #apache hama
+    master_group.authorize('tcp', 40013, 40013, '0.0.0.0/0') #apache hama
     if opts.ganglia:
       master_group.authorize('tcp', 5080, 5080, '0.0.0.0/0')
   if slave_group.rules == []: # Group was just now created
