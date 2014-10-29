@@ -35,6 +35,17 @@ export MASTERS_DNS_MAPPINGS="{{masters_dns_mappings}}"
 export SLAVES_DNS_MAPPINGS="{{slaves_dns_mappings}}"
 export MASTERS_DNS_MAPPINGS_PUBLIC="{{masters_dns_mappings_public}}"
 export SLAVES_DNS_MAPPINGS_PUBLIC="{{slaves_dns_mappings_public}}"
+
+#Backup specific variables
 export AWS_ACCESS_KEY="{{aws_access_key}}"
 export AWS_SECRET_KEY="{{aws_secret_key}}"
 export WALRUS_IP="{{walrus_ip}}"
+
+#MPI on Mesos specific variables
+#TODO: Its OK to be hardcoded for the emi version but for building from scratch they have to be configurable
+export MESOS_SOURCE_DIR= "/root/mesos-0.20.0" #"{{mesos_source_dir}}"
+export MESOS_BUILD_DIR="/root/mesos-0.20.0/build" #"{{mesos_build_dir}}"
+export PYTHON_PATH="/usr/bin/python" #"{{python_path}}" - (which python)
+export PYTHON_EGG_POSTFIX="py2.7-linux-x86_64" #"{{python_egg_postfix}}"
+export PYTHON_EGG_PUREPY_POSTFIX="py2.7" #"{{python_egg_purepy_postfix}}"
+

@@ -87,11 +87,17 @@ template_vars = {
   "cluster_name": os.getenv("CLUSTER_NAME"),
   "aws_access_key": os.getenv("AWS_ACCESS_KEY"),
   "aws_secret_key": os.getenv("AWS_SECRET_KEY"),
-  "walrus_ip": os.getenv("WALRUS_IP")
+  "walrus_ip": os.getenv("WALRUS_IP"),
+  "mesos_source_dir": os.getenv("MESOS_SOURCE_DIR"),
+  "mesos_build_dir": os.getenv("MESOS_BUILD_DIR"), 
+  "python_path": os.getenv("PYTHON_PATH"),
+  "python_egg_postfix": os.getenv("PYTHON_EGG_POSTFIX"),
+  "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUPERY_POSTFIX")
 }
 
 template_dir="/root/spark-euca/templates"
-modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"]
+modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd", "mpi"]
+
 
 for path, dirs, files in os.walk(template_dir):
   print "template_dir" + template_dir  
