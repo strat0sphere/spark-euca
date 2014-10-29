@@ -440,7 +440,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
 
   #modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs', 'mapreduce', 'spark-standalone', 'tachyon']
 
-  modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"] #It is also defined on deploy_templates_mesos
+  modules = ["mesos", "mpich2", "spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"] #It is also defined on deploy_templates_mesos
 
   ssh(master, opts, "rm -rf spark-euca && git clone -b mesos-emi https://github.com/strat0sphere/spark-euca.git")
 
@@ -558,7 +558,7 @@ def get_num_disks(instance_type):
 # cluster (e.g. lists of masters and slaves). Files are only deployed to
 # the first master instance in the cluster, and we expect the setup
 # script to be run on that instance to copy them to other nodes.
-#This function fills up the variables on the ec3-variables.sh script
+#This function fills up the variables on the ec2-variables.sh script
 def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn):
   active_master = master_nodes[0].public_dns_name
   active_master_private = master_nodes[0].private_dns_name
@@ -608,7 +608,12 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "cluster_name": opts.cluster_name,
     "aws_access_key": s3conn['aws_access_key'],
     "aws_secret_key": s3conn['aws_secret_key'],
-    "walrus_ip": s3conn['walrus_ip']
+    "walrus_ip": s3conn['walrus_ip'],
+    "mesos_source_dir": os.getenv("MESOS_SOURCE_DIR"),
+    "mesos_build_dir": os.getenv("MESOS_BUILD_DIR"), 
+    "python_path": os.getenv("PYTHON_PATH"),
+    "python_egg_postfix": os.getenv("PYTHON_EGG_POSTFIX"),
+    "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUPERY_POSTFIX")
     
   }
 
