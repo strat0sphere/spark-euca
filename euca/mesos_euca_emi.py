@@ -608,12 +608,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "cluster_name": opts.cluster_name,
     "aws_access_key": s3conn['aws_access_key'],
     "aws_secret_key": s3conn['aws_secret_key'],
-    "walrus_ip": s3conn['walrus_ip'],
-    "mesos_source_dir": os.getenv("MESOS_SOURCE_DIR"),
-    "mesos_build_dir": os.getenv("MESOS_BUILD_DIR"), 
-    "python_path": os.getenv("PYTHON_PATH"),
-    "python_egg_postfix": os.getenv("PYTHON_EGG_POSTFIX"),
-    "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUPERY_POSTFIX")
+    "walrus_ip": s3conn['walrus_ip']
     
   }
 
