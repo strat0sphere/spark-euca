@@ -96,7 +96,7 @@ template_vars = {
 }
 
 template_dir="/root/spark-euca/templates"
-modules = ["spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd", "mpi"]
+modules = ["mesos", "mpich2", "spark-on-mesos", "hadoop-on-mesos", "backup", "s3cmd"]
 
 
 for path, dirs, files in os.walk(template_dir):
