@@ -10,6 +10,8 @@ make 2>&1 | tee m.txt
 make install 2>&1 | tee mi.txt
 
 #Also put this on /etc/environment
+
+sed -i '/^PATH=/s/$/:\/root\/mpich2-install\/bin/'
 PATH=/root/mpich2-install/bin:$PATH ; export PATH
 
 #-> Create .mpd conf file in home directory:
