@@ -82,7 +82,7 @@ template_vars = {
   "slaves_dns_mappings": os.getenv("SLAVES_DNS_MAPPINGS"),
   "masters_dns_mappings_public": os.getenv("MASTERS_DNS_MAPPINGS_PUBLIC"),
   "slaves_dns_mappings_public": os.getenv("SLAVES_DNS_MAPPINGS_PUBLIC"),
-  "mesos_version": os.getenv("MESOS_INSTALL_VERSION"),
+  "mesos_setup_version": os.getenv("MESOS_SETUP_VERSION"),
   "java_home": os.getenv("JAVA_HOME"),
   "cluster_name": os.getenv("CLUSTER_NAME"),
   "aws_access_key": os.getenv("AWS_ACCESS_KEY"),

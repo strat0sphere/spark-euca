@@ -96,7 +96,7 @@ def parse_args():
       help="Github repo from which to checkout supplied commit hash")
   parser.add_option("--hadoop-major-version", default="1",
       help="Major version of Hadoop (default: 0.20.0)")
-  parser.add_option("--mesos-version", default="0.20.0",
+  parser.add_option("--mesos-setup-version", default="0.20.0",
       help="Major version of Hadoop (default: 1)")
   parser.add_option("-D", metavar="[ADDRESS:]PORT", dest="proxy_port",
       help="Use SSH dynamic port forwarding to create a SOCKS proxy at " +
@@ -604,7 +604,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "cluster_url": cluster_url,
     "swap": str(opts.swap),
     "modules": '\n'.join(modules),
-    "mesos_version": opts.mesos_version,
+    "mesos_setup_version": opts.mesos_setup_version,
     "cluster_name": opts.cluster_name,
     "aws_access_key": s3conn['aws_access_key'],
     "aws_secret_key": s3conn['aws_secret_key'],
