@@ -21,6 +21,7 @@
 export MASTERS="{{master_list}}"
 export SLAVES="{{slave_list}}"
 export ZOOS="{{zoo_list}}"
+export NODES_NUMBER={{nodes_number}} #total number of master and slave nodes - used for mpdboot command
 export HDFS_DATA_DIRS="{{hdfs_data_dirs}}"
 export MAPRED_LOCAL_DIRS="{{mapred_local_dirs}}"
 export MODULES="{{modules}}"

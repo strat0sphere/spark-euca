@@ -4,4 +4,4 @@
 /root/spark-euca/copy-dir /root/mpich2-install
 
 #Boot mpd ring
-mpdboot --file=/etc/mpd.hosts --verbose -n 3
+mpdboot --file=/etc/mpd.hosts --verbose -n $NODES_NUMBER
