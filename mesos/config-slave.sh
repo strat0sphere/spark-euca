@@ -1,6 +1,7 @@
 #ATTENTION: User the IP used on the file /usr/local/var/mesos/deploy/slaves  and .../masters
 #nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --master=euca-128-111-179-167.eucalyptus.race.cs.ucsb.edu:5050 </dev/null >/dev/null 2>&1 &
-export LD_LIBRARY_PATH=/root/mesos-$MESOS_VERSION/build/src/.libs/
+#export LD_LIBRARY_PATH=/root/mesos-$MESOS_VERSION/build/src/.libs/
+export LD_LIBRARY_PATH=/root/mesos-installation/lib/
 #with zookeper
 nohup /root/mesos-installation/sbin/mesos-slave --log_dir=/mnt/mesos-logs --master=zk://10.2.7.122:2181/mesos </dev/null >/dev/null 2>&1 &
 
