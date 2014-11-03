@@ -609,7 +609,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "aws_access_key": s3conn['aws_access_key'],
     "aws_secret_key": s3conn['aws_secret_key'],
     "walrus_ip": s3conn['walrus_ip'],
-    "nodes_number": opts.slaves+1
+    "nodes_number": str(opts.slaves+1)
     
   }
 
