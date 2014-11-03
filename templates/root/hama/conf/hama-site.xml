@@ -44,7 +44,7 @@
     </property>
     <property>
       <name>hama.mesos.executor.uri</name>
-      <value>hdfs://{{active_master_private}}:9000/hama-0.6.4-hadoop-2.3.0-mr1-cdh5.1.2-mesos-0.20.0.tar.gz</value>
+      <value>hdfs://{{active_master_private}}:9000/hama.tar.gz</value>
       <description>This is the URI of the Hama distribution
       </description>
     </property>
