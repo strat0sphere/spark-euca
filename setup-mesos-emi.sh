@@ -66,6 +66,7 @@ echo "SSH'ing to master machine(s) to approve key(s)..."
 for master in $MASTERS; do
 echo $master
 #Delete previous PUBLIC_DNS env variable if exists (restore session)
+echo "Seding previous PUBLIC_DNS value..."
 ssh $SSH_OPTS $master "sed '/PUBLIC_DNS=/d' /etc/environment"
 ssh $SSH_OPTS $master "echo 'PUBLIC_DNS=$master' >> /etc/environment"
 ssh $SSH_OPTS $master echo -n &
