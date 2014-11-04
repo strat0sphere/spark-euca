@@ -62,13 +62,12 @@ worker_cores = max(slave_cpus / worker_instances, 1)
 
 
 #TODO: some of the following are not needed
-
 #print "masters: " + os.getenv("MASTERS")
 #print "master_dns_mapping: " + os.getenv("MASTERS_DNS_MAPPINGS")
 
-def dirInModules(local_dir, modules):
-    for mod in modules:
-        if mod in local_dir:
+def dirNeedsConfig(local_dir, config_dirs):
+    for dir in config_dirs:
+        if dir in local_dir:
             return True
     return False
 
@@ -96,7 +95,10 @@ template_vars = {
 }
 
 template_dir="/root/spark-euca/templates"
-modules = ["mpich2", "hama-on-mesos", "spark-on-mesos", "hadoop-on-mesos", "s3cmd", "backup"]
+
+#config_dirs condais all the directories that might need some configuration. This includes the modules that are installed by 
+#the script (which are all located under /root) plus the directories under /etc or any other dirs requiring configuration
+config_dirs = ["etc","mpich2", "hama-on-mesos", "spark-on-mesos", "hadoop-on-mesos", "s3cmd", "backup"]
 
 
 for path, dirs, files in os.walk(template_dir):
@@ -106,10 +108,10 @@ for path, dirs, files in os.walk(template_dir):
     dest_dir = os.path.join('/', path[len(template_dir):])
     if not os.path.exists(dest_dir):
       print "DEBUG: dest_dir " + dest_dir
-      if not dirInModules(dest_dir, modules):
+      if not dirNeedsConfig(dest_dir, config_dirs):
           continue
       else:
-       print dest_dir + " in modules" 
+       print dest_dir + " in config_dirs" 
        os.makedirs(dest_dir)
     for filename in files:
       if filename[0] not in '#.~' and filename[-1] != '~':
