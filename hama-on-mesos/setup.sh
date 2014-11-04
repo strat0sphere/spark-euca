@@ -11,6 +11,8 @@ echo "Building hama... mvn clean install -Phadoop2 -Dhadoop.version=2.3.0-cdh5.1
 mvn clean install -Phadoop2 -Dhadoop.version=2.3.0-cdh5.1.2 -Dmesos.version=0.20.0
 
 
+#For hama-0.64 commons-collections jar is missing --> cp ~/hama/lib/commons-collections-3.2.1.jar ~/hama-0.6.4/dist/target/hama-0.6.4/hama-0.6.4/lib/
+
 #Make scripts executable
 #chmod +x /bin/* --> not needed if you take jar from the /dist directory
 

@@ -92,11 +92,11 @@ template_vars = {
   "mesos_build_dir": os.getenv("MESOS_BUILD_DIR"), 
   "python_path": os.getenv("PYTHON_PATH"),
   "python_egg_postfix": os.getenv("PYTHON_EGG_POSTFIX"),
-  "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUPERY_POSTFIX")
+  "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUREPY_POSTFIX")
 }
 
 template_dir="/root/spark-euca/templates"
-modules = ["mesos", "mpich2", "hama", "spark-on-mesos", "hadoop-on-mesos", "s3cmd", "backup"]
+modules = ["mpich2", "hama-on-mesos", "spark-on-mesos", "hadoop-on-mesos", "s3cmd", "backup"]
 
 
 for path, dirs, files in os.walk(template_dir):

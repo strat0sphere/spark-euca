@@ -46,7 +46,7 @@ export WALRUS_IP="{{walrus_ip}}"
 
 #MPI on Mesos specific variables
 #TODO: Its OK to be hardcoded for the emi version but for building from scratch they have to be configurable
-export MESOS_SOURCE_DIR= "/root/mesos-0.20.0" #"{{mesos_source_dir}}"
+export MESOS_SOURCE_DIR="/root/mesos-0.20.0" #"{{mesos_source_dir}}"
 export MESOS_BUILD_DIR="/root/mesos-0.20.0/build" #"{{mesos_build_dir}}"
 export PYTHON_PATH="/usr/bin/python" #"{{python_path}}" - (which python)
 export PYTHON_EGG_POSTFIX="py2.7-linux-x86_64" #"{{python_egg_postfix}}"

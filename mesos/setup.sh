@@ -35,7 +35,7 @@ make install
 
 #TODO: SET LD_LIBRARY_PATH CORRECTLY ON EMI
 #delete previous LD_LIBRARY_PATH
-sed -i '/LD_LIBRARY_PATH=/d' test.txt
+sed -i '/LD_LIBRARY_PATH=/d'  /etc/environment
 echo "LD_LIBRARY_PATH=/root/mesos-installation/lib" >> /etc/environment
 export LD_LIBRARY_PATH=/root/mesos-installation/lib/
 
