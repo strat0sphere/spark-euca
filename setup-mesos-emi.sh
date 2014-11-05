@@ -17,6 +17,8 @@ source ec2-variables.sh
 #PRIVATE_DNS=hostname
 #echo $PRIVATE_DNS > /etc/hostname
 #export HOSTNAME=$PRIVATE_DNS  # Fix the bash built-in hostname variable too
+
+
 echo $HOSTNAME > /etc/hostname
 
 echo "Setting up Mesos on `hostname`..."
@@ -67,7 +69,7 @@ for master in $MASTERS; do
 echo $master
 #Delete previous PUBLIC_DNS env variable if exists (restore session)
 echo "Seding previous PUBLIC_DNS value..."
-ssh $SSH_OPTS $master "sed '/PUBLIC_DNS=/d' /etc/environment"
+ssh $SSH_OPTS $master "sed -i '/PUBLIC_DNS=/d' /etc/environment"
 ssh $SSH_OPTS $master "echo 'PUBLIC_DNS=$master' >> /etc/environment"
 ssh $SSH_OPTS $master echo -n &
 sleep 0.3
