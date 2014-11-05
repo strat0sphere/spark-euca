@@ -450,7 +450,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   print "Running setup on master..."
   #ssh(master, opts, "echo '****************'; ls -al")
   
-  print "opts.installation_type: " + opts.installation_type
+  #print "opts.installation_type: " + opts.installation_type
   if(opts.installation_type == "mesos"):
       setup_mesos_cluster(master, opts)
   elif(opts.installation_type == "mesos-emi"):
