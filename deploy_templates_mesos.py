@@ -102,17 +102,19 @@ config_dirs = ["etc", "hama-on-mesos", "spark-on-mesos", "hadoop-on-mesos", "s3c
 
 
 for path, dirs, files in os.walk(template_dir):
-  print "template_dir" + template_dir  
+  #print "template_dir" + template_dir  
   
   if path.find(".svn") == -1:
     dest_dir = os.path.join('/', path[len(template_dir):])
     if not os.path.exists(dest_dir):
-      print "DEBUG: dest_dir " + dest_dir
       if not dirNeedsConfig(dest_dir, config_dirs):
           continue
       else:
-       print dest_dir + " in config_dirs" 
+       print "Creating: " + dest_dir 
        os.makedirs(dest_dir)
+       
+    print "DEBUG: Configuring dest_dir " + dest_dir
+       
     for filename in files:
       if filename[0] not in '#.~' and filename[-1] != '~':
         dest_file = os.path.join(dest_dir, filename)
