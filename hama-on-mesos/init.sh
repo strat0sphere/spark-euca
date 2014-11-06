@@ -2,7 +2,7 @@
 
 pushd /root
 
-
+#enable this when isntalled from MPI
 if [ -d "hama" ]; then
 echo "hama seems to be installed. Exiting."
 return
