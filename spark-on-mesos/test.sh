@@ -18,4 +18,4 @@ hadoop fs -put /executor_tars/spark-1.1.0-bin-2.3.0.tgz /
 
 /root/spark/bin/spark-submit --class WordCount3 --master mesos://zk://$ACTIVE_MASTER_PRIVATE:2181/mesos ~/test-code/simple-project_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE
 
-popd /root
+popd

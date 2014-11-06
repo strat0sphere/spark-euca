@@ -14,4 +14,4 @@ hadoop fs -ls /
 #delete to save some space if necessary
 rm /executor_tars/hadoop-2.3.0-cdh5.1.2-mesos.0.20.tar.gz
 
-popd /root
+popd

@@ -22,7 +22,7 @@ PATH=/root/mpich2-install/bin:$PATH ; export PATH
 echo "secretword=nil" > /etc/mpd.conf
 chmod 600 /etc/mpd.conf
 
-popd /root
+popd
 
 
 
