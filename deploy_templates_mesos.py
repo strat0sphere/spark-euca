@@ -120,10 +120,10 @@ for path, dirs, files in os.walk(template_dir):
         dest_file = os.path.join(dest_dir, filename)
         with open(os.path.join(path, filename)) as src:
           with open(dest_file, "w") as dest:
-            print "Configuring " + dest_file
+            print "DEBUG: Configuring " + dest_file
             text = src.read()
             for key in template_vars:
-              print "key: " + key
+              #print "DEBUG: key: " + key
               #if (template_vars[key] != None):  
               #    print "Replacing " +key+ " with: " + template_vars[key]
               text = text.replace("{{" + key + "}}", template_vars[key])
