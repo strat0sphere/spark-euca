@@ -21,7 +21,6 @@
  * limitations under the License.
  */
 -->
-
 <configuration>
      <property>
     <name>bsp.master.address</name>
@@ -42,12 +41,25 @@
       <description>Instructs the scheduler to use Mesos to execute tasks of each job
       </description>
     </property>
+   <property>
+      <name>fs.default.name</name>
+      <value>hdfs://{{active_master_private}}:9000</value>
+      <description>
+        The name of the default file system. Either the literal string
+        "local" or a host:port for HDFS.
+      </description>
+    </property>
     <property>
       <name>hama.mesos.executor.uri</name>
       <value>hdfs://{{active_master_private}}:9000/hama.tar.gz</value>
       <description>This is the URI of the Hama distribution
       </description>
     </property>
+    
+     <!--  Hama requires one cpu and memory defined by bsp.child.java.opts for each slot. 
+    This means that a cluster with bsp.tasks.maximum.total set to 2 and bsp.child.jova.opts set to -Xmx1024m 
+    will need at least 2 cpus and and 2048m of memory. -->
+    
     <property>
       <name>bsp.tasks.maximum.total</name>
       <value>2</value>
@@ -57,6 +69,7 @@
           So, a value indicating the maximum number of slots available in the cluster is needed.
       </description>
     </property>
+
     <property>
       <name>hama.mesos.master</name>
       <value>zk://{{active_master_private}}:2181/mesos</value>
@@ -71,14 +84,9 @@
       </description>
     </property>
     
-    <!--  Hama requires one cpu and memory defined by bsp.child.java.opts for each slot. 
-    This means that a cluster with bsp.tasks.maximum.total set to 2 and bsp.child.jova.opts set to -Xmx1024m 
-    will need at least 2 cpus and and 2048m of memory. -->
-    
-    
     <property>
     <name>bsp.system.dir</name>
-    <value>/mnt/bsp/system</value>
+    <value>${hadoop.tmp.dir}/bsp/system</value>
     <description>The shared directory where BSP stores control files.
     </description>
   </property>
@@ -89,7 +97,7 @@
   </property>
   <property>
     <name>hama.tmp.dir</name>
-    <value>/mnt/hama/tmp/hama</value>
+    <value>/mnt/hama/tmp/hama-${user.name}</value>
     <description>Temporary directory on the local filesystem.</description>
   </property>
    <property>
@@ -114,6 +122,5 @@
       <description>The port to which the zookeeper clients connect
       </description>
     </property>
-
 
 </configuration>
