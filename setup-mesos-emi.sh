@@ -271,19 +271,19 @@ cd /root/spark-euca  # guard against init.sh changing the cwd
 done
 
 # Setup each module
-#for module in $MODULES; do
-#echo "Setting up $module"
-#source ./$module/setup.sh
-#sleep 1
-#cd /root/spark-euca  # guard against setup.sh changing the cwd
-#done
+for module in $MODULES; do
+echo "Setting up $module"
+source ./$module/setup.sh
+sleep 1
+cd /root/spark-euca  # guard against setup.sh changing the cwd
+done
 
 
 #Startup each module
 for module in $MODULES; do
-if [[ -e $module/setup.sh ]]; then
-echo "Setting up $module"
-source ./$module/setup.sh
+if [[ -e $module/startup.sh ]]; then
+echo "Starting up $module"
+source ./$module/startup.sh
 sleep 1
 fi
 cd /root/spark-euca  # guard against setup.sh changing the cwd

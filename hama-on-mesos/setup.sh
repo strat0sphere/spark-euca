@@ -8,7 +8,7 @@ cd hama
 #On pom.xml under the "build for Hadoop 2.x properties" change hadoop-common, hadoop-hdfs, hadoop-hdfs with classifer tests, hadoop-mapreduce-client-core and hadoop-auth to 2.3.0-cdh5.1.2 instead of hadoop.version
 
 echo "Building hama... mvn clean install -Phadoop2 -Dhadoop.version=2.3.0-cdh5.1.2 -Dmesos.version=0.20.0"
-mvn clean install -Phadoop2 -Dhadoop.version=2.3.0-cdh5.1.2 -Dmesos.version=0.20.0
+mvn clean install -Phadoop2 -Dhadoop.version=2.3.0-cdh5.1.2 -Dmesos.version=0.20.0 -DskipTests
 
 
 #For hama-0.64 commons-collections jar is missing --> cp ~/hama/lib/commons-collections-3.2.1.jar ~/hama-0.6.4/dist/target/hama-0.6.4/hama-0.6.4/lib/
@@ -18,7 +18,7 @@ mvn clean install -Phadoop2 -Dhadoop.version=2.3.0-cdh5.1.2 -Dmesos.version=0.20
 
 #Case1: --- Rebuilding hama ----
 echo "Putting hama-0.6.4-hadoop-2.3.0-mr1-cdh5.1.2-mesos-0.20.0.tar.gz to HDFS..."
-hadoop fs -put dist/target/hama-0.6.4.tar.gz /hama.tar.gz
+hadoop fs -put dist/target/hama-0.7.0-SNAPSHOT.tar.gz /hama.tar.gz
 hadoop fs -ls /
 
 #Case2: ---- Resume operation from emi  ----
@@ -38,3 +38,5 @@ hadoop fs -ls /
 
 #delete to save some space if necessary
 #rm /executor_tars/hama.tar.gz
+
+popd
