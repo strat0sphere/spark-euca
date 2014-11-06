@@ -19,7 +19,5 @@ git clone https://github.com/jfenc91/hama.git
 echo "Removing previous hama executors from HDFS..."
 
 hadoop fs -rm /hama.tar.gz
-hadoop fs -put dist/target/hama-0.7.0-SNAPSHOT.tar.gz /hama.tar.gz
-
 
 popd
