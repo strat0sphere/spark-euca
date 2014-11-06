@@ -252,6 +252,7 @@ def launch_cluster(conn, opts, cluster_name):
     slave_group.authorize('tcp', 50075, 50075, '0.0.0.0/0')
     slave_group.authorize('tcp', 60060, 60060, '0.0.0.0/0')
     slave_group.authorize('tcp', 60075, 60075, '0.0.0.0/0')
+    slave_group.authorize('tcp', 40015, 40015, '0.0.0.0/0') ##apache hama web UI
   
   if zoo_group.rules == []: # Group was just now created
       zoo_group.authorize(src_group=master_group)
