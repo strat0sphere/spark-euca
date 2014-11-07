@@ -1,6 +1,8 @@
 #!/bin/bash
 
+echo "Deleting previous backups..."
 rm -rf /mnt/hdfs-backup #delete previous backups
+
 mkdir -p /mnt/hdfs-backup
 mkdir -p /mnt/hdfs-backup-logs
 chown -R hdfs:hadoop /mnt/hdfs-backup
