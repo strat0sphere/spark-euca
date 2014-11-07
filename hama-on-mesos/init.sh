@@ -14,7 +14,7 @@ fi
 #mv hama-0.6.4 hama
 
 
-git clone https://github.com/jfenc91/hama.git
+git clone https://github.com/strat0sphere/hama.git
 
 echo "Removing previous hama executors from HDFS..."
 
