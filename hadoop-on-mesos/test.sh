@@ -1,5 +1,6 @@
 #/bin/bash
 
+#TODO: FIX java.lang.NoClassDefFoundError: org/apache/hadoop/mapred/JobConf
 echo "I love UCSB" > /tmp/file0
 echo "Do you love UCSB?" > /tmp/file1
 chown hdfs:hadoop /tmp/file0
