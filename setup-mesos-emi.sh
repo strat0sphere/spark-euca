@@ -273,7 +273,7 @@ done
 # Setup each module
 for module in $MODULES; do
 echo "Setting up $module"
-source ./$module/setup.sh
+source $module/setup.sh
 sleep 1
 cd /root/spark-euca  # guard against setup.sh changing the cwd
 done
@@ -283,7 +283,7 @@ done
 for module in $MODULES; do
 if [[ -e $module/startup.sh ]]; then
 echo "Starting up $module"
-source ./$module/startup.sh
+source $module/startup.sh
 sleep 1
 fi
 cd /root/spark-euca  # guard against setup.sh changing the cwd
@@ -299,6 +299,7 @@ for module in $MODULES; do
 echo "Adding test code & running tests for $module"
 if [[ -e $module/test.sh ]]; then
 source $module/test.sh
+sleep 1
 fi
 cd /root/spark-euca  # guard against setup-test.sh changing the cwd
 done
