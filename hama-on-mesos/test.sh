@@ -2,8 +2,7 @@
 
 pushd /root
 
-cd hama/dist/target/hama-0.7.0-SNAPSHOT/hama-0.7.0-SNAPSHOT
-
+cd hama/
 echo "Executing: ./bin/hama jar hama-examples-0.7.0-SNAPSHOT.jar gen fastgen 100 10 randomgraph 2"
 ./bin/hama jar hama-examples-0.7.0-SNAPSHOT.jar gen fastgen 100 10 randomgraph 2
 
