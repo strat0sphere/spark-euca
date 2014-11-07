@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#TODO: java.io.IOException: Call to euca-10-2-112-26.eucalyptus.internal/10.2.112.26:40000 failed on local exception: java.io.IOException: Connection reset by peer
+
 pushd /root
 
 cd hama/
