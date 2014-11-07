@@ -1,5 +1,6 @@
 #!/bin/bash
 
+date >> /mnt/hdfs-backup-logs/backup.log
 echo "Deleting previous backups..."
 rm -rf /mnt/hdfs-backup #delete previous backups
 

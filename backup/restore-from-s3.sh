@@ -4,15 +4,15 @@
 mkdir -p /mnt/hdfs-backup
 chown -R hdfs:hadoop /mnt/hdfs-backup
 
-
-echo "Geting files from S3..."
+date >> /mnt/hdfs-backup-logs/restore.log
+echo "Geting files from S3..." | tee -a /mnt/hdfs-backup-logs/restore.log 1>&2
 #Get the file from S3
 s3cmd -c /etc/s3cmd/s3cfg get --recursive --disable-multipart s3://$CLUSTER_NAME/hdfs-backup/ /mnt/hdfs-backup/
 echo "Done!"
 
-echo "Putting files on HDFS..."
+echo "Putting files on HDFS..." | tee -a /mnt/hdfs-backup-logs/restore.log 1>&2
 sudo -u hdfs hadoop fs -put /mnt/hdfs-backup/* /
-echo "Done!"
+echo "Done!" | tee -a /mnt/hdfs-backup-logs/restore.log 1>&2
 
 rm -rf /mnt/hdfs-backup #delete previous backups
 mkdir -p /mnt/hdfs-backup
