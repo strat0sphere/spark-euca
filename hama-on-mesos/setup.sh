@@ -28,6 +28,16 @@ echo "Putting hama-0.7.0-SNAPSHOT.tar.gz to HDFS..."
 hadoop fs -put dist/target/hama-0.7.0-SNAPSHOT.tar.gz /hama.tar.gz
 hadoop fs -ls /
 
+echo "Copying hama-0.7.0-SNAPSHOT to /root dir..."
+
+cp -r dist/target/hama-0.7.0-SNAPSHOT/hama-0.7.0-SNAPSHOT/ /root/
+cd /root
+
+echo "Removing hama source files..."
+rm -rf hama/
+
+mv hama-0.7.0-SNAPSHOT hama/
+
 #Case2: ---- Resume operation from emi  ----
 #pushd /root
 #mkdir /executor_tars
