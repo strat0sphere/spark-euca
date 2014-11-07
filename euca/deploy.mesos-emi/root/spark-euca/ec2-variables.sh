@@ -34,6 +34,12 @@ export ACTIVE_MASTER="{{active_master}}"
 export ACTIVE_MASTER_PRIVATE="{{active_master_private}}"
 sed -i '/ACTIVE_MASTER_PRIVATE=/d' /etc/environment
 echo "ACTIVE_MASTER_PRIVATE=$ACTIVE_MASTER_PRIVATE" >> /etc/environment #Need this to startup mesos scripts on reboot
+
+#TODO LD_LIBRARY_PATH should be set correctly to emi and not hardcoded here
+echo "Seding previous LD_LIBRARY_PATH value..."
+sed -i '/LD_LIBRARY_PATH=/d' /etc/environment
+echo 'LD_LIBRARY_PATH=/root/mesos-installation/lib/' >> /etc/environment
+
 export MASTERS_DNS_MAPPINGS="{{masters_dns_mappings}}"
 export SLAVES_DNS_MAPPINGS="{{slaves_dns_mappings}}"
 export MASTERS_DNS_MAPPINGS_PUBLIC="{{masters_dns_mappings_public}}"
