@@ -98,7 +98,7 @@ template_dir="/root/spark-euca/templates"
 
 #config_dirs condais all the directories that might need some configuration. This includes the modules that are installed by 
 #the script (which are all located under /root) plus the directories under /etc or any other dirs requiring configuration
-config_dirs = ["etc", "spark-on-mesos", "hadoop-on-mesos", "s3cmd", "backup"]
+config_dirs = ["etc", "spark-on-mesos", "hadoop-on-mesos", "s3cmd", "backup", "mesos-0.20"]
 
 
 for path, dirs, files in os.walk(template_dir):

@@ -4,6 +4,9 @@ pushd /root
 
 cd hama
 
+echo "DEBUG: Print env variables"
+env
+export LD_LIBRARY_PATH=/root/mesos-installation/lib/
 ./bin/hama-daemon.sh start bspmaster
 
 echo "HOSTNAME=$HOSTNAME"
