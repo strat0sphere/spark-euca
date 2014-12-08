@@ -8,7 +8,8 @@ SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # m h dom mon dow user  command
-01 00 	* * *	root 	/root/spark-euca/backup/backup-to-s3.sh 
+01 00	* * *	root 	/usr/lib/zookeeper/bin/zkCleanup.sh -n 3 	
+30 00 	* * *	root 	/root/spark-euca/backup/backup-to-s3.sh 
 17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
 25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
 47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
