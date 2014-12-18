@@ -1,3 +1,3 @@
 #/bin/bash
 
-/root/storm-mesos-git/bin/storm-mesos nimbus
+/root/storm-mesos-${STORM_RELEASE}/bin/storm-mesos nimbus

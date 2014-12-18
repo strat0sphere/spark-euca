@@ -1,3 +1,3 @@
 #/bin/bash
 
-/root/storm-mesos-git/bin/storm-mesos ui
+/root/storm-mesos-${STORM_RELEASE}/bin/storm-mesos ui

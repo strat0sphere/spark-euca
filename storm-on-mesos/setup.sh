@@ -12,17 +12,19 @@ cp storm-mesos-${STORM_RELEASE}.tgz /root/
 cd storm-mesos-${STORM_RELEASE}
 
 #copy configuration template
-cp /etc/storm-mesos/storm.yaml ./conf
-cp /etc/storm-mesos/logback ./logback
+cp /etc/storm/storm.yaml ./conf
+cp /etc/storm/logback ./logback
 
 #nohup bin/storm-mesos nimbus  > nimbus.out &
 #nohup bin/storm-mesos ui  > ui.out &
 
 #Adding soft links to automatically start services on reboot
-ln -s /root/storm-on-mesos/start-nimbus.sh storm-nimbus-start
+cp /root/spark-euca/storm-on-mesos/start-nimbus.sh storm-mesos-${STORM_RELEASE}/bin
+ln -s /root/storm-mesos-${STORM_RELEASE}/bin/start-nimbus.sh storm-nimbus-start
 update-rc.d storm-nimbus-start defaults
 
-ln -s /root/storm-on-mesos/start-storm-ui.sh storm-ui-start
+cp /root/spark-euca/storm-on-mesos/start-storm-ui.sh storm-mesos-${STORM_RELEASE}/bin
+ln -s /root/storm-mesos-${STORM_RELEASE}/bin/start-storm-ui.sh storm-ui-start
 update-rc.d storm-ui-start defaults
 
 popd
