@@ -91,14 +91,15 @@ template_vars = {
   "mesos_build_dir": os.getenv("MESOS_BUILD_DIR"), 
   "python_path": os.getenv("PYTHON_PATH"),
   "python_egg_postfix": os.getenv("PYTHON_EGG_POSTFIX"),
-  "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUREPY_POSTFIX")
+  "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUREPY_POSTFIX"),
+  "storm_version": os.getenv("STORM_VERSION")
 }
 
 template_dir="/root/spark-euca/templates"
 
-#config_dirs condais all the directories that might need some configuration. This includes the modules that are installed by 
+#config_dirs contains all the directories that might need some configuration. This includes the modules that are installed by 
 #the script (which are all located under /root) plus the directories under /etc or any other dirs requiring configuration
-config_dirs = ["etc", "spark-on-mesos", "hadoop-on-mesos", "s3cmd", "backup", "mesos-0.20"]
+config_dirs = ["etc", "spark-on-mesos", "hadoop-on-mesos", "s3cmd", "backup", "mesos-0.20", "storm-on-mesos", "kafka"]
 
 
 for path, dirs, files in os.walk(template_dir):

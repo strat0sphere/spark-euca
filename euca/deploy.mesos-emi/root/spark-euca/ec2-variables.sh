@@ -57,4 +57,5 @@ export MESOS_BUILD_DIR="/root/mesos-0.20.0/build" #"{{mesos_build_dir}}"
 export PYTHON_PATH="/usr/bin/python" #"{{python_path}}" - (which python)
 export PYTHON_EGG_POSTFIX="py2.7-linux-x86_64" #"{{python_egg_postfix}}"
 export PYTHON_EGG_PUREPY_POSTFIX="py2.7" #"{{python_egg_purepy_postfix}}"
+export STORM_VERSION=`grep -1 -A 0 -B 0 '<version>' /root/storm-mesos/pom.xml | head -n 1 | awk '{print $1}' | sed -e 's/.*<version>//' | sed -e 's/<\/version>.*//'`
 
