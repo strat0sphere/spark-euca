@@ -35,10 +35,10 @@
 --run-tests True
 launch mesos-cluster-emi
 """
-"""
-clean master emi: emi-5C9A3741
-Clean slave emi: emi-35E93896
-"""
+
+#clean master emi: emi-5C9A3741
+#Clean slave emi: emi-35E93896
+
 from __future__ import with_statement
 
 import base64

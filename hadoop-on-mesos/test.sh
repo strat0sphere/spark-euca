@@ -17,3 +17,7 @@ hadoop jar /usr/lib/hadoop-0.20-mapreduce/hadoop-examples-2.3.0-mr1-cdh5.1.2.jar
 
 hadoop fs -ls /user/foo/out
 hadoop fs -cat /user/foo/out/part*
+
+#cleaning up
+echo "Cleaning up test output..."
+hadoop fs -rm /user/foo/out
