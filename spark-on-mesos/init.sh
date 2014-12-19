@@ -1,4 +1,5 @@
 #!/bin/bash
+#TODO: Install s3cmd if not included in modules because it is a dependecy for this script to work
 pushd /root
 
 mkdir /executor_tars

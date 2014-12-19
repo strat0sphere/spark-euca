@@ -1,6 +1,5 @@
 #!/bin/bash
-
-pushd /root
+#TODO: Install s3cmd if not included in modules because it is a dependecy for this script to workpushd /root
 mkdir /executor_tars
 
 s3cmd -c /etc/s3cmd/s3cfg get --recursive --disable-multipart s3://mesos-repo/executors/hadoop-2.3.0-cdh5.1.2-mesos.0.20.tar.gz /executor_tars/
