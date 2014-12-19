@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd root
+pushd /root
 
 cd kafka_2.9.2-0.8.1.1
 echo "Creating Kafka topic..."
