@@ -92,7 +92,7 @@ template_vars = {
   "python_path": os.getenv("PYTHON_PATH"),
   "python_egg_postfix": os.getenv("PYTHON_EGG_POSTFIX"),
   "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUREPY_POSTFIX"),
-  "storm_version": os.getenv("STORM_VERSION")
+  "storm_release": os.getenv("STORM_RELEASE")
 }
 
 template_dir="/root/spark-euca/templates"
