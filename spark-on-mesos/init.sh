@@ -2,7 +2,8 @@
 pushd /root
 
 mkdir /executor_tars
-wget -P /executor_tars http://php.cs.ucsb.edu/spark-related-packages/executor_tars/spark-1.1.0-bin-2.3.0.tgz
+s3cmd -c /etc/s3cmd/s3cfg get --recursive --disable-multipart s3://mesos-repo/executors/spark-1.1.0-bin-2.3.0.tgz /executor_tars/
+#wget -P /executor_tars http://php.cs.ucsb.edu/spark-related-packages/executor_tars/spark-1.1.0-bin-2.3.0.tgz
 
 chown -R hdfs:hadoop /executor_tars
 

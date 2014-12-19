@@ -2,7 +2,10 @@
 
 pushd /root
 mkdir /executor_tars
-wget -P /executor_tars http://php.cs.ucsb.edu/spark-related-packages/executor_tars/hadoop-2.3.0-cdh5.1.2-mesos.0.20.tar.gz
+
+s3cmd -c /etc/s3cmd/s3cfg get --recursive --disable-multipart s3://mesos-repo/executors/hadoop-2.3.0-cdh5.1.2-mesos.0.20.tar.gz /executor_tars/
+
+#wget -P /executor_tars http://php.cs.ucsb.edu/spark-related-packages/executor_tars/hadoop-2.3.0-cdh5.1.2-mesos.0.20.tar.gz
 
 chown -R hdfs:hadoop /executor_tars
 
