@@ -125,9 +125,11 @@ for path, dirs, files in os.walk(template_dir):
             text = src.read()
             for key in template_vars:
               #print "DEBUG: key: " + key
-              #if (template_vars[key] != None):  
-              #    print "Replacing " +key+ " with: " + template_vars[key]
-              text = text.replace("{{" + key + "}}", template_vars[key])
+              if (template_vars[key] != None):  
+                   #print "Replacing " +key+ " with: " + template_vars[key]
+                   text = text.replace("{{" + key + "}}", template_vars[key])
+              else:
+                  print "WARNING: Key " + key + " has no value!!!"
             dest.write(text)
             dest.close()
 
