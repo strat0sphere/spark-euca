@@ -206,6 +206,10 @@ echo "Creating local config files..."
 /root/spark-euca/copy-dir /etc/hosts
 
 
+#Creating zookeeper configuration directories
+mkdir -p /mnt/zookeeper/dataDir
+mkdir -p /mnt/zookeeper/dataLogDir
+
 #TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
 echo "Starting up Zookeeper, HDFS and Jobtracker..."
 #Startup HDFS + Zookeeper

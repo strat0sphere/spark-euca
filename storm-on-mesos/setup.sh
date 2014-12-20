@@ -16,6 +16,7 @@ rm storm-mesos-${STORM_RELEASE}.tgz
 cd /root/storm-mesos-${STORM_RELEASE}
 
 #copy configuration template
+echo "Copying configurations..."
 cp /etc/storm/storm.yaml ./conf
 cp /etc/storm/logback/cluster.xml ./logback
 
