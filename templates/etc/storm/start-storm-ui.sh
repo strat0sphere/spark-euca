@@ -1,3 +1,3 @@
 #/bin/bash
 
-/root/storm-mesos-{{storm_release}}/bin/storm-mesos ui > /dev/null 2>&1 &
+/root/storm-mesos-{{storm_release}}/bin/storm-mesos ui > /mnt/storm-logs/ui.out &
