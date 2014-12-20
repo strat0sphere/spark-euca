@@ -12,6 +12,7 @@ hadoop fs -put storm-mesos-${STORM_RELEASE}.tgz /
 cp storm-mesos-${STORM_RELEASE}.tgz /root/
 cd /root
 tar xzf storm-mesos-${STORM_RELEASE}.tgz
+rm storm-mesos-${STORM_RELEASE}.tgz
 cd /root/storm-mesos-${STORM_RELEASE}
 
 #copy configuration template
