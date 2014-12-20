@@ -22,12 +22,12 @@ cp /etc/storm/logback/cluster.xml ./logback
 #nohup bin/storm-mesos ui  > ui.out &
 
 #Adding soft links to automatically start services on reboot
-chmod +x /etc/start-nimbus.sh
-ln -s /etc/start-nimbus.sh /etc/init.d/storm-nimbus-start
+chmod +x /etc/storm/start-nimbus.sh
+ln -s /etc/storm/start-nimbus.sh /etc/init.d/storm-nimbus-start
 update-rc.d storm-nimbus-start defaults
 
-chmod +x /etc/start-storm-ui.sh
-ln -s /etc/start-storm-ui.sh /etc/init.d/storm-ui-start
+chmod +x /etc/storm/start-storm-ui.sh
+ln -s /etc/storm/start-storm-ui.sh /etc/init.d/storm-ui-start
 update-rc.d storm-ui-start defaults
 
 
