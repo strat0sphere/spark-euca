@@ -1,16 +1,16 @@
 #!/bin/bash
 
 pushd /root
-tar -xzf kafka_2.9.2-0.8.1.1.tgz
-rm kafka_2.9.2-0.8.1.1.tgz
-cd kafka_2.9.2-0.8.1.1
+tar -xzf kafka_${KAFKA_SCALA_BINARY}.tgz
+rm kafka_${KAFKA_SCALA_BINARY}.tgz
+cd kafka_${KAFKA_SCALA_BINARY}
 
 cp /etc/kafka/config/server.properties ./config/
 cp /etc/kafka/start-kafka.sh ./bin/
 
 #add command to init.d
 chmod +x ./bin/start-kafka.sh
-ln -s /root/kafka_2.9.2-0.8.1.1/bin/start-kafka.sh /etc/init.d/kafka-start
+ln -s /root/kafka_${KAFKA_SCALA_BINARY}/bin/start-kafka.sh /etc/init.d/kafka-start
 update-rc.d kafka-start defaults
 
 popd
