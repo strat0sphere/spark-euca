@@ -32,5 +32,8 @@ chmod +x /etc/storm/start-storm-ui.sh
 ln -s /etc/storm/start-storm-ui.sh /etc/init.d/storm-ui-start
 update-rc.d storm-ui-start defaults
 
+#Create dir for logs
+mkdir /mnt/storm-logs
+
 
 popd
