@@ -20,9 +20,6 @@ echo "Copying configurations..."
 cp /etc/storm/storm.yaml ./conf
 cp /etc/storm/logback/cluster.xml ./logback
 
-#nohup bin/storm-mesos nimbus  > nimbus.out &
-#nohup bin/storm-mesos ui  > ui.out &
-
 #Adding soft links to automatically start services on reboot
 chmod +x /etc/storm/start-nimbus.sh
 ln -s /etc/storm/start-nimbus.sh /etc/init.d/storm-nimbus-start
