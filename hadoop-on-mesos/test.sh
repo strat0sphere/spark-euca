@@ -20,4 +20,4 @@ hadoop fs -cat /user/foo/out/part*
 
 #cleaning up
 echo "Cleaning up test output..."
-hadoop fs -rm /user/foo/out
+hadoop fs -rm -r -f /user/foo/out
