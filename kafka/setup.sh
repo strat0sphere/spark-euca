@@ -12,5 +12,8 @@ chmod +x /etc/kafka/start-kafka.sh
 ln -s /etc/kafka/start-kafka.sh /etc/init.d/kafka-start
 update-rc.d kafka-start defaults
 
+#creating log dir
+mkdir /mnt/kafka-logs/
+
 popd
 

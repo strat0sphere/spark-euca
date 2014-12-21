@@ -12,7 +12,7 @@ nimbus.host: "{{active_master_private}}"
 
 # Use the public Mesosphere Storm build
 # Please note that it won't work with other distributions
-mesos.executor.uri: "hdfs://{{active_master_private}}:9000/storm-mesos-{{storm_version}}.tgz"
+mesos.executor.uri: "hdfs://{{active_master_private}}:9000/storm-mesos-{{storm_release}}.tgz"
 
 
 # Use Netty to avoid ZMQ dependencies
