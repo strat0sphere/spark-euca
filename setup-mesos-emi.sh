@@ -210,6 +210,7 @@ echo "Creating local config files..."
 mkdir -p /mnt/zookeeper/dataDir
 mkdir -p /mnt/zookeeper/dataLogDir
 chown -R zookeeper:zookeeper /mnt/zookeeper/
+chmod -R g+w /mnt/zookeeper/
 
 #TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
 echo "Starting up Zookeeper, HDFS and Jobtracker..."
