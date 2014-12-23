@@ -2,6 +2,7 @@
 
 pushd /root
 
+echo "Setting up Storm on Mesos..."
 cd storm-mesos-git/
 
 bin/build-release.sh downloadStormRelease
