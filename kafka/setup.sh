@@ -1,9 +1,13 @@
 #!/bin/bash
 
 pushd /root
+
+echo "Setting up Kafka..."
+
 tar -xzf kafka_${KAFKA_SCALA_BINARY}.tgz
 rm kafka_${KAFKA_SCALA_BINARY}.tgz
 mv kafka_${KAFKA_SCALA_BINARY} kafka
+cd kafka
 
 cp /etc/kafka/config/server.properties ./config/
 
