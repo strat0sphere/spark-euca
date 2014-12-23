@@ -1,4 +1,4 @@
 #/bin/bash
 
 #start-up script at /etc/kafka
-service kafka-start
+service kafka-server start

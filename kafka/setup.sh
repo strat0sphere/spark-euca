@@ -3,14 +3,14 @@
 pushd /root
 tar -xzf kafka_${KAFKA_SCALA_BINARY}.tgz
 rm kafka_${KAFKA_SCALA_BINARY}.tgz
-cd kafka_${KAFKA_SCALA_BINARY}
+mv kafka_${KAFKA_SCALA_BINARY} kafka
 
 cp /etc/kafka/config/server.properties ./config/
 
 #add command to init.d
-chmod +x /etc/kafka/start-kafka.sh
-ln -s /etc/kafka/start-kafka.sh /etc/init.d/kafka-start
-update-rc.d kafka-start defaults
+chmod +x kafka/kafka-server.sh
+ln -s /root/kafka/kafka-server.sh /etc/init.d/kafka-server
+update-rc.d kafka-server defaults
 
 #creating log dir
 mkdir /mnt/kafka-logs/
