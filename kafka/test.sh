@@ -11,6 +11,8 @@ echo "Executing ./bin/kafka-topics.sh --list --zookeeper $ACTIVE_MASTER_PRIVATE:
 ./bin/kafka-topics.sh --list --zookeeper $ACTIVE_MASTER_PRIVATE:2181
 
 
+cd /root
+
 #Storm tests with Kafka
 git clone https://github.com/strat0sphere/storm-kafka-0.8-plus-test.git
 cd storm-kafka-0.8-plus-test
@@ -22,7 +24,6 @@ mvn clean package -P cluster
 #Manual tests-TODO: Automate 
 #Run producer
 #java -cp /root/storm-kafka-0.8-plus-test/target/storm-kafka-0.8-plus-test-0.2.0-SNAPSHOT-jar-with-dependencies.jar storm.kafka.tools.StormProducer $ACTIVE_MASTER_PRIVATE:9092
-popd
 
 #Run consumer
 #/root/kafka/bin/kafka-console-consumer.sh --zookeeper $ACTIVE_MASTER_PRIVATE:2181 --from-beginning --topic storm-sentence
@@ -34,3 +35,5 @@ popd
 
 #Run consumer
 #/root/spark/bin/spark-submit --class testingsparkwithscala.KafkaWordCount --master mesos://zk://$ACTIVE_MASTER_PRIVATE:2181/mesos ~/test-code/simple-project-assembly_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE spark-group test-sentence 1
+
+popd
