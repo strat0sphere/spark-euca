@@ -36,7 +36,7 @@
 launch mesos-cluster-emi
 """
 
-#clean master emi: emi-6BEC3850
+#clean master emi: emi-283B3B45
 #Clean slave emi: emi-35E93896
 
 from __future__ import with_statement

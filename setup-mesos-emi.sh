@@ -220,7 +220,7 @@ echo $node
 ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs hdfs namenode -format -force" & sleep 10.0 #TODO: Can formatting be avoided?
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode restart" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node "service zookeeper-server init" & sleep 10.0
-ssh -t -t $SSH_OPTS root@$node "service zookeeper-server restart" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
 done
 
