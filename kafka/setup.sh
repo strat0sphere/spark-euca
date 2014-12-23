@@ -12,6 +12,11 @@ chmod +x kafka/kafka-server.sh
 ln -s /root/kafka/kafka-server.sh /etc/init.d/kafka-server
 update-rc.d kafka-server defaults
 
+#add restart command to init.d with lower priority
+chmod +x kafka/kafka-restart.sh
+ln -s /root/kafka/kafka-restart.sh /etc/init.d/kafka-restart
+update-rc.d kafka-restart defaults 91
+
 #creating log dir
 mkdir /mnt/kafka-logs/
 
