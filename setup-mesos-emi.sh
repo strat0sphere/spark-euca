@@ -327,6 +327,8 @@ cd /root/spark-euca  # guard against setup-test.sh changing the cwd
 done
 fi
 
+ps -ef | grep kafka
+
 
 
 
