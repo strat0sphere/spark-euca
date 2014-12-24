@@ -279,6 +279,8 @@ done
 #chmod u+x /root/spark/conf/spark-env.sh #TODO: Is this needed?
 #/root/spark-euca/copy-dir /root/spark/conf
 
+echo "Initializing modules..."
+
 # Install / Init module
 for module in $MODULES; do
 if [[ -e $module/init.sh ]]; then
@@ -288,6 +290,7 @@ fi
 cd /root/spark-euca  # guard against init.sh changing the cwd
 done
 
+echo "Setting up modules..."
 # Setup each module
 for module in $MODULES; do
 echo "Setting up $module"
@@ -296,7 +299,7 @@ sleep 1
 cd /root/spark-euca  # guard against setup.sh changing the cwd
 done
 
-
+echo "Starting up modules..."
 #Startup each module
 for module in $MODULES; do
 if [[ -e $module/startup.sh ]]; then
@@ -309,6 +312,7 @@ done
 
 # Test modules
 
+echo "Testing modules..."
 #echo "run_tests=$run_tests"
 if [ "$run_tests" == "True" ]; then
 
