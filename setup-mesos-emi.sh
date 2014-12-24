@@ -194,6 +194,14 @@ export RESTORE=$restore #If it is a restore session the backup module will resto
 #sleep 5
 #fi
 
+
+#Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
+#With the new configuration its only possibled to be stopped by killing the process witch messes up the ssh session
+for node in $MASTERS; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "service zookeeper-server stop" & sleep 10.0
+done
+
 # Deploy templates
 # TODO: Move configuring templates to a per-module ?
 echo "Creating local config files..."
@@ -217,12 +225,13 @@ echo "Starting up Zookeeper, HDFS and Jobtracker..."
 #Startup HDFS + Zookeeper
 for node in $MASTERS; do
 echo $node
-ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs hdfs namenode -format -force" & sleep 10.0 #TODO: Can formatting be avoided?
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode restart" & sleep 10.0
 #service zookeeper stop doesn't work because zookeeper daemon on emi is running with the old configuration and doesn't have access to the new log dirs
-ssh -t -t $SSH_OPTS root@$node `ps ax | grep -i '/usr/lib/zookeeper' | grep -v grep | awk '{print $1}' | xargs kill -9` & sleep 10.0
+#ssh -t -t $SSH_OPTS root@$node `ps ax | grep -i '/usr/lib/zookeeper' | grep -v grep | awk '{print $1}' | xargs kill -9` & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node "service zookeeper-server init" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 10.0
+
+ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs hdfs namenode -format -force" & sleep 10.0 #TODO: Can formatting be avoided?
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode restart" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
 done
 
