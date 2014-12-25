@@ -13,6 +13,38 @@ This repository contains the set of scripts used to setup:
 
 In both cases I am assuming you already have a running eucalyptus cluster. The scripts require that Eycaluptus is already installed and then create the instances to run your cluster according to the EMI you specify.
 
+### Usage
+
+For case 1) all you need to do is run something like this: 
+./spark-euca 
+-i xxxx.pem 
+-k xxxx 
+-s n 
+-emi-xyzzyzxy
+-t x2.2xlarge 
+--no-ganglia 
+--os-type ubuntu
+--user-data zzzz.sh  
+launch spark-test
+
+For case 2) all you need to do is run something like this:
+./mesos-euca-emi -i xxxx.pem.pem
+-k xxxx 
+-s n
+-emi-master emi-xyzzyzxy
+-e emi-xyzzyzxy  
+-t m2.2xlarge 
+--no-ganglia 
+-w 60 
+--user-data-file zzzz.sh
+--installation-type mesos-emi
+--run-tests True
+launch mesos-cluster-emi
+
+Basically you could use the mesos-euca-emi to also install a Spark Standalone cluster by specifying the correct arguments but the spark-euca script will work just fine for Spark-standalone
+
+*Check scripts for more options*
+
 ### Details
 
 
