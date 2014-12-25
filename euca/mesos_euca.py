@@ -1,37 +1,60 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-example run;
-./spark-euca -
-i xxxx.pem 
--k xxxx 
--s 1 
--a-56CB3EE9
--t x2.2xlarge 
---no-ganglia 
---os-type ubuntu
---user-data zzzz.sh  
-launch spark-test
-"""
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
+
+"""
+#example run
+./mesos-euca -i ~/vagrant_euca/stratos.pem 
+-k stratos 
+-s 1 
+-a emi-56CB3EE9 
+-t m2.2xlarge 
+--no-ganglia 
+-w 120 
+--user-data-file ~/vagrant_euca/clear-key-ubuntu.sh 
+--os-type ubuntu 
+--installation-type mesos 
+--mesos-version 0.18.1 
+--vol-size 5 
+launch mesos-cluster-x
+"""
 from __future__ import with_statement
 
+import base64
 import logging
-from optparse import OptionParser
 import os
 import pipes
 import random
 import shutil
 import subprocess
-from sys import stderr
 import sys
 import tempfile
 import time
 import urllib2
-
+from optparse import OptionParser
+from sys import stderr
 import boto
 from boto.ec2.blockdevicemapping import BlockDeviceMapping, EBSBlockDeviceType
+from boto import ec2
+
 from boto.ec2.regioninfo import RegionInfo
 
 
@@ -43,7 +66,7 @@ AMI_PREFIX = "https://raw.github.com/mesos/spark-euca/v2/ami-list"
 
 # Configure and parse our command-line arguments
 def parse_args():
-  parser = OptionParser(usage="spark-euca [options] <action> <cluster_name>"
+  parser = OptionParser(usage="mesos-euca [options] <action> <cluster_name>"
       + "\n\n<action> can be: launch, destroy, login, stop, start, get-master",
       add_help_option=False)
   parser.add_option("-h", "--help", action="help",
@@ -61,7 +84,7 @@ def parse_args():
            "WARNING: must be 64-bit; small instances won't work")
   parser.add_option("-m", "--master-instance-type", default="",
       help="Master instance type (leave empty for same as instance-type)")
-  parser.add_option("-r", "--region", default="us-east-1",
+  parser.add_option("-r", "--region", default="cs270",
       help="EC2 region zone to launch instances in")
   parser.add_option("-z", "--zone", default="",
       help="Availability zone to launch instances in, or 'all' to spread " +
@@ -74,6 +97,8 @@ def parse_args():
       default="https://github.com/apache/spark",
       help="Github repo from which to checkout supplied commit hash")
   parser.add_option("--hadoop-major-version", default="1",
+      help="Major version of Hadoop (default: 0.18.2)")
+  parser.add_option("--mesos-version", default="0.18.2",
       help="Major version of Hadoop (default: 1)")
   parser.add_option("-D", metavar="[ADDRESS:]PORT", dest="proxy_port",
       help="Use SSH dynamic port forwarding to create a SOCKS proxy at " +
@@ -113,7 +138,12 @@ def parse_args():
   parser.add_option("--user-data-file", type="string", default="",
       help="User data-file to pass to the instances created")
   parser.add_option("--os-type", type="string", default="",
-      help="Type of the OS (ubuntu/ centos)")
+      help="Type of the OS (ubuntu/ centos)"),
+  parser.add_option("--installation-type", type="string", default="spark-standalone",
+      help="Type of installation (spark-standalone /  mesos)"),
+  parser.add_option("-f", "--ft", metavar="NUM_MASTERS", default="1", 
+      help="Number of masters to run. Default is 1. Greater values " + 
+           "make Mesos run in fault-tolerant mode with ZooKeeper.")
 
 
 
@@ -151,7 +181,7 @@ def get_or_make_group(conn, name):
     return group[0]
   else:
     print "Creating security group " + name
-    return conn.create_security_group(name, "Spark EC2 group")
+    return conn.create_security_group(name, "Mesos EC2 group")
 
 
 # Wait for a set of launched instances to exit the "pending" state
@@ -175,7 +205,7 @@ def is_active(instance):
 # Return correct versions of Spark and Shark, given the supplied Spark version
 def get_spark_shark_version(opts):
   spark_shark_map = {"0.7.3": "0.7.1", "0.8.0": "0.8.0", "0.8.1": "0.8.1", "0.9.0": "0.9.0", 
-    "0.9.1": "0.9.1", "1.0.0": "1.0.0", "1.0.1":"1.0.1"}
+    "0.9.1": "0.9.1", "1.0.0": "1.0.0", "1.0.1":"1.0.1", "1.0.2":"1.0.2"}
   version = opts.spark_version.replace("v", "")
   if version not in spark_shark_map:
     print >> stderr, "Don't know about Spark version: %s" % version
@@ -184,7 +214,7 @@ def get_spark_shark_version(opts):
 
 # Attempt to resolve an appropriate AMI given the architecture and
 # region of the request.
-def get_spark_ami(opts):
+def get_ami(opts):
   instance_types = {
     "m1.small":    "pvm",
     "m1.medium":   "pvm",
@@ -248,39 +278,58 @@ def launch_cluster(conn, opts, cluster_name):
   master_group.owner_id = os.getenv('EC2_USER_ID')
   slave_group = get_or_make_group(conn, cluster_name + "-slaves")
   slave_group.owner_id = os.getenv('EC2_USER_ID')
+  zoo_group = get_or_make_group(conn, cluster_name + "-zoo")
+  zoo_group.owner_id = os.getenv('EC2_USER_ID')
+  
   if master_group.rules == []: # Group was just now created
     master_group.authorize(src_group=master_group)
     master_group.authorize(src_group=slave_group)
+    master_group.authorize(src_group=zoo_group)
     master_group.authorize('tcp', 22, 22, '0.0.0.0/0')
     master_group.authorize('tcp', 8080, 8081, '0.0.0.0/0')
+    master_group.authorize('tcp', 5050, 5051, '0.0.0.0/0')
     master_group.authorize('tcp', 19999, 19999, '0.0.0.0/0')
     master_group.authorize('tcp', 50030, 50030, '0.0.0.0/0')
     master_group.authorize('tcp', 50070, 50070, '0.0.0.0/0')
     master_group.authorize('tcp', 60070, 60070, '0.0.0.0/0')
+    master_group.authorize('tcp', 38090, 38090, '0.0.0.0/0')
     master_group.authorize('tcp', 4040, 4045, '0.0.0.0/0')
     if opts.ganglia:
       master_group.authorize('tcp', 5080, 5080, '0.0.0.0/0')
   if slave_group.rules == []: # Group was just now created
     slave_group.authorize(src_group=master_group)
     slave_group.authorize(src_group=slave_group)
+    slave_group.authorize(src_group=zoo_group)
     slave_group.authorize('tcp', 22, 22, '0.0.0.0/0')
     slave_group.authorize('tcp', 8080, 8081, '0.0.0.0/0')
+    slave_group.authorize('tcp', 5050, 5051, '0.0.0.0/0')
     slave_group.authorize('tcp', 50060, 50060, '0.0.0.0/0')
     slave_group.authorize('tcp', 50075, 50075, '0.0.0.0/0')
     slave_group.authorize('tcp', 60060, 60060, '0.0.0.0/0')
     slave_group.authorize('tcp', 60075, 60075, '0.0.0.0/0')
+  
+  if zoo_group.rules == []: # Group was just now created
+      zoo_group.authorize(src_group=master_group)
+      zoo_group.authorize(src_group=slave_group)
+      zoo_group.authorize(src_group=zoo_group)
+      zoo_group.authorize('tcp', 22, 22, '0.0.0.0/0')
+      zoo_group.authorize('tcp', 2181, 2181, '0.0.0.0/0')
+      zoo_group.authorize('tcp', 2888, 2888, '0.0.0.0/0')
+      zoo_group.authorize('tcp', 3888, 3888, '0.0.0.0/0')   
+   
+
 
   # Check if instances are already running in our groups
-  existing_masters, existing_slaves = get_existing_cluster(conn, opts, cluster_name,
+  existing_masters, existing_slaves, existing_zoos = get_existing_cluster(conn, opts, cluster_name,
                                                            die_on_error=False)
   if existing_slaves or (existing_masters and not opts.use_existing_master):
     print >> stderr, ("ERROR: There are already instances running in " +
-        "group %s or %s" % (master_group.name, slave_group.name))
+        "group %s or %s" % (master_group.name, slave_group.name, zoo_group.name))
     sys.exit(1)
 
   # Figure out Spark AMI
   if opts.ami is None:
-    opts.ami = get_spark_ami(opts)
+    opts.ami = get_ami(opts)
   print "Launching instances..."
 
   try:
@@ -312,17 +361,15 @@ def launch_cluster(conn, opts, cluster_name):
           #print "user data (encoded) = ", opts.user_data
       finally:
           user_data_file.close()
-
- 
-    # Launch non-spot instances
-  zones = get_zones(conn, opts)
+  
+  # Launch non-spot instances
+  zones = get_zones(conn, opts)    
   num_zones = len(zones)
-  i = 0 
+  i = 0
   slave_nodes = []
   for zone in zones:
-      num_slaves_this_zone = get_partition(opts.slaves, num_zones, i)
-      if num_slaves_this_zone > 0:
-                  
+    num_slaves_this_zone = get_partition(opts.slaves, num_zones, i)
+    if num_slaves_this_zone > 0:
         slave_res = image.run(key_name = opts.key_pair,
                               security_groups = [slave_group],
                               instance_type = opts.instance_type,
@@ -334,8 +381,7 @@ def launch_cluster(conn, opts, cluster_name):
         slave_nodes += slave_res.instances
         print "Launched %d slaves in %s, regid = %s" % (num_slaves_this_zone,
                                                         zone, slave_res.id)
-        
-      i += 1
+    i += 1  
 
   # Launch or resume masters
   if existing_masters:
@@ -360,9 +406,25 @@ def launch_cluster(conn, opts, cluster_name):
                            user_data = opts.user_data)
     master_nodes = master_res.instances
     print "Launched master in %s, regid = %s" % (zone, master_res.id)
+    
+  # Launch ZooKeeper nodes if required
+  if int(opts.ft) > 1:
+    print "Running " + opts.ft + " zookeepers"
+    zoo_res = image.run(key_name = opts.key_pair,
+                        security_groups = [zoo_group],
+                        instance_type = opts.instance_type,
+                        placement = opts.zone,
+                        min_count = 3,
+                        max_count = 3,
+                        block_device_map = block_map,
+                        user_data = opts.user_data)
+    zoo_nodes = zoo_res.instances
+    print "Launched zoo, regid = " + zoo_res.id
+  else:
+    zoo_nodes = []
 
   # Return all the instances
-  return (master_nodes, slave_nodes)
+  return (master_nodes, slave_nodes, zoo_nodes)
 
 
 # Get the EC2 instances in an existing cluster if available.
@@ -373,6 +435,7 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
   reservations = conn.get_all_reservations()
   master_nodes = []
   slave_nodes = []
+  zoo_nodes = []
   for res in reservations:
     #print "res.groups", res.groups
     #print "res.groups.name", res.groups[0].name
@@ -383,12 +446,14 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
         master_nodes.append(inst)
       elif group_name == cluster_name + "-slaves":
         slave_nodes.append(inst)
+      elif group_name == cluster_name + "-zoo":
+        zoo_nodes.append(inst)
                   
-  if any((master_nodes, slave_nodes)):
-    print ("Found %d master(s), %d slaves" %
-           (len(master_nodes), len(slave_nodes)))
+  if any((master_nodes, slave_nodes, zoo_nodes)):
+    print ("Found %d master(s), %d slaves, %d zookeeper nodes" %
+           (len(master_nodes), len(slave_nodes), len(zoo_nodes)))
   if master_nodes != [] or not die_on_error:
-    return (master_nodes, slave_nodes)
+    return (master_nodes, slave_nodes, zoo_nodes)
   else:
     if master_nodes == [] and slave_nodes != []:
       print >> sys.stderr, "ERROR: Could not find master in group " + cluster_name + "-master"
@@ -399,7 +464,7 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
 
 # Deploy configuration files and run setup scripts on a newly launched
 # or started EC2 cluster.
-def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
+def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_key):
   master = master_nodes[0].public_dns_name
   if deploy_ssh_key:
     print "Generating cluster's SSH key on master..."
@@ -415,12 +480,15 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
       print slave.public_dns_name
       ssh_write(slave.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
 
-  modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs',
-             'mapreduce', 'spark-standalone', 'tachyon']
+  #modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs', 'mapreduce', 'spark-standalone', 'tachyon']
+
+  modules = ['ephemeral-hdfs', 'persistent-hdfs']
 
   if opts.hadoop_major_version == "1":
     modules = filter(lambda x: x != "mapreduce", modules)
 
+  if opts.installation_type == "mesos":
+      modules.append('mesos')
   
   if opts.ganglia:
     modules.append('ganglia')
@@ -458,41 +526,61 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
   ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")
   ssh(master, opts, "echo PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment")
+  #   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
+  ssh(master, opts, "echo LD_LIBRARY_PATH='/root/mesos/build/src/.libs/' >> /etc/environment")
        
   #Download packages needed by the setup scripts on the spark-euca directory - Normally downloaded from s3.amazonaws.com
   #:q
   #ssh(master, opts, "wget https://archive.apache.org/dist/hadoop/core/hadoop-1.0.4/hadoop-1.0.4.tar.gz")
-  ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") # shark 0.8.* needs hive and the shark/setup.sh script tries to rsync hive* regardless of the version used
+  #ssh(master, opts, "wget https://archive.apache.org/dist/hive/hive-0.9.0/hive-0.9.0.tar.gz") # shark 0.8.* needs hive and the shark/setup.sh script tries to rsync hive* regardless of the version used
   
-  #Required packets to run MLlib
-  ssh(master, opts, pkg_mngr + " install gfortran")
-  ssh(master, opts, pkg_mngr + " install libgfortran3")
-  ssh(master, opts, pkg_mngr + " install libatlas3gf-base libopenblas-base")
-  ssh(master, opts, "update-alternatives --config libblas.so.3gf --skip-auto")
-  ssh(master, opts, "update-alternatives --config liblapack.so.3gf --skip-auto")
+  # *****  Required packets to run MLlib ******
+  #ssh(master, opts, pkg_mngr + " install gfortran")
+  #ssh(master, opts, pkg_mngr + " install libgfortran3")
+  #ssh(master, opts, pkg_mngr + " libatlas3gf-base libopenblas-base")
+  #ssh(master, opts, "update-alternatives --config libblas.so.3gf --skip-auto")
+  #ssh(master, opts, "update-alternatives --config liblapack.so.3gf --skip-auto")
+  
+  
+  # ****** Required configurations for Apache Mesos ******
+   # Install build tools.
+   # $ sudo apt-get install build-essential
+   
+   # Install devel python.
+   #$ sudo apt-get install python-dev python-boto
+   
+   # Install devel libcurl
+   #$ sudo apt-get install libcurl4-nss-dev
+
+   # Install devel libsasl (***Only required for Mesos 0.14.0 or newer***).
+   #$ sudo apt-get install libsasl2-dev
+
+   # Install Maven (***Only required for Mesos 0.18.1 or newer***).
+   #$ sudo apt-get install maven
+  
   #If we want to format the attached volume with xfs the following should not be in comments & prepare-slaves.sh should be modified as well
   #if opts.vol_size > 0:
   #    ssh(master, opts, pkg_mngr + " install xfsprogs")
   
   # NOTE: We should clone the repository before running deploy_files to
   # prevent ec2-variables.sh from being overwritten
-  ssh(master, opts, "rm -rf spark-euca && git clone https://github.com/strat0sphere/spark-euca.git")
+  ssh(master, opts, "rm -rf spark-euca && git clone -b mesos https://github.com/strat0sphere/spark-euca.git")
   
   print "Deploying files to master..."
-  deploy_files(conn, "deploy.generic", opts, master_nodes, slave_nodes, modules)
+  deploy_files(conn, "deploy.generic", opts, master_nodes, slave_nodes, zoo_nodes, modules)
 
   print "Running setup on master..."
   ssh(master, opts, "echo '****************'; ls -al")
-  #setup_standalone_cluster(master, slave_nodes, opts)
-  setup_spark_cluster(master, opts)
+  
+  print "opts.installation_type: " + opts.installation_type
+  if(opts.installation_type == "mesos"):
+      setup_mesos_cluster(master, opts)
+  elif(opts.installation_type == "spark-standalone"):
+      setup_spark_standalone_cluster(master, opts)
+  
   print "Done!"
 
-def setup_standalone_cluster(master, slave_nodes, opts):
-  slave_ips = '\n'.join([i.public_dns_name for i in slave_nodes])
-  ssh(master, opts, "echo \"%s\" > spark/conf/slaves" % (slave_ips))
-  ssh(master, opts, "/root/spark/sbin/start-all.sh")
-
-def setup_spark_cluster(master, opts):
+def setup_spark_standalone_cluster(master, opts):
   #ssh(master, opts, "chmod u+x ~/spark-testing/setup.sh")
   #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
   ssh(master, opts, "chmod u+x spark-euca/setup.sh")
@@ -506,13 +594,31 @@ def setup_spark_cluster(master, opts):
   if opts.ganglia:
     print "Ganglia started at http://%s:5080/ganglia" % master
 
+def setup_mesos_cluster(master, opts):
+  #ssh(master, opts, "chmod u+x ~/spark-testing/setup.sh")
+  #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
+  ssh(master, opts, "chmod u+x spark-euca/setup-mesos.sh")
+  #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
+  #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
+  ssh(master, opts, "spark-euca/setup-mesos.sh " + opts.os_type)
+  #ssh(master, opts, "echo 'Starting-all...'")
+  #ssh(master, opts, "/root/spark/sbin/start-all.sh")
+  #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
+
+  print "Mesos cluster started at http://%s:5050" % master
+
+  if opts.ganglia:
+    print "Ganglia started at http://%s:5080/ganglia" % master
+
 
 # Wait for a whole cluster (masters, slaves and ZooKeeper) to start up
-def wait_for_cluster(conn, wait_secs, master_nodes, slave_nodes):
+def wait_for_cluster(conn, wait_secs, master_nodes, slave_nodes, zoo_nodes):
   print "Waiting for instances to start up..."
   time.sleep(5)
   wait_for_instances(conn, master_nodes)
   wait_for_instances(conn, slave_nodes)
+  if zoo_nodes != []:
+    wait_for_instances(conn, zoo_nodes)
   print "Waiting %d more seconds..." % wait_secs
   time.sleep(wait_secs)
 
@@ -562,7 +668,7 @@ def get_num_disks(instance_type):
 # cluster (e.g. lists of masters and slaves). Files are only deployed to
 # the first master instance in the cluster, and we expect the setup
 # script to be run on that instance to copy them to other nodes.
-def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
+def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, modules):
   active_master = master_nodes[0].public_dns_name
 
   num_disks = get_num_disks(opts.instance_type)
@@ -575,7 +681,14 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
       mapred_local_dirs += ",/mnt%d/hadoop/mrlocal" % i
       spark_local_dirs += ",/mnt%d/spark" % i
 
-  cluster_url = "%s:7077" % active_master
+  if zoo_nodes != []:
+    zoo_list = '\n'.join([i.public_dns_name for i in zoo_nodes])
+    cluster_url = "zoo://" + ",".join(
+        ["%s:2181/mesos" % i.public_dns_name for i in zoo_nodes])
+  else:
+    zoo_list = "NONE"
+    
+  cluster_url = "master@%s:5050" % active_master
 
   if "." in opts.spark_version:
     # Pre-built spark & shark deploy
@@ -590,6 +703,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
     "master_list": '\n'.join([i.public_dns_name for i in master_nodes]),
     "active_master": active_master,
     "slave_list": '\n'.join([i.public_dns_name for i in slave_nodes]),
+    "zoo_list": zoo_list,
     "cluster_url": cluster_url,
     "hdfs_data_dirs": hdfs_data_dirs,
     "mapred_local_dirs": mapred_local_dirs,
@@ -600,7 +714,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, modules):
     "shark_version": shark_v,
     "hadoop_major_version": opts.hadoop_major_version,
     "spark_worker_instances": "%d" % opts.worker_instances,
-    "spark_master_opts": opts.master_opts
+    "spark_master_opts": opts.master_opts,
+    "mesos_version": opts.mesos_version
   }
 
 
@@ -756,24 +871,24 @@ def real_main():
       print >> sys.stderr, "ERROR: You have to start at least 1 slave"
       sys.exit(1)
     if opts.resume:
-      (master_nodes, slave_nodes) = get_existing_cluster(
+      (master_nodes, slave_nodes, zoo_nodes) = get_existing_cluster(
           conn, opts, cluster_name)
     else:
-      (master_nodes, slave_nodes) = launch_cluster(conn, opts, cluster_name)
-      wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes)
+      (master_nodes, slave_nodes, zoo_nodes) = launch_cluster(conn, opts, cluster_name)
+      wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes, zoo_nodes)
       if opts.vol_size > 0:
           attach_volumes(conn, master_nodes, opts.vol_size)
           time.sleep(10)
           attach_volumes(conn, slave_nodes, opts.vol_size)
           time.sleep(10)
-    setup_cluster(conn, master_nodes, slave_nodes, opts, True)
+    setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, True)
 
   elif action == "destroy":
     response = raw_input("Are you sure you want to destroy the cluster " +
         cluster_name + "?\nALL DATA ON ALL NODES WILL BE LOST!!\n" +
         "Destroy cluster " + cluster_name + " (y/N): ")
     if response == "y":
-      (master_nodes, slave_nodes) = get_existing_cluster(
+      (master_nodes, slave_nodes, zoo_nodes) = get_existing_cluster(
           conn, opts, cluster_name, die_on_error=False)
       print "Terminating master..."
       for inst in master_nodes:
@@ -783,6 +898,10 @@ def real_main():
       for inst in slave_nodes:
         print "Terminating slave instance... ", inst   
         inst.terminate()
+      print "Terminating zookeepers..."
+      for inst in zoo_nodes:
+          print "Terminating zoo instance...", inst
+          inst.terminate()
 
       # Delete security groups as well
       if opts.delete_groups:
@@ -827,7 +946,7 @@ def real_main():
           print "Try re-running in a few minutes."
 
   elif action == "login":
-    (master_nodes, slave_nodes) = get_existing_cluster(
+    (master_nodes, slave_nodes, zoo_nodes) = get_existing_cluster(
         conn, opts, cluster_name)
     master = master_nodes[0].public_dns_name
     print "Logging into master " + master + "..."
@@ -838,7 +957,7 @@ def real_main():
         ssh_command(opts) + proxy_opt + ['-t', '-t', "%s@%s" % (opts.user, master)])
 
   elif action == "get-master":
-    (master_nodes, slave_nodes) = get_existing_cluster(conn, opts, cluster_name)
+    (master_nodes, slave_nodes, zoo_nodes) = get_existing_cluster(conn, opts, cluster_name)
     print master_nodes[0].public_dns_name
 
   elif action == "stop":
@@ -849,7 +968,7 @@ def real_main():
         "All data on spot-instance slaves will be lost.\n" +
         "Stop cluster " + cluster_name + " (y/N): ")
     if response == "y":
-      (master_nodes, slave_nodes) = get_existing_cluster(
+      (master_nodes, slave_nodes, zoo_nodes) = get_existing_cluster(
           conn, opts, cluster_name, die_on_error=False)
       print "Stopping master..."
       for inst in master_nodes:
@@ -864,7 +983,7 @@ def real_main():
             inst.stop()
 
   elif action == "start":
-    (master_nodes, slave_nodes) = get_existing_cluster(conn, opts, cluster_name)
+    (master_nodes, slave_nodes, zoo_nodes) = get_existing_cluster(conn, opts, cluster_name)
     print "Starting slaves..."
     for inst in slave_nodes:
       if inst.state not in ["shutting-down", "terminated"]:
@@ -873,8 +992,14 @@ def real_main():
     for inst in master_nodes:
       if inst.state not in ["shutting-down", "terminated"]:
         inst.start()
-    wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes)
-    setup_cluster(conn, master_nodes, slave_nodes, opts, False)
+    if zoo_nodes != []:
+      print "Starting zoo..."
+      for inst in zoo_nodes:
+        if inst.state not in ["shutting-down", "terminated"]:
+          inst.start()
+          
+    wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes, zoo_nodes)
+    setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, False)
 
   else:
     print >> stderr, "Invalid action: %s" % action

@@ -49,44 +49,90 @@ else:
 # Make tachyon_mb as spark_mb for now.
 tachyon_mb = spark_mb
 
-worker_instances = int(os.getenv("SPARK_WORKER_INSTANCES", 1))
+worker_instances = int(os.getenv("SPARK_WORKER_INSTANCES", 1)) #Unecessary for Mesos
 # Distribute equally cpu cores among worker instances
 worker_cores = max(slave_cpus / worker_instances, 1)
+
+#get local IP address
+#/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'
+#get hostname
+#hostname
+#get fqdn hostname
+#hostname --fqdn
+
+
+#TODO: some of the following are not needed
+#print "masters: " + os.getenv("MASTERS")
+#print "master_dns_mapping: " + os.getenv("MASTERS_DNS_MAPPINGS")
+
+def dirNeedsConfig(local_dir, config_dirs):
+    for dir in config_dirs:
+        if dir in local_dir:
+            return True
+    return False
 
 template_vars = {
   "master_list": os.getenv("MASTERS"),
   "active_master": os.getenv("MASTERS").split("\n")[0],
+  "active_master_private": os.getenv("ACTIVE_MASTER_PRIVATE"),
   "slave_list": os.getenv("SLAVES"),
-  "hdfs_data_dirs": os.getenv("HDFS_DATA_DIRS"),
-  "mapred_local_dirs": os.getenv("MAPRED_LOCAL_DIRS"),
-  "spark_local_dirs": os.getenv("SPARK_LOCAL_DIRS"),
-  "default_spark_mem": "%dm" % spark_mb,
-  "spark_worker_instances": "%d" %  worker_instances,
-  "spark_worker_cores": "%d" %  worker_cores,
-  "spark_master_opts": os.getenv("SPARK_MASTER_OPTS", ""),
-  "spark_version": os.getenv("SPARK_VERSION"),
-  "shark_version": os.getenv("SHARK_VERSION"),
-  "mesos_version": os.getenv("MESOS_VERSION"),
-  "hadoop_major_version": os.getenv("HADOOP_MAJOR_VERSION"),
+  "zoo_list": os.getenv("ZOOS"),
+  "masters_dns_mappings": os.getenv("MASTERS_DNS_MAPPINGS"),
+  "slaves_dns_mappings": os.getenv("SLAVES_DNS_MAPPINGS"),
+  "masters_dns_mappings_public": os.getenv("MASTERS_DNS_MAPPINGS_PUBLIC"),
+  "slaves_dns_mappings_public": os.getenv("SLAVES_DNS_MAPPINGS_PUBLIC"),
+  "mesos_setup_version": os.getenv("MESOS_SETUP_VERSION"),
   "java_home": os.getenv("JAVA_HOME"),
-  "default_tachyon_mem": "%dMB" % tachyon_mb,
+  "cluster_name": os.getenv("CLUSTER_NAME"),
+  "aws_access_key": os.getenv("AWS_ACCESS_KEY"),
+  "aws_secret_key": os.getenv("AWS_SECRET_KEY"),
+  "walrus_ip": os.getenv("WALRUS_IP"),
+  "mesos_source_dir": os.getenv("MESOS_SOURCE_DIR"),
+  "mesos_build_dir": os.getenv("MESOS_BUILD_DIR"), 
+  "python_path": os.getenv("PYTHON_PATH"),
+  "python_egg_postfix": os.getenv("PYTHON_EGG_POSTFIX"),
+  "python_egg_purepy_postfix": os.getenv("PYTHON_EGG_PUREPY_POSTFIX"),
+  "storm_release": os.getenv("STORM_RELEASE"),
+  "kafka_scala_binary": os.getenv("KAFKA_SCALA_BINARY")
 }
 
 template_dir="/root/spark-euca/templates"
 
+#config_dirs contains all the directories that might need some configuration. This includes the modules that are installed by 
+#the script (which are all located under /root) plus the directories under /etc or any other dirs requiring configuration
+
+#If MPI enabled "mesos-0.20" should be added on the config_dirs
+config_dirs = ["etc", "spark", "hadoop", "s3cmd", "backup", "storm", "kafka"]
+
+
 for path, dirs, files in os.walk(template_dir):
+  #print "template_dir" + template_dir  
+  
   if path.find(".svn") == -1:
     dest_dir = os.path.join('/', path[len(template_dir):])
     if not os.path.exists(dest_dir):
-      os.makedirs(dest_dir)
+      if not dirNeedsConfig(dest_dir, config_dirs):
+          continue
+      else:
+       print "Creating: " + dest_dir 
+       os.makedirs(dest_dir)
+       
+    print "DEBUG: Configuring dest_dir " + dest_dir
+       
     for filename in files:
       if filename[0] not in '#.~' and filename[-1] != '~':
         dest_file = os.path.join(dest_dir, filename)
         with open(os.path.join(path, filename)) as src:
           with open(dest_file, "w") as dest:
-            print "Configuring " + dest_file
+            print "DEBUG: Configuring " + dest_file
             text = src.read()
             for key in template_vars:
-              text = text.replace("{{" + key + "}}", template_vars[key])
+              #print "DEBUG: key: " + key
+              if (template_vars[key] != None):  
+                   #print "Replacing " +key+ " with: " + template_vars[key]
+                   text = text.replace("{{" + key + "}}", template_vars[key])
+              else:
+                  print "WARNING: Key " + key + " has no value!!!"
             dest.write(text)
             dest.close()
+

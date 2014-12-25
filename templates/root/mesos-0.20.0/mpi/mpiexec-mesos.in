@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# This is a wrapper script for the MPI launcher framework.
+#
+# This script uses MESOS_SOURCE_DIR and MESOS_BUILD_DIR which come
+# from configuration substitutions.
+MESOS_SOURCE_DIR="{{mesos_source_dir}}"
+MESOS_BUILD_DIR="{{mesos_build_dir}}"
+
+# Use colors for errors.
+. ${MESOS_SOURCE_DIR}/support/colors.sh
+
+# Force the use of the Python interpreter configured during building.
+test ! -z "${PYTHON}" && \
+  echo "${RED}Ignoring PYTHON environment variable (using {{python_path}})${NORMAL}"
+
+PYTHON="{{python_path}}"
+
+DISTRIBUTE_EGG=`echo ${MESOS_BUILD_DIR}/3rdparty/distribute-*/dist/*.egg`
+
+test ! -e ${DISTRIBUTE_EGG} && \
+  echo "${RED}Failed to find ${DISTRIBUTE_EGG} verify PYTHONPATH${NORMAL}"
+
+PROTOBUF=${MESOS_BUILD_DIR}/3rdparty/libprocess/3rdparty/protobuf-*
+PROTOBUF_EGG=`echo ${PROTOBUF}/python/dist/protobuf*.egg`
+
+# Just warn in the case when build with --disable-bundled.
+test ! -e ${PROTOBUF_EGG} && \
+  echo "${RED}Failed to find ${PROTOBUF_EGG} check your PYTHONPATH${NORMAL}"
+
+MESOS_EGGS=""
+for egg in interface native; do
+  base_dir="${MESOS_BUILD_DIR}/src/python/${egg}/dist/"
+  egg_path="${base_dir}mesos.${egg}-{{mesos_version}}"
+
+  if [[ "$egg" == "native" ]]; then
+    egg_path+="-{{python_egg_postfix}}"
+  else
+     egg_path+="-{{python_egg_purepy_postfix}}"
+  fi
+
+  egg_path+=".egg"
+
+  test ! -e ${egg_path} && \
+    echo "${RED}Failed to find ${egg_path}${NORMAL}" && \
+    exit 1
+
+  MESOS_EGGS+="${egg_path}:"
+done
+
+SCRIPT=${MESOS_SOURCE_DIR}/mpi/mpiexec-mesos.py
+
+test ! -e ${SCRIPT} && \
+  echo "${RED}Failed to find ${SCRIPT}${NORMAL}" && \
+  exit 1
+
+PYTHONPATH="${DISTRIBUTE_EGG}:${PROTOBUF_EGG}:${MESOS_EGGS}" \
+  exec ${PYTHON} ${SCRIPT} "${@}"
