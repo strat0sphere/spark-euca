@@ -12,7 +12,7 @@ case "$1" in
 start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
-nohup $DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
+$DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
 ;;
 stop)
 # Stop daemons.
