@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /lib/lsb/init-functions
+
 USER=root
 DAEMON_PATH=/root/kafka
 DAEMON_NAME=kafka
@@ -10,7 +12,7 @@ case "$1" in
 start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
-$DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
+nohup $DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
 ;;
 stop)
 # Stop daemons.
