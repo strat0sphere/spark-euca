@@ -327,7 +327,11 @@ cd /root/spark-euca  # guard against setup-test.sh changing the cwd
 done
 fi
 
-ps -ef | grep kafka
+for node in $MASTERS; do
+echo Rebooting $node ...
+ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
+done
+
 
 
 
