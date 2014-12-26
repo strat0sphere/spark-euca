@@ -104,7 +104,7 @@ fi
 done
 
 echo "RSYNC'ing /root/spark-euca to other cluster nodes..."
-for node in $SLAVES $OTHER_MASTERS; $ZOOS do
+for node in $SLAVES $OTHER_MASTERS $ZOOS; do
 echo $node
 rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
 scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
