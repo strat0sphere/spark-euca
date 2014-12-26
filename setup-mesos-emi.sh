@@ -104,7 +104,7 @@ fi
 done
 
 echo "RSYNC'ing /root/spark-euca to other cluster nodes..."
-for node in $SLAVES $OTHER_MASTERS; do
+for node in $SLAVES $OTHER_MASTERS; $ZOOS do
 echo $node
 rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
 scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
@@ -199,7 +199,7 @@ echo "Starting up zookeeper ensemble..."
 for zoo in $ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 zid=1
-ssh -t -t $SSH_OPTS root@$node "service zookeeper-server init --myid=$zid --force" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server init --myid=$zid --force" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server start" & sleep 10.0
 zid=$(($zid+1))
 sleep 0.3

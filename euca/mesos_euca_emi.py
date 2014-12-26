@@ -143,6 +143,8 @@ def parse_args():
   parser.add_option("-f", "--ft", metavar="NUM_MASTERS", default="1", 
       help="Number of masters to run. Default is 1. Greater values " + 
            "make Mesos run in fault-tolerant mode with ZooKeeper."),
+  parser.add_option("--zoo-num", metavar="NUM_ZOOS", default="3", 
+      help="Size of zookeeper quorum. Default is 3. This should be an odd number."),
   parser.add_option("--run-tests", type="string", default="False", 
       help="Set True if you want to run module tests")
   parser.add_option("--restore", type="string", default="False",  
@@ -358,12 +360,14 @@ def launch_cluster(conn, opts, cluster_name):
       master_type = opts.instance_type
     if opts.zone == 'all':
       opts.zone = random.choice(conn.get_all_zones()).name
+    
+    print "Running " + opts.ft + " masters"
     master_res = image_master.run(key_name = opts.key_pair,
                            security_groups = [master_group],
                            instance_type = master_type,
                            placement = opts.zone,
-                           min_count = 1,
-                           max_count = 1,
+                           min_count = opts.ft,
+                           max_count = opts.ft,
                            block_device_map = block_map,
                            user_data = opts.user_data)
     master_nodes = master_res.instances
@@ -371,13 +375,13 @@ def launch_cluster(conn, opts, cluster_name):
     
   # Launch ZooKeeper nodes if required
   if int(opts.ft) > 1:
-    print "Running " + opts.ft + " zookeepers"
+    print "Running " + opts.zoo-no + " zookeepers"
     zoo_res = image_zoo.run(key_name = opts.key_pair,
                         security_groups = [zoo_group],
                         instance_type = opts.instance_type,
                         placement = opts.zone,
-                        min_count = 3,
-                        max_count = 3,
+                        min_count = opts.zoo-no,
+                        max_count = opts.zoo-no,
                         block_device_map = block_map,
                         user_data = opts.user_data)
     zoo_nodes = zoo_res.instances
@@ -585,8 +589,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
         ["%s:2181/mesos" % i.public_dns_name for i in zoo_nodes])
   else:
     zoo_list = "NONE"
-    
-  cluster_url = "master@%s:5050" % active_master
+    cluster_url = "master@%s:5050" % active_master
    
   # self.private_ip_address = None
   # self.ip_address = None 
