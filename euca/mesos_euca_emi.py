@@ -113,6 +113,10 @@ def parse_args():
            "/vol.")
   parser.add_option("--swap", metavar="SWAP", type="int", default=1024,
       help="Swap space to set up per node, in MB (default: 1024)")
+  parser.add_option("-z", "--zone", default="",
+      help="Availability zone to launch instances in, or 'all' to spread " +
+           "slaves across multiple (an additional $0.01/Gb for bandwidth" +
+           "between zones applies)")
   parser.add_option("--ganglia", action="store_true", default=True,
       help="Setup Ganglia monitoring on cluster (default: on). NOTE: " +
            "the Ganglia page will be publicly accessible")
