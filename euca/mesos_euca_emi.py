@@ -113,9 +113,6 @@ def parse_args():
            "/vol.")
   parser.add_option("--swap", metavar="SWAP", type="int", default=1024,
       help="Swap space to set up per node, in MB (default: 1024)")
-  parser.add_option("--spot-price", metavar="PRICE", type="float",
-      help="If specified, launch slaves as spot instances with the given " +
-            "maximum price (in dollars)")
   parser.add_option("--ganglia", action="store_true", default=True,
       help="Setup Ganglia monitoring on cluster (default: on). NOTE: " +
            "the Ganglia page will be publicly accessible")
@@ -145,7 +142,7 @@ def parse_args():
   parser.add_option("--run-tests", type="string", default="False", 
       help="Set True if you want to run module tests")
   parser.add_option("--restore", type="string", default="False",  
-      help="Restore HDFS from previous backup"),
+      help="Restore HDFS from previous backup")
   parser.add_option("--cohost", action="store_true", default=False,
   help="Host mesos and Zoo on the same nodes") 
 
