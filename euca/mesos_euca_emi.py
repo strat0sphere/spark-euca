@@ -375,13 +375,13 @@ def launch_cluster(conn, opts, cluster_name):
     
   # Launch ZooKeeper nodes if required
   if int(opts.ft) > 1:
-    print "Running " + opts.zoo-no + " zookeepers"
+    print "Running " + opts.zoo_num + " zookeepers"
     zoo_res = image_zoo.run(key_name = opts.key_pair,
                         security_groups = [zoo_group],
                         instance_type = opts.instance_type,
                         placement = opts.zone,
-                        min_count = opts.zoo-no,
-                        max_count = opts.zoo-no,
+                        min_count = opts.zoo_num,
+                        max_count = opts.zoo_num,
                         block_device_map = block_map,
                         user_data = opts.user_data)
     zoo_nodes = zoo_res.instances
