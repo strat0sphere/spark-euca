@@ -86,10 +86,6 @@ def parse_args():
       help="Master instance type (leave empty for same as instance-type)")
   parser.add_option("-r", "--region", default="cs270",
       help="EC2 region zone to launch instances in")
-  parser.add_option("-z", "--zone", default="",
-      help="Availability zone to launch instances in, or 'all' to spread " +
-           "slaves across multiple (an additional $0.01/Gb for bandwidth" +
-           "between zones applies)")
   parser.add_option("--emi-master", default="", help="Eucalyptus Machine Image ID to use for the master instance")
   parser.add_option("--emi-zoo", default="", help="Eucalyptus Machine Image ID to use for the zoo instance")
   parser.add_option("-e", "--emi", help="Eucalyptus Machine Image ID to use")
@@ -149,7 +145,9 @@ def parse_args():
   parser.add_option("--run-tests", type="string", default="False", 
       help="Set True if you want to run module tests")
   parser.add_option("--restore", type="string", default="False",  
-      help="Restore HDFS from previous backup")  
+      help="Restore HDFS from previous backup"),
+  parser.add_option("--cohost", action="store_true", default=False,
+  help="Host mesos and Zoo on the same nodes") 
 
 
 
