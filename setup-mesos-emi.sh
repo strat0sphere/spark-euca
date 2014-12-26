@@ -3,21 +3,8 @@
 # Make sure we are in the spark-euca directory
 cd /root/spark-euca
 
-# Load the environment variables specific to this AMI
-#source /root/.bash_profile
-
 # Load the cluster variables set by the deploy script
 source ec2-variables.sh
-
-# Set hostname based on EC2 private DNS name, so that it is set correctly
-# even if the instance is restarted with a different private DNS name
-#PRIVATE_DNS=`wget -q -O - http://instance-data.ec2.internal/latest/meta-data/local-hostname`
-#PUBLIC_DNS=`wget -q -O - http://instance-data.ec2.internal/latest/meta-data/hostname`
-#hostname $PRIVATE_DNS
-#PRIVATE_DNS=hostname
-#echo $PRIVATE_DNS > /etc/hostname
-#export HOSTNAME=$PRIVATE_DNS  # Fix the bash built-in hostname variable too
-
 
 echo $HOSTNAME > /etc/hostname
 
@@ -80,16 +67,17 @@ ssh $SSH_OPTS `hostname` echo -n &
 wait
 
 
-if [[ $NUM_ZOOS != 0 ]] ; then
-echo "SSH'ing to ZooKeeper server(s) to approve keys..."
-zid=1
-for zoo in $ZOOS; do
-echo $zoo
-ssh $SSH_OPTS $zoo echo -n \; mkdir -p /tmp/zookeeper \; echo $zid \> /tmp/zookeeper/myid &
-zid=$(($zid+1))
-sleep 0.3
-done
-fi
+#TODO: Replace hard-coded with $ZooDataDir
+#if [[ $NUM_ZOOS != 0 ]] ; then
+#echo "SSH'ing to ZooKeeper server(s) to approve keys..."
+#zid=1
+#for zoo in $ZOOS; do
+#echo $zoo
+#ssh $SSH_OPTS $zoo echo -n \; mkdir -p /mnt/zookeeper/dataDir/ \; echo $zid \> /mnt/zookeeper/dataDir/ &
+#zid=$(($zid+1))
+#sleep 0.3
+#done
+#fi
 
 # Try to SSH to each cluster node to approve their key. Since some nodes may
 # be slow in starting, we retry failed slaves up to 3 times.
@@ -161,22 +149,6 @@ restore=$2
 
 export RESTORE=$restore #If it is a restore session the backup module will restore files from S3
 
-#installing required packages to slave nodes
-#echo "Installing required packages to slave nodes..."
-#distribution=$1 #ubuntu or centos
-
-#for node in $SLAVES $OTHER_MASTERS; do
-#echo $node
-#ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
-#ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/prepare-slaves-$distribution.sh" & sleep 0.3
-##   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
-#ssh -t -t $SSH_OPTS root@$node "echo 'LD_LIBRARY_PATH=/root/mesos/build/src/.libs/' >> /etc/environment" & sleep 0.3
-#ssh -t -t $SSH_OPTS root@$node "echo 'JAVA_HOME=/usr/lib/jvm/java-1.7.0' >> /etc/environment"
-#ssh -t -t $SSH_OPTS root@$node "echo 'SCALA_HOME=/root/scala' >> /etc/environment"
-#ssh -t -t $SSH_OPTS root@$node "echo 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment"
-#done
-#wait
-
 # Always include 'scala' module if it's not defined as a work around
 # for older versions of the scripts.
 #if [[ ! $MODULES =~ *scala* ]]; then
@@ -184,28 +156,37 @@ export RESTORE=$restore #If it is a restore session the backup module will resto
 #fi
 
 
-##TODO: Start zookeeper from wherever is actually located
-#if [[ $NUM_ZOOS != 0 ]]; then
-#echo "Starting ZooKeeper quorum..."
-#for zoo in $ZOOS; do
+#Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
+if [[ $NUM_ZOOS != 0 ]]; then
+echo "Stoping old zooKeeper daemons running on emi..."
+for zoo in $ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
-#done
-#wait
-#sleep 5
-#fi
+
+#Creating zookeeper configuration directories
+mkdir -p /mnt/zookeeper/dataDir
+mkdir -p /mnt/zookeeper/dataLogDir
+chown -R zookeeper:zookeeper /mnt/zookeeper/
+chmod -R g+w /mnt/zookeeper/
+
+ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server stop" & sleep 10.0
+done
+wait
+sleep 5
+fi
 
 
 #Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
 #With the new configuration its only possibled to be stopped by killing the process witch messes up the ssh session
-for node in $MASTERS; do
-echo $node
-ssh -t -t $SSH_OPTS root@$node "service zookeeper-server stop" & sleep 10.0
-done
+#for node in $MASTERS; do
+#echo $node
+#ssh -t -t $SSH_OPTS root@$node "service zookeeper-server stop" & sleep 10.0
+#done
 
 # Deploy templates
 # TODO: Move configuring templates to a per-module ?
 echo "Creating local config files..."
 ./deploy_templates_mesos.py
+
 
 #Deploy all /etc/hadoop configuration
 /root/spark-euca/copy-dir /etc/hadoop
@@ -213,12 +194,19 @@ echo "Creating local config files..."
 #Deploy hosts-configuration
 /root/spark-euca/copy-dir /etc/hosts
 
-
-#Creating zookeeper configuration directories
-mkdir -p /mnt/zookeeper/dataDir
-mkdir -p /mnt/zookeeper/dataLogDir
-chown -R zookeeper:zookeeper /mnt/zookeeper/
-chmod -R g+w /mnt/zookeeper/
+if [[ $NUM_ZOOS != 0 ]]; then
+echo "Starting up zookeeper ensemble..."
+for zoo in $ZOOS; do
+#ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
+zid=1
+ssh -t -t $SSH_OPTS root@$node "service zookeeper-server init --myid=$zid --force" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server start" & sleep 10.0
+zid=$(($zid+1))
+sleep 0.3
+done
+wait
+sleep 5
+fi
 
 #TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
 echo "Starting up Zookeeper, HDFS and Jobtracker..."
@@ -227,8 +215,8 @@ for node in $MASTERS; do
 echo $node
 #service zookeeper stop doesn't work because zookeeper daemon on emi is running with the old configuration and doesn't have access to the new log dirs
 #ssh -t -t $SSH_OPTS root@$node `ps ax | grep -i '/usr/lib/zookeeper' | grep -v grep | awk '{print $1}' | xargs kill -9` & sleep 10.0
-ssh -t -t $SSH_OPTS root@$node "service zookeeper-server init" & sleep 10.0
-ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 10.0
+#ssh -t -t $SSH_OPTS root@$node "service zookeeper-server init" & sleep 10.0
+#ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 10.0
 
 ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs hdfs namenode -format -force" & sleep 10.0 #TODO: Can formatting be avoided?
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode restart" & sleep 10.0
@@ -327,7 +315,11 @@ cd /root/spark-euca  # guard against setup-test.sh changing the cwd
 done
 fi
 
-ps -ef | grep kafka
+#reboot maschines to fix issue with starting up kafka and storm
+for node in $MASTERS; do
+echo Rebooting $node ...
+ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
+done
 
 
 
