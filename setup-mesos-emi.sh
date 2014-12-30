@@ -34,10 +34,12 @@ OTHER_MASTERS=`cat masters | sed '1d'`
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
 if [ "$cohosts" == "True" ]; then
-OTHER_ZOOS=$MASTERS
 echo "$MASTERS" >> zoos
-ALL_ZOOS="$ZOOS $OTHER_ZOOS"
+ALL_ZOOS="$ZOOS $MASTERS"
 fi
+
+
+echo "ALL_ZOOS=$ALL_ZOOS"
 
 #TODO: Change - should never go on the if statement - always at least 1 zoo
 if [[ $ZOOS = *NONE* ]]; then
@@ -177,12 +179,10 @@ echo "Stoping old zooKeeper daemons running on emi..."
 for zoo in $ZOOS $MASTERS $OTHER_MASTERS do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 
+echo "Creating zookeeper dirs..."
 #Creating dirs on masters and other_masters even if it is not not needed when not co-hosting instances
 #Creating zookeeper configuration directories
-mkdir -p /mnt/zookeeper/dataDir
-mkdir -p /mnt/zookeeper/dataLogDir
-chown -R zookeeper:zookeeper /mnt/zookeeper/
-chmod -R g+w /mnt/zookeeper/
+ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/" & sleep 10.0
 
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server stop" & sleep 10.0
 done
@@ -211,10 +211,22 @@ echo "Creating local config files..."
 /root/spark-euca/copy-dir /etc/hosts
 
 if [[ $NUM_ZOOS != 0 ]]; then
+
+echo "RSYNC'ing config dirs and spark-euca dir to ZOOs..."
+#TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
+for node in $ZOOS; do
+echo $node
+rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
+sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az /etc $node:/ &
+sleep 0.3
+done
+wait
+
 echo "Starting up zookeeper ensemble..."
+zid=1
 for zoo in $ALL_ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
-zid=1
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server init --myid=$zid --force" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server start" & sleep 10.0
 zid=$(($zid+1))
@@ -262,7 +274,7 @@ echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 
 for node in $MASTERS; do
 echo $node
-chmod +x /root/mesos-installation/start-mesos-master.sh
+ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-master.sh" & sleep 0.3
 ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh start-mesos-master; update-rc.d start-mesos-master defaults; service start-mesos-master" & sleep 10.0
 done
 
