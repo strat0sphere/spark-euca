@@ -297,7 +297,7 @@ def launch_cluster(conn, opts, cluster_name):
         image_zoo = conn.get_all_images(image_ids=[opts.emi_zoo])[0]
       except:
         print >> stderr, "Could not find emi " + opts.emi_zoo
-        sys.exit(1)     
+        sys.exit(1)
     
     
     
@@ -372,16 +372,27 @@ def launch_cluster(conn, opts, cluster_name):
                            user_data = opts.user_data)
     master_nodes = master_res.instances
     print "Launched master in %s, regid = %s" % (zone, master_res.id)
-    
-  # Launch ZooKeeper nodes if required
+    if (opts.cohost):
+        #zoo_nodes = master_nodes
+        print "zoo_nodes: ", zoo_nodes
+        print "Zookeepers are co-hosted on mesos instances..."
+
+  # Launch additional ZooKeeper nodes if required - ex: if mesos masters specified are 2 and the zoo_num=3 (default)
   if int(opts.ft) > 1:
-    print "Running " + opts.zoo_num + " zookeepers"
+    if(opts.cohost):
+        zoo_num = opts.zoo_num - opts.ft #extra zoo instances needed
+    else:
+        zoo_num = opts.zoo_num
+
+  if(zoo_num > 0):
+    
+    print "Running additional " + zoo_num + " zookeepers"
     zoo_res = image_zoo.run(key_name = opts.key_pair,
                         security_groups = [zoo_group],
                         instance_type = opts.instance_type,
                         placement = opts.zone,
-                        min_count = opts.zoo_num,
-                        max_count = opts.zoo_num,
+                        min_count = zoo_num,
+                        max_count = zoo_num,
                         block_device_map = block_map,
                         user_data = opts.user_data)
     zoo_nodes = zoo_res.instances
@@ -503,7 +514,7 @@ def setup_mesos_emi_cluster(master, opts):
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
     #print "opts.run_tests: " + opts.run_tests
-    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore)
+    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + opts.cohost)
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
     #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")

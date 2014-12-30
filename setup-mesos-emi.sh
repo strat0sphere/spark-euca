@@ -10,17 +10,36 @@ echo $HOSTNAME > /etc/hostname
 
 echo "Setting up Mesos on `hostname`..."
 
+#Getting arguments
+run_tests=$1
+restore=$2
+cohost=$3
+
+export RESTORE=$restore #If it is a restore session the backup module will restore files from S3
+
 # Set up the masters, slaves, etc files based on cluster env variables
 echo "$MASTERS" > masters
 echo "$SLAVES" > slaves
+
 echo "$ZOOS" > zoos
+
+#If instances are co-hosted then masters will also act as Zoos
+#if [ "$cohosts" == "True" ]; then
+#echo "$MASTERS" >> zoos
+#fi
 
 MASTERS=`cat masters`
 NUM_MASTERS=`cat masters | wc -l`
 OTHER_MASTERS=`cat masters | sed '1d'`
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
+if [ "$cohosts" == "True" ]; then
+OTHER_ZOOS=$MASTERS
+echo "$MASTERS" >> zoos
+ALL_ZOOS="$ZOOS $OTHER_ZOOS"
+fi
 
+#TODO: Change - should never go on the if statement - always at least 1 zoo
 if [[ $ZOOS = *NONE* ]]; then
 NUM_ZOOS=0
 ZOOS=""
@@ -81,22 +100,23 @@ wait
 
 # Try to SSH to each cluster node to approve their key. Since some nodes may
 # be slow in starting, we retry failed slaves up to 3 times.
-TODO="$SLAVES $OTHER_MASTERS $ZOOS" # List of nodes to try (initially all)
+#TODO: if (cohost) --> INSTANCES ="$SLAVES $ZOOS" (ZOOS includes both zoos, other_masters and masters)
+INSTANCES="$SLAVES $OTHER_MASTERS $ZOOS" # List of nodes to try (initially all)
 TRIES="0"                          # Number of times we've tried so far
 echo "SSH'ing to other cluster nodes to approve keys..."
-while [ "e$TODO" != "e" ] && [ $TRIES -lt 4 ] ; do
-NEW_TODO=
-for slave in $TODO; do
+while [ "e$INSTANCES" != "e" ] && [ $TRIES -lt 4 ] ; do
+NEW_INSTANCES=
+for slave in $INSTANCES; do
 echo $slave
 ssh $SSH_OPTS $slave echo -n
 if [ $? != 0 ] ; then
-NEW_TODO="$NEW_TODO $slave"
+NEW_INSTANCES="$NEW_INSTANCES $slave"
 fi
 done
 TRIES=$[$TRIES + 1]
-if [ "e$NEW_TODO" != "e" ] && [ $TRIES -lt 4 ] ; then
+if [ "e$NEW_INSTANCES" != "e" ] && [ $TRIES -lt 4 ] ; then
 sleep 15
-TODO="$NEW_TODO"
+INSTANCES="$NEW_INSTANCES"
 echo "Re-attempting SSH to cluster nodes to approve keys..."
 else
 break;
@@ -104,7 +124,7 @@ fi
 done
 
 echo "RSYNC'ing /root/spark-euca to other cluster nodes..."
-for node in $SLAVES $OTHER_MASTERS $ZOOS; do
+for node in $INSTANCES; do
 echo $node
 rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
 scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
@@ -144,11 +164,6 @@ ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-d
 done
 wait
 
-run_tests=$1
-restore=$2
-
-export RESTORE=$restore #If it is a restore session the backup module will restore files from S3
-
 # Always include 'scala' module if it's not defined as a work around
 # for older versions of the scripts.
 #if [[ ! $MODULES =~ *scala* ]]; then
@@ -162,6 +177,7 @@ echo "Stoping old zooKeeper daemons running on emi..."
 for zoo in $ZOOS $MASTERS $OTHER_MASTERS do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 
+#Creating dirs on masters and other_masters even if it is not not needed when not co-hosting instances
 #Creating zookeeper configuration directories
 mkdir -p /mnt/zookeeper/dataDir
 mkdir -p /mnt/zookeeper/dataLogDir
@@ -196,7 +212,7 @@ echo "Creating local config files..."
 
 if [[ $NUM_ZOOS != 0 ]]; then
 echo "Starting up zookeeper ensemble..."
-for zoo in $ZOOS; do
+for zoo in $ALL_ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 zid=1
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server init --myid=$zid --force" & sleep 10.0
@@ -209,7 +225,7 @@ sleep 5
 fi
 
 #TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
-echo "Starting up Zookeeper, HDFS and Jobtracker..."
+echo "Starting up HDFS and Jobtracker..."
 #Startup HDFS + Zookeeper
 for node in $MASTERS; do
 echo $node
@@ -316,7 +332,7 @@ done
 fi
 
 #reboot maschines to fix issue with starting up kafka and storm
-for node in $MASTERS; do
+for node in $MASTERS $OTHER_MASTERS $ZOOS; do
 echo Rebooting $node ...
 ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
 done
