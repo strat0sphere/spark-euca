@@ -244,6 +244,12 @@ def launch_cluster(conn, opts, cluster_name):
     master_group.authorize('tcp', 4040, 4045, '0.0.0.0/0')
     master_group.authorize('tcp', 40000, 40000, '0.0.0.0/0') #apache hama
     master_group.authorize('tcp', 40013, 40013, '0.0.0.0/0') #apache hama
+    #If cohosted with zookeeper open necessary ports
+    if opts.cohost:
+        zoo_group.authorize('tcp', 2181, 2181, '0.0.0.0/0')
+        zoo_group.authorize('tcp', 2888, 2888, '0.0.0.0/0')
+        zoo_group.authorize('tcp', 3888, 3888, '0.0.0.0/0') 
+        
     if opts.ganglia:
       master_group.authorize('tcp', 5080, 5080, '0.0.0.0/0')
   if slave_group.rules == []: # Group was just now created
