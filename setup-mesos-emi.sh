@@ -159,7 +159,7 @@ export RESTORE=$restore #If it is a restore session the backup module will resto
 #Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
 if [[ $NUM_ZOOS != 0 ]]; then
 echo "Stoping old zooKeeper daemons running on emi..."
-for zoo in $ZOOS; do
+for zoo in $ZOOS $MASTERS $OTHER_MASTERS do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 
 #Creating zookeeper configuration directories
