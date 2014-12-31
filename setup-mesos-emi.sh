@@ -212,13 +212,25 @@ echo "Creating local config files..."
 
 if [[ $NUM_ZOOS != 0 ]]; then
 
+echo "Adding zookeeper hostnames and ports to configuration file..."
+zid=1
+for zoo in $ALL_ZOOS; do
+echo ''
+echo 'server.$zid=$zoo:2888:3888' >> /etc/zookeeper/conf.dist/zoo.cfg & sleep 0.3
+zid=$(($zid+1))
+sleep 0.3
+done
+wait
+
 echo "RSYNC'ing config dirs and spark-euca dir to ZOOs..."
 #TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
 for node in $ZOOS; do
 echo $node
 rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
 sleep 0.3
-rsync -e "ssh $SSH_OPTS" -az /etc $node:/ &
+rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc &
+sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc &
 sleep 0.3
 done
 wait
@@ -235,6 +247,15 @@ done
 wait
 sleep 5
 fi
+
+echo "Checking that zookeeper election finished and quorum is running..."
+for zoo in $ALL_ZOOS; do
+#ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
+ssh -t -t $SSH_OPTS root@$zoo "echo srvr | nc localhost 2181 | grep Mode"
+sleep 0.3
+done
+wait
+
 
 #TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
 echo "Starting up HDFS and Jobtracker..."
