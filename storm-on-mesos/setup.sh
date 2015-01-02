@@ -16,10 +16,23 @@ tar xzf storm-mesos-${STORM_RELEASE}.tgz
 rm storm-mesos-${STORM_RELEASE}.tgz
 cd /root/storm-mesos-${STORM_RELEASE}
 
+
+#Add zookeepers in storm.yaml in the expected format
+ZOOS_PRIVATE=`cat /root/spark-euca/zoos_private`
+
+echo ''  >> /etc/storm/storm.yaml
+echo 'storm.zookeeper.servers:' >> /etc/storm/storm.yaml
+
+for zoo in $ZOOS_PRIVATE; do
+echo $zoo
+echo '- "'$zoo'"' >> /etc/storm/storm.yaml
+done
+
 #copy configuration template
 echo "Copying configurations..."
 cp /etc/storm/storm.yaml ./conf
 cp /etc/storm/logback/cluster.xml ./logback
+
 
 #Adding soft links to automatically start services on reboot
 chmod +x /etc/storm/start-nimbus.sh

@@ -378,10 +378,6 @@ def launch_cluster(conn, opts, cluster_name):
                            user_data = opts.user_data)
     master_nodes = master_res.instances
     print "Launched master in %s, regid = %s" % (zone, master_res.id)
-    if (opts.cohost):
-        #zoo_nodes = master_nodes
-        print "zoo_nodes: ", zoo_nodes
-        print "Zookeepers are co-hosted on mesos instances..."
 
   # Launch additional ZooKeeper nodes if required - ex: if mesos masters specified are 2 and the zoo_num=3 (default)
   if int(opts.ft) > 1:
@@ -405,6 +401,9 @@ def launch_cluster(conn, opts, cluster_name):
     print "Launched zoo, regid = " + zoo_res.id
   else:
     zoo_nodes = []
+    
+  if (opts.cohost):
+      print "Zookeepers are co-hosted on mesos instances..."
 
   # Return all the instances
   return (master_nodes, slave_nodes, zoo_nodes)
@@ -588,6 +587,9 @@ def get_num_disks(instance_type):
 def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn):
   active_master = master_nodes[0].public_dns_name
   active_master_private = master_nodes[0].private_dns_name
+  
+  #for zoo : zoo_nodes:
+
 
   num_disks = get_num_disks(opts.instance_type)
   #hdfs_data_dirs = "/mnt/ephemeral-hdfs/data" #TODO: Not using - delete or change to cloudera-hdfs and data dirs
@@ -600,13 +602,33 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   #    mapred_local_dirs += ",/mnt%d/hadoop/mrlocal" % i
   #    spark_local_dirs += ",/mnt%d/spark" % i
 
-  if zoo_nodes != []:
+  if zoo_nodes != [] or opts.cohost == True:
     zoo_list = '\n'.join([i.public_dns_name for i in zoo_nodes])
-    cluster_url = "zoo://" + ",".join(
-        ["%s:2181/mesos" % i.public_dns_name for i in zoo_nodes])
+    zoo_list_private_ip = '\n'.join([i.private_ip_address for i in zoo_nodes])
+    
+    cluster_url = "zk://" + ",".join(
+        ["%s:2181" % i.public_dns_name for i in zoo_nodes])
+    cluster_url_private_ip = "zk://" + ",".join(
+        ["%s:2181" % i.private_ip_address for i in zoo_nodes])
+    
+    #If instances are cohosted concatenate masters and zoos
+    if opts.cohost == True:
+        zoo_list += '\n'.join([i.public_dns_name for i in master_nodes])
+        cluster_url += ",".join(
+        ["%s:2181" % i.public_dns_name for i in master_nodes])
+        
+        zoo_list_private_ip += '\n'.join([i.private_ip_address for i in master_nodes])
+        cluster_url_private_ip += ",".join(
+        ["%s:2181" % i.private_ip_address for i in master_nodes])
+    
+    cluster_url += "/mesos"    
+    cluster_url_private_ip += "/mesos"
+
   else:
     zoo_list = "NONE"
     cluster_url = "master@%s:5050" % active_master
+    
+    #','.join([i.private_ip_address for i in zoo_nodes])
    
   # self.private_ip_address = None
   # self.ip_address = None 
@@ -622,11 +644,15 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "active_master_private": active_master_private,
     "slave_list": '\n'.join([i.public_dns_name for i in slave_nodes]),
     "slaves_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in slave_nodes]),
-    "masters_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in master_nodes]),
     "slaves_dns_mappings_public": '\n'.join([' '.join([i.ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in slave_nodes]),
+    "masters_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in master_nodes]),
     "masters_dns_mappings_public": '\n'.join([' '.join([i.ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in master_nodes]),
+    "zoo_dns_mappings": '\n'.join([' '.join([i.private_ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in zoo_nodes]),
+    "zoo_dns_mappings_public": '\n'.join([' '.join([i.ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in zoo_nodes]),
     "zoo_list": zoo_list,
+    "zoo_list_private_ip": zoo_list_private_ip,
     "cluster_url": cluster_url,
+    "cluster_url_private_ip": cluster_url_private_ip,
     "swap": str(opts.swap),
     "modules": '\n'.join(modules),
     "mesos_setup_version": opts.mesos_setup_version,

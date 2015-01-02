@@ -31,9 +31,9 @@ mvn clean package -P cluster
 #Tesk Spark-Streaming with Kafka
 
 #Run producer
-#/root/spark/bin/spark-submit --class testingsparkwithscala.KafkaWordCountProducer --master mesos://zk://$ACTIVE_MASTER_PRIVATE:2181/mesos ~/test-code/simple-project-assembly_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE:9092 test-sentence 2 10
+#/root/spark/bin/spark-submit --class testingsparkwithscala.KafkaWordCountProducer --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project-assembly_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE:9092 test-sentence 2 10
 
 #Run consumer
-#/root/spark/bin/spark-submit --class testingsparkwithscala.KafkaWordCount --master mesos://zk://$ACTIVE_MASTER_PRIVATE:2181/mesos ~/test-code/simple-project-assembly_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE spark-group test-sentence 1
+#/root/spark/bin/spark-submit --class testingsparkwithscala.KafkaWordCount --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project-assembly_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE spark-group test-sentence 1
 
 popd

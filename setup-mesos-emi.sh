@@ -23,6 +23,8 @@ echo "$SLAVES" > slaves
 
 echo "$ZOOS" > zoos
 
+echo "$ZOOS_PRIVATE_IP" > zoos_private
+
 #If instances are co-hosted then masters will also act as Zoos
 #if [ "$cohosts" == "True" ]; then
 #echo "$MASTERS" >> zoos
