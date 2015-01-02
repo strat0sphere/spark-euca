@@ -178,7 +178,7 @@ wait
 #Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
 if [[ $NUM_ZOOS != 0 ]]; then
 echo "Stoping old zooKeeper daemons running on emi..."
-for zoo in $ZOOS $MASTERS $OTHER_MASTERS do
+for zoo in $ZOOS $MASTERS $OTHER_MASTERS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 
 echo "Creating zookeeper dirs..."
@@ -192,14 +192,15 @@ wait
 sleep 5
 fi
 
-
-#Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
-#With the new configuration its only possibled to be stopped by killing the process witch messes up the ssh session
-#for node in $MASTERS; do
-#echo $node
-#ssh -t -t $SSH_OPTS root@$node "service zookeeper-server stop" & sleep 10.0
-#done
-
+#Ungly hack because zookeeper is on the emi
+#Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
+if [ $cohosts == False]; then
+for node in $MASTERS $OTHER_MASTERS; do
+ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove" & sleep 0.3
+done
+wait
+sleep 5
+fi
 # Deploy templates
 # TODO: Move configuring templates to a per-module ?
 echo "Creating local config files..."
@@ -224,15 +225,19 @@ sleep 0.3
 done
 wait
 
-echo "RSYNC'ing config dirs and spark-euca dir to ZOOs..."
+echo "RSYNC'ing config dirs and spark-euca dir to ZOOs and OTHER_MASTERS..."
 #TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
-for node in $ZOOS; do
+for node in $ZOOS $OTHER_MASTERS; do
 echo $node
 rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
 sleep 0.3
 rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc &
 sleep 0.3
 rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc &
+sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc &
+sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc &
 sleep 0.3
 done
 wait
@@ -292,10 +297,8 @@ done
 wait
 
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
-#Startup Mesos
-#TODO: Multiple masters?
 
-for node in $MASTERS; do
+for node in $MASTERS $OTHER_MASTERS; do
 echo $node
 ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-master.sh" & sleep 0.3
 ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh start-mesos-master; update-rc.d start-mesos-master defaults; service start-mesos-master" & sleep 10.0
@@ -365,6 +368,22 @@ fi
 cd /root/spark-euca  # guard against setup-test.sh changing the cwd
 done
 fi
+
+#Some modules setups (Kafka - Storm) modifies the configuration files on /etc/ and spark-euca.
+#So this makes sure that instances have identical file structures
+for node in $OTHER_MASTERS; do
+echo $node
+rsync -e "ssh $SSH_OPTS" -az /root $node:/ &
+sleep 0.3
+#Keep a backup of the hostname file
+ssh $SSH_OPTS root@$node "mv /etc/hostname /etc/hostname-bk" & sleep 0.3
+
+rsync -e "ssh $SSH_OPTS" -az /etc $node:/ &
+
+#Replace overwritten hostname file
+ssh $SSH_OPTS root@$node "mv /etc/hostname-bk /etc/hostname" & sleep 0.3
+sleep 0.3
+done
 
 #reboot maschines to fix issue with starting up kafka and storm
 for node in $MASTERS $OTHER_MASTERS $ZOOS; do
