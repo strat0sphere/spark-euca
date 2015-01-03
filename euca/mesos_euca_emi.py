@@ -33,6 +33,7 @@
 --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh
 --installation-type mesos-emi
 --run-tests True
+--cohost True
 launch mesos-cluster-emi
 """
 
@@ -382,7 +383,7 @@ def launch_cluster(conn, opts, cluster_name):
   # Launch additional ZooKeeper nodes if required - ex: if mesos masters specified are 2 and the zoo_num=3 (default)
   if int(opts.ft) > 1:
     if(opts.cohost):
-        zoo_num = opts.zoo_num - opts.ft #extra zoo instances needed
+        zoo_num = str(int(opts.zoo_num) - int(opts.ft)) #extra zoo instances needed
     else:
         zoo_num = opts.zoo_num
 
@@ -519,7 +520,7 @@ def setup_mesos_emi_cluster(master, opts):
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
     #print "opts.run_tests: " + opts.run_tests
-    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + opts.cohost)
+    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
     #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
