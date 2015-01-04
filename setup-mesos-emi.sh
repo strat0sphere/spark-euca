@@ -194,7 +194,7 @@ fi
 
 #Ungly hack because zookeeper is on the emi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
-if [ $cohosts == False]; then
+if [ $cohosts == False ]; then
 for node in $MASTERS $OTHER_MASTERS; do
 ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove" & sleep 0.3
 done
