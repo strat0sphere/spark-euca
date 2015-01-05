@@ -151,7 +151,7 @@ echo "Configuring HDFS on `hostname`..."
 echo "Creating Namenode directories on master..."
 
 #Create hdfs name node directories on masters
-for node in $MASTERS $OTHER_MASTERS; do
+for node in $MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh" & sleep 0.3
@@ -178,7 +178,7 @@ wait
 #Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
 if [[ $NUM_ZOOS != 0 ]]; then
 echo "Stoping old zooKeeper daemons running on emi..."
-for zoo in $ZOOS $MASTERS $OTHER_MASTERS; do
+for zoo in $ZOOS $MASTERS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 
 echo "Creating zookeeper dirs..."
@@ -195,7 +195,7 @@ fi
 #Ungly hack because zookeeper is on the emi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
 if [ $cohosts == False ]; then
-for node in $MASTERS $OTHER_MASTERS; do
+for node in $MASTERS; do
 ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove" & sleep 0.3
 done
 wait
@@ -298,7 +298,7 @@ wait
 
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 
-for node in $MASTERS $OTHER_MASTERS; do
+for node in $MASTERS; do
 echo $node
 ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-master.sh" & sleep 0.3
 ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh start-mesos-master; update-rc.d start-mesos-master defaults; service start-mesos-master" & sleep 10.0
@@ -386,7 +386,7 @@ sleep 0.3
 done
 
 #reboot maschines to fix issue with starting up kafka and storm
-for node in $MASTERS $OTHER_MASTERS $ZOOS; do
+for node in $MASTERS $ZOOS; do
 echo Rebooting $node ...
 ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
 done
