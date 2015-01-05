@@ -462,7 +462,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
     print "Transferring cluster's SSH key to slaves..."
     for slave in slave_nodes:
       print slave.public_dns_name
-      ssh_write(slave.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
+      ssh_write(slave.ip_address, opts, ['tar', 'x'], dot_ssh_tar)
 
   #modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs', 'mapreduce', 'spark-standalone', 'tachyon']
 
