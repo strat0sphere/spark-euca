@@ -800,7 +800,8 @@ def real_main():
   opts.cluster_name = cluster_name #set cluster name
   
   try:
-    euca_ec2_host="eucalyptus.race.cs.ucsb.edu" #TODO: Replace with opts.euca-ec2-host
+    euca_ec2_host="128.111.179.130"  
+    #euca_ec2_host="eucalyptus.race.cs.ucsb.edu" #TODO: Replace with opts.euca-ec2-host
     euca_id=os.getenv('AWS_ACCESS_KEY')
     euca_key=os.getenv('AWS_SECRET_KEY')
     euca_region = RegionInfo(name="eucalyptus", endpoint=euca_ec2_host)
