@@ -299,11 +299,25 @@ def launch_cluster(conn, opts, cluster_name):
     print >> stderr, "Could not find emi " + opts.emi_master
     sys.exit(1)
   
-  if (opts.emi_zoo != ""):  
+  # Launch additional ZooKeeper nodes if required - ex: if mesos masters specified are 2 and the zoo_num=3 (default)
+  if int(opts.ft) > 1:
+    if(opts.cohost):
+        zoo_num = str(int(opts.zoo_num) - int(opts.ft)) #extra zoo instances needed
+    else:
+        zoo_num = opts.zoo_num
+  else:
+      zoo_num = 0
+      
+  if (zoo_num > 0):
+      if opts.emi_zoo == "":
+          emi_zoo = opts.emi_master 
+      else:
+          emi_zoo = opts.emi_zoo
+              
       try:
-        image_zoo = conn.get_all_images(image_ids=[opts.emi_zoo])[0]
+        image_zoo = conn.get_all_images(image_ids=[emi_zoo])[0]
       except:
-        print >> stderr, "Could not find emi " + opts.emi_zoo
+        print >> stderr, "Could not find emi " + emi_zoo
         sys.exit(1)
     
     
@@ -379,15 +393,6 @@ def launch_cluster(conn, opts, cluster_name):
                            user_data = opts.user_data)
     master_nodes = master_res.instances
     print "Launched master in %s, regid = %s" % (zone, master_res.id)
-
-  # Launch additional ZooKeeper nodes if required - ex: if mesos masters specified are 2 and the zoo_num=3 (default)
-  if int(opts.ft) > 1:
-    if(opts.cohost):
-        zoo_num = str(int(opts.zoo_num) - int(opts.ft)) #extra zoo instances needed
-    else:
-        zoo_num = opts.zoo_num
-  else:
-      zoo_num = 0
 
   if(zoo_num > 0):
     
