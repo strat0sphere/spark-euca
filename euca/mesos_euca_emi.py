@@ -448,8 +448,8 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
 # Deploy configuration files and run setup scripts on a newly launched
 # or started EC2 cluster.
 def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_key, s3conn):
-  #master = master_nodes[0].public_dns_name
-  master = master_nodes[0].ip_address
+  master = master_nodes[0].public_dns_name
+  #master = master_nodes[0].ip_address
   if deploy_ssh_key:
     print "Generating cluster's SSH key on master..."
     key_setup = """
@@ -462,7 +462,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
     print "Transferring cluster's SSH key to slaves..."
     for slave in slave_nodes:
       print slave.public_dns_name
-      ssh_write(slave.ip_address, opts, ['tar', 'x'], dot_ssh_tar)
+      ssh_write(slave.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
 
   #modules = ['spark', 'shark', 'ephemeral-hdfs', 'persistent-hdfs', 'mapreduce', 'spark-standalone', 'tachyon']
 
