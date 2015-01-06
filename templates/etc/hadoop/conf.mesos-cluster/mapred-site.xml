@@ -17,7 +17,7 @@
     </property>
     <property>
         <name>mapred.mesos.master</name>
-        <value>zk://{{active_master_private}}:2181/mesos</value>
+        <value>{{cluster_url}}</value>
     </property>
     <!-- TODO: Change tar.gz to be configurable-->
     <property>
