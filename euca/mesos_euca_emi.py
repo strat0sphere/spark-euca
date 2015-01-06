@@ -386,6 +386,8 @@ def launch_cluster(conn, opts, cluster_name):
         zoo_num = str(int(opts.zoo_num) - int(opts.ft)) #extra zoo instances needed
     else:
         zoo_num = opts.zoo_num
+  else:
+      zoo_num = 0
 
   if(zoo_num > 0):
     
