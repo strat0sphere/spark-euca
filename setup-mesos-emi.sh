@@ -23,7 +23,7 @@ echo "$SLAVES" > slaves
 
 echo "$ZOOS" > zoos
 
-#echo "$ZOOS_PRIVATE_IP" > zoos_private
+echo "$ZOOS_PRIVATE_IP" > zoos_private #List with zoos private IPs needed on storm and kafka setup scripts
 
 #If instances are co-hosted then masters will also act as Zoos
 if [ "$cohost" == "True" ]; then
