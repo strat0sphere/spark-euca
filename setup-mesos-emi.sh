@@ -194,7 +194,7 @@ fi
 
 #Ungly hack because zookeeper is on the emi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
-if [ $cohosts == False ]; then
+if [ "$cohosts" == "False" ]; then
 for node in $MASTERS; do
 ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove" & sleep 0.3
 done
@@ -283,8 +283,8 @@ done
 echo "Starting up datanodes..."
 for node in $SLAVES; do
 echo $node
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" & sleep 10.0 #TODO: Clean up the cluster to avoid having this running
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" & sleep 10.0 #Making sure there is not tasktracker left running on the EMI
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode restart" & sleep 10.0
 done
 
 
@@ -373,7 +373,7 @@ fi
 #So this makes sure that instances have identical file structures
 for node in $OTHER_MASTERS; do
 echo $node
-rsync -e "ssh $SSH_OPTS" -az /root $node:/ &
+rsync -e "ssh $SSH_OPTS" -az /root $node:/ & sleep 0.3
 sleep 0.3
 #Keep a backup of the hostname file
 ssh $SSH_OPTS root@$node "mv /etc/hostname /etc/hostname-bk" & sleep 0.3
@@ -382,11 +382,12 @@ rsync -e "ssh $SSH_OPTS" -az /etc $node:/ &
 
 #Replace overwritten hostname file
 ssh $SSH_OPTS root@$node "mv /etc/hostname-bk /etc/hostname" & sleep 0.3
-sleep 0.3
+
+rsync -e "ssh $SSH_OPTS" -az /mnt $node:/ & sleep 0.3
 done
 
 #reboot maschines to fix issue with starting up kafka and storm
-for node in $MASTERS $ZOOS; do
+for node in $ZOOS; $OHER_MASTERS $MASTERS do
 echo Rebooting $node ...
 ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
 done
