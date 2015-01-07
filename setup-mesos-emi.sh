@@ -26,27 +26,29 @@ echo "$ZOOS" > zoos
 echo "$ZOOS_PRIVATE_IP" > zoos_private
 
 #If instances are co-hosted then masters will also act as Zoos
-#if [ "$cohosts" == "True" ]; then
-#echo "$MASTERS" >> zoos
-#fi
+if [ "$cohost" == "True" ]; then
+echo "cohost:$cohost"
+fi
 
 MASTERS=`cat masters`
 NUM_MASTERS=`cat masters | wc -l`
 OTHER_MASTERS=`cat masters | sed '1d'`
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
-if [ "$cohosts" == "True" ]; then
+if [ "$cohost" == "True" ]; then
 echo "$MASTERS" >> zoos
 ALL_ZOOS="$ZOOS $MASTERS"
+else
+ALL_ZOOS="$ZOOS"
 fi
 
 
 echo "ALL_ZOOS=$ALL_ZOOS"
 
 #TODO: Change - should never go on the if statement - always at least 1 zoo
-if [[ $ZOOS = *NONE* ]]; then
+if [[ $ALL_ZOOS = *NONE* ]]; then
 NUM_ZOOS=0
-ZOOS=""
+ALL_ZOOS=""
 else
 NUM_ZOOS=`cat zoos | wc -l`
 fi
@@ -104,7 +106,7 @@ wait
 
 # Try to SSH to each cluster node to approve their key. Since some nodes may
 # be slow in starting, we retry failed slaves up to 3 times.
-#TODO: if (cohost) --> INSTANCES ="$SLAVES $ZOOS" (ZOOS includes both zoos, other_masters and masters)
+#TODO: if (cohost) --> INSTANCES ="$SLAVES $ALL_ZOOS" (ZOOS includes both zoos, other_masters and masters)
 INSTANCES="$SLAVES $OTHER_MASTERS $ZOOS" # List of nodes to try (initially all)
 TRIES="0"                          # Number of times we've tried so far
 echo "SSH'ing to other cluster nodes to approve keys..."
@@ -178,7 +180,7 @@ wait
 #Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
 if [[ $NUM_ZOOS != 0 ]]; then
 echo "Stoping old zooKeeper daemons running on emi..."
-for zoo in $ZOOS $MASTERS; do
+for zoo in $ALL_ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 
 echo "Creating zookeeper dirs..."
@@ -194,7 +196,7 @@ fi
 
 #Ungly hack because zookeeper is on the emi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
-if [ "$cohosts" == "False" ]; then
+if [ "$cohost" == "False" ]; then
 for node in $MASTERS; do
 ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove" & sleep 0.3
 done
@@ -387,10 +389,10 @@ rsync -e "ssh $SSH_OPTS" -az /mnt $node:/ & sleep 0.3
 done
 
 #reboot maschines to fix issue with starting up kafka and storm
-for node in $ZOOS; $OHER_MASTERS $MASTERS do
-echo Rebooting $node ...
-ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
-done
+#for node in $ZOOS; $OHER_MASTERS $MASTERS do
+#echo Rebooting $node ...
+#ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
+#done
 
 
 

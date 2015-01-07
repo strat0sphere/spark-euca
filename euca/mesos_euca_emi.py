@@ -306,7 +306,7 @@ def launch_cluster(conn, opts, cluster_name):
     else:
         zoo_num = opts.zoo_num
   else:
-      zoo_num = 0
+      zoo_num = opts.zoo_num
       
   if (zoo_num > 0):
       if opts.emi_zoo == "":
