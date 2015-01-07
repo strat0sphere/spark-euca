@@ -213,6 +213,7 @@ fi
 echo "Creating local config files..."
 ./deploy_templates_mesos.py
 
+chmod a+x /root/spark-euca/copy-dir
 
 #Deploy all /etc/hadoop configuration
 /root/spark-euca/copy-dir /etc/hadoop
