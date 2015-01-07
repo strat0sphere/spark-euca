@@ -23,7 +23,7 @@ echo "$SLAVES" > slaves
 
 echo "$ZOOS" > zoos
 
-echo "$ZOOS_PRIVATE_IP" > zoos_private
+#echo "$ZOOS_PRIVATE_IP" > zoos_private
 
 #If instances are co-hosted then masters will also act as Zoos
 if [ "$cohost" == "True" ]; then
@@ -35,22 +35,22 @@ NUM_MASTERS=`cat masters | wc -l`
 OTHER_MASTERS=`cat masters | sed '1d'`
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
-if [ "$cohost" == "True" ]; then
-echo "$MASTERS" >> zoos
-ALL_ZOOS="$ZOOS $MASTERS"
-else
-ALL_ZOOS="$ZOOS"
-fi
+#if [ "$cohost" == "True" ]; then
+#echo "$MASTERS" >> zoos
+#ALL_ZOOS="$ZOOS $MASTERS"
+#else
+#ALL_ZOOS="$ZOOS"
+#fi
 
 
-echo "ALL_ZOOS=$ALL_ZOOS"
+#echo "ALL_ZOOS=$ALL_ZOOS"
 
 #TODO: Change - should never go on the if statement - always at least 1 zoo
-if [[ $ALL_ZOOS = *NONE* ]]; then
+if [[ $ZOOS = *NONE* ]]; then
 NUM_ZOOS=0
-ALL_ZOOS=""
+ZOOS=""
 else
-NUM_ZOOS=`cat zoos | wc -l`
+ZOOS=`cat zoos | wc -l`
 fi
 
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=5"
@@ -106,8 +106,13 @@ wait
 
 # Try to SSH to each cluster node to approve their key. Since some nodes may
 # be slow in starting, we retry failed slaves up to 3 times.
-#TODO: if (cohost) --> INSTANCES ="$SLAVES $ALL_ZOOS" (ZOOS includes both zoos, other_masters and masters)
+
+if [ "$cohost" == "True" ]; then
+INSTANCES="$SLAVES $ZOOS"
+else
 INSTANCES="$SLAVES $OTHER_MASTERS $ZOOS" # List of nodes to try (initially all)
+fi
+
 TRIES="0"                          # Number of times we've tried so far
 echo "SSH'ing to other cluster nodes to approve keys..."
 while [ "e$INSTANCES" != "e" ] && [ $TRIES -lt 4 ] ; do
@@ -141,7 +146,7 @@ wait
 # NOTE: We need to rsync spark-euca before we can run setup-mesos-slave.sh
 # on other cluster nodes
 echo "Running slave setup script on other cluster nodes..."
-for node in $SLAVES $OTHER_MASTERS $ZOOS; do
+for node in $SLAVES; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh" & sleep 0.3
 done
@@ -180,7 +185,7 @@ wait
 #Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
 if [[ $NUM_ZOOS != 0 ]]; then
 echo "Stoping old zooKeeper daemons running on emi..."
-for zoo in $ALL_ZOOS; do
+for zoo in $ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 
 echo "Creating zookeeper dirs..."
@@ -219,7 +224,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
 
 echo "Adding zookeeper hostnames and ports to configuration file..."
 zid=1
-for zoo in $ALL_ZOOS; do
+for zoo in $ZOOS; do
 echo ''
 echo 'server.$zid=$zoo:2888:3888' >> /etc/zookeeper/conf.dist/zoo.cfg & sleep 0.3
 zid=$(($zid+1))
@@ -229,6 +234,13 @@ wait
 
 echo "RSYNC'ing config dirs and spark-euca dir to ZOOs and OTHER_MASTERS..."
 #TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
+
+if [ "$cohost" == "True" ]; then
+NODES="$ZOOS"
+else
+NODES="$ZOOS $OTHER_MASTERS"
+fi
+
 for node in $ZOOS $OTHER_MASTERS; do
 echo $node
 rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
@@ -246,7 +258,7 @@ wait
 
 echo "Starting up zookeeper ensemble..."
 zid=1
-for zoo in $ALL_ZOOS; do
+for zoo in $ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server init --myid=$zid --force" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server start" & sleep 10.0
@@ -258,7 +270,7 @@ sleep 5
 fi
 
 echo "Checking that zookeeper election finished and quorum is running..."
-for zoo in $ALL_ZOOS; do
+for zoo in $ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 ssh -t -t $SSH_OPTS root@$zoo "echo srvr | nc localhost 2181 | grep Mode"
 sleep 0.3
