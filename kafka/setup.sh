@@ -18,9 +18,9 @@ zoo_num=0
 for zoo in $ZOOS_PRIVATE; do
 #echo $zoo
 if [ $zoo_num != 0 ] ; then
-zoo_string="$zoo_string,$zoo"
+zoo_string="$zoo_string,$zoo:2181"
 else
-zoo_string="$zoo"
+zoo_string="$zoo:2181"
 fi
 zoo_num=$(($zoo_num+1))
 done
