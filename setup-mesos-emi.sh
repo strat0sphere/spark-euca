@@ -203,6 +203,7 @@ fi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
 if [ "$cohost" == "False" ]; then
 for node in $MASTERS; do
+echo "Removing zookeeper daemon from node: $node"
 ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove" & sleep 0.3
 done
 wait
@@ -226,8 +227,9 @@ if [[ $NUM_ZOOS != 0 ]]; then
 echo "Adding zookeeper hostnames and ports to configuration file..."
 zid=1
 for zoo in $ZOOS; do
-echo ''
-echo 'server.$zid=$zoo:2888:3888' >> /etc/zookeeper/conf.dist/zoo.cfg & sleep 0.3
+echo "Adding configuration for zoo: $zoo"
+echo "" >> /etc/zookeeper/conf.dist/zoo.cfg
+echo "server.$zid=$zoo:2888:3888" >> /etc/zookeeper/conf.dist/zoo.cfg & sleep 0.3
 zid=$(($zid+1))
 sleep 0.3
 done
