@@ -381,7 +381,7 @@ cd /root/spark-euca  # guard against setup-test.sh changing the cwd
 done
 fi
 
-#Some modules setups (Kafka - Storm) modifies the configuration files on /etc/ and spark-euca.
+#Some modules setups (Kafka - Storm) modifies the configuration files on /etc/ and modules on /root dir.
 #So this makes sure that instances have identical file structures
 echo "Copying master files to other masters..."
 for node in $OTHER_MASTERS; do
