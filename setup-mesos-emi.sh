@@ -85,8 +85,8 @@ ssh $SSH_OPTS $master "sed -i '/PUBLIC_DNS=/d' /etc/environment"
 ssh $SSH_OPTS $master "echo 'PUBLIC_DNS=$master' >> /etc/environment"
 ssh $SSH_OPTS $master echo -n &
 sleep 0.3
-
 done
+
 ssh $SSH_OPTS localhost echo -n &
 ssh $SSH_OPTS `hostname` echo -n &
 wait
@@ -246,16 +246,11 @@ fi
 
 for node in $ZOOS $OTHER_MASTERS; do
 echo $node
-rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
-sleep 0.3
-rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc &
-sleep 0.3
-rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc &
-sleep 0.3
-rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc &
-sleep 0.3
-rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc &
-sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root
+rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc
+rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc
+rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc
+rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc
 done
 wait
 
@@ -308,8 +303,7 @@ done
 echo "RSYNC'ing /root/mesos-installation to other cluster nodes..."
 for node in $SLAVES $OTHER_MASTERS; do
 echo $node
-rsync -e "ssh $SSH_OPTS" -az /root/mesos-installation $node:/root &
-sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az /root/mesos-installation $node:/root
 done
 wait
 
@@ -317,8 +311,9 @@ echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 
 for node in $MASTERS; do
 echo $node
+ssh $SSH_OPTS root@$node "update-rc.d -f start-mesos-master remove" & sleep 0.3 #remove previous service on emi
 ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-master.sh" & sleep 0.3
-ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh start-mesos-master; update-rc.d start-mesos-master defaults; service start-mesos-master" & sleep 10.0
+ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh mesos-master-start; update-rc.d mesos-master-start defaults; service mesos-master-start" & sleep 10.0
 done
 
 
@@ -388,19 +383,14 @@ fi
 
 #Some modules setups (Kafka - Storm) modifies the configuration files on /etc/ and spark-euca.
 #So this makes sure that instances have identical file structures
+echo "Copying master files to other masters..."
 for node in $OTHER_MASTERS; do
 echo $node
-rsync -e "ssh $SSH_OPTS" -az /root $node:/ & sleep 0.3
-sleep 0.3
-#Keep a backup of the hostname file
-ssh $SSH_OPTS root@$node "mv /etc/hostname /etc/hostname-bk" & sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az /root $node:/
 
-rsync -e "ssh $SSH_OPTS" -az /etc $node:/ & sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az --exclude "/etc/hostname" /etc $node:/
 
-#Replace overwritten hostname file
-ssh $SSH_OPTS root@$node "mv /etc/hostname-bk /etc/hostname" & sleep 0.3
-
-rsync -e "ssh $SSH_OPTS" -az /mnt $node:/ & sleep 0.3
+rsync -e "ssh $SSH_OPTS" -az /mnt $node:/
 done
 
 
@@ -418,12 +408,14 @@ ssh $SSH_OPTS root@$node "ps -ef | grep zoo" & sleep 0.3
 
 echo "ps -ef | grep mesos"
 ssh $SSH_OPTS root@$node "ps -ef | grep mesos" & sleep 0.3
+done
 
 #reboot maschines to fix issue with starting up kafka and storm
-#for node in $ZOOS; $OHER_MASTERS $MASTERS do
-#echo Rebooting $node ...
-#ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
-#done
+echo "Rebooting nodes..."
+for node in $SLAVES $ZOOS $OHER_MASTERS $MASTERS; do
+echo Rebooting $node ...
+ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
+done
 
 
 

@@ -23,7 +23,8 @@
 """
 #example run
 ./mesos-euca-emi -i ~/vagrant_euca/stratos.pem
--k stratos 
+-k stratos
+--ft 3 
 -s 2
 -emi-master emi-283B3B45
 -e emi-35E93896  
