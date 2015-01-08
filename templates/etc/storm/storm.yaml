@@ -3,7 +3,7 @@
 # -----------------------------------------------------------
 mesos.master.url: "{{cluster_url_private_ip}}"
 #storm.zookeeper.servers:
-#    - "{{active_master_private}}"
+#    This is completed suring storm setup with all the zk servers- "{{active_master_private}}"
 nimbus.host: "{{active_master_private}}"
 # -----------------------------------------------------------
 
