@@ -395,13 +395,29 @@ sleep 0.3
 #Keep a backup of the hostname file
 ssh $SSH_OPTS root@$node "mv /etc/hostname /etc/hostname-bk" & sleep 0.3
 
-rsync -e "ssh $SSH_OPTS" -az /etc $node:/ &
+rsync -e "ssh $SSH_OPTS" -az /etc $node:/ & sleep 0.3
 
 #Replace overwritten hostname file
 ssh $SSH_OPTS root@$node "mv /etc/hostname-bk /etc/hostname" & sleep 0.3
 
 rsync -e "ssh $SSH_OPTS" -az /mnt $node:/ & sleep 0.3
 done
+
+
+echo "Checking if services are up..."
+for node in $MASTERS $OTHER_MASTERS; do
+echo $node
+echo "ps -ef | grep storm"
+ssh $SSH_OPTS root@$node "ps -ef | grep storm" & sleep 0.3
+
+echo "ps -ef | grep kafka"
+ssh $SSH_OPTS root@$node "ps -ef | grep kafka" & sleep 0.3
+
+echo "ps -ef | grep zoo"
+ssh $SSH_OPTS root@$node "ps -ef | grep zoo" & sleep 0.3
+
+echo "ps -ef | grep mesos"
+ssh $SSH_OPTS root@$node "ps -ef | grep mesos" & sleep 0.3
 
 #reboot maschines to fix issue with starting up kafka and storm
 #for node in $ZOOS; $OHER_MASTERS $MASTERS do
