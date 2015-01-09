@@ -308,7 +308,7 @@ wait
 
 echo "Formating and starting standby namenode $STANDBY_NAMENODE..."
 #Run only for the standby namenode
-ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby -force" & sleep 0.3
 wait
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start" & sleep 10
 wait
