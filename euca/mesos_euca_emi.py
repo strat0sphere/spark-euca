@@ -600,6 +600,9 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   
   namenode = active_master
   standby_namenode = master_nodes[1].public_dns_name
+  
+  print "namenode", namenode
+  print "standby_namenode", standby_namenode
 
   #for zoo : zoo_nodes:
 

@@ -272,7 +272,7 @@ wait
 sleep 5
 
 #Initialize the HA state - run the command in one of the namenodes
-echo "Initializing the HA state..."
+echo "Initializing the HA state on namenode $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK" & sleep 0.3
 
 echo "Installing journal nodes..."
@@ -285,9 +285,10 @@ wait
 sleep 10
 
 
-echo "Starting the namenodes..."
+echo "Starting namenode $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
 
+echo "Starting standby namenode $STANDBY_NAMENODE..."
 #Run only for the secondary namenode
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
