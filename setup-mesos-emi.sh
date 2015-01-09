@@ -271,6 +271,13 @@ done
 wait
 sleep 5
 
+echo "Copying configuration files to other masters..."
+for node in $OTHER_MASTERS; do
+echo $node
+#Could be only /etc/hadoop dir - Other dirs are copied before
+rsync -e "ssh $SSH_OPTS" -az --exclude "/etc/hostname" /etc $node:/
+done
+
 #Initialize the HA state - run the command in one of the namenodes
 echo "Initializing the HA state on zookeeper from $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK" & sleep 0.3
