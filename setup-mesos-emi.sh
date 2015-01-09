@@ -282,6 +282,9 @@ done
 echo "Initializing the HA state on zookeeper from $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK" & sleep 0.3
 
+echo "Formatting namenode $NAMENODE ..."
+ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force" & sleep 5.0
+
 echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
@@ -299,31 +302,16 @@ then
     exit
 fi
 
-echo "Formatting namenode $NAMENODE ..."
-ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force" & sleep 5.0
-
 echo "Starting namenode $NAMENODE..."
-ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
+ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start" & sleep 10
+wait
 
 echo "Formating and starting standby namenode $STANDBY_NAMENODE..."
 #Run only for the standby namenode
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
-
-#TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
-#echo "Starting up HDFS and Jobtracker..."
-#Startup HDFS + Zookeeper
-#for node in $MASTERS; do
-#echo $node
-#service zookeeper stop doesn't work because zookeeper daemon on emi is running with the old configuration and doesn't have access to the new log dirs
-#ssh -t -t $SSH_OPTS root@$node `ps ax | grep -i '/usr/lib/zookeeper' | grep -v grep | awk '{print $1}' | xargs kill -9` & sleep 10.0
-#ssh -t -t $SSH_OPTS root@$node "service zookeeper-server init" & sleep 10.0
-#ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 10.0
-
-#ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs hdfs namenode -format -force" & sleep 10.0 #TODO: Can formatting be avoided?
-#ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode start" & sleep 10.0
-#ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
-#done
+wait
+ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start" & sleep 10
+wait
 
 
 echo "Starting up datanodes..."
@@ -339,18 +327,17 @@ echo "Starting job trackers..."
 for node in $MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
-jps | grep Tracker
+ssh -t -t $SSH_OPTS root@$node "jps | grep Tracker" & sleep 0.3
 done
 wait
 sleep 5
 
 
 echo "Starting Zookeeper failover controller on namenodes..."
-for node in $NAMENODES; do
+for node in $NAMENODE $STANDBY_NAMENODE; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-zkfc" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start" & sleep 0.3
-jps | grep Tracker
 done
 wait
 sleep 5
