@@ -271,25 +271,37 @@ done
 wait
 sleep 5
 
+#Formatting namenode
+ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force" & sleep 5.0
+
+
 #Initialize the HA state - run the command in one of the namenodes
 echo "Initializing the HA state on namenode $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK" & sleep 0.3
 
 echo "Installing journal nodes..."
+journals_no=1
 for node in $MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-journalnode" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start" & sleep 0.3
+journals_no=$(($journals_no+1))
 done
 wait
 sleep 10
+
+if [ "$journals_no" -lt "3" ]
+then
+    echo "ERROR: You need at least 3 journal daemonds to run namenode with HA!"
+    exit
+fi
 
 
 echo "Starting namenode $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
 
-echo "Starting standby namenode $STANDBY_NAMENODE..."
-#Run only for the secondary namenode
+echo "Formating and starting standby namenode $STANDBY_NAMENODE..."
+#Run only for the standby namenode
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
 

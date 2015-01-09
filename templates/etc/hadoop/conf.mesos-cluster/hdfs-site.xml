@@ -48,7 +48,7 @@
 	</property>
 	<property>
 	  <name>dfs.journalnode.edits.dir</name>
-	  <value>/mnt/cloudera-hdfs/data/1/dfs/jn</value>
+	  <value>/mnt/cloudera-hdfs/1/dfs/jn</value>
 	</property>
 	<property>
   <name>dfs.client.failover.proxy.provider.{{cluster_name}}</name>
