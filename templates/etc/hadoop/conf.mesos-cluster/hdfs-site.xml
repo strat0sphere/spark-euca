@@ -27,11 +27,11 @@
   		<value>nn1,nn2</value> <!-- Can be maximum 2 on CDH5.1.2 --> 
 	</property>
 	<property>
-	  <name>dfs.namenode.rpc-address.mycluster.nn1</name>
+	  <name>dfs.namenode.rpc-address.{{cluster_name}}.nn1</name>
 	  <value>{{namenode}}:8020</value>
 	</property>
 	<property>
-	  <name>dfs.namenode.rpc-address.mycluster.nn2</name>
+	  <name>dfs.namenode.rpc-address.{{cluster_name}}.nn2</name>
 	  <value>{{standby_namenode}}:8020</value>
 	</property>
 	<property>
