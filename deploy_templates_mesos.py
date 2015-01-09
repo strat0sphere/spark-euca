@@ -78,6 +78,8 @@ template_vars = {
   "slave_list": os.getenv("SLAVES"),
   "zoo_list": os.getenv("ZOOS"),
   "zoo_list_private_ip": os.getenv("ZOOS_PRIVATE_IP"),
+  "zoo_string": os.getenv("ZOO_STRING"),
+  "zoo_string_private_ip": os.getenv("ZOO_STRING_PRIVATE_IP"),
   "namenode": os.getenv("NAMENODE"),
   "standby_namenode": os.getenv("STANDBY_NAMENODE"),
   "journal_url": os.getenv("JOURNAL_URL"),
