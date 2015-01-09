@@ -14,6 +14,7 @@ echo "Setting up Mesos on `hostname`..."
 run_tests=$1
 restore=$2
 cohost=$3
+namenode-ha=$4
 
 export RESTORE=$restore #If it is a restore session the backup module will restore files from S3
 
@@ -35,15 +36,10 @@ NUM_MASTERS=`cat masters | wc -l`
 OTHER_MASTERS=`cat masters | sed '1d'`
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
-#if [ "$cohost" == "True" ]; then
-#echo "$MASTERS" >> zoos
-#ALL_ZOOS="$ZOOS $MASTERS"
-#else
-#ALL_ZOOS="$ZOOS"
-#fi
 
-
-#echo "ALL_ZOOS=$ALL_ZOOS"
+NAMENODES=`head -n 2 masters` #TODO: They should be the same with $NAMENODE and $STANDBY_NAMENODE but check
+echo $NAMENODES > namenodes
+#STANDBY_NAMENODE=`cat namenodes | sed '1d'`
 
 #TODO: Change - should never go on the if statement - always at least 1 zoo
 if [[ $ZOOS = *NONE* ]]; then
@@ -260,6 +256,7 @@ for zoo in $ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server init --myid=$zid --force" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server start" & sleep 10.0
+
 zid=$(($zid+1))
 sleep 0.3
 done
@@ -275,21 +272,52 @@ sleep 0.3
 done
 wait
 
+if [ $namenode-ha == True ]; then
+echo "Copying configurations for high-availability"
+for node in $NAMENODES; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "mv /etc/hadoop/conf.mesos-cluster/core-site-ha.xml /etc/hadoop/conf.mesos-cluster/core-site.xml" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "mv /etc/hadoop/conf.mesos-cluster/hdfs-site-ha.xml /etc/hadoop/conf.mesos-cluster/hdfs-site.xml" & sleep 0.3
+done
+fi
 
-#TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
-echo "Starting up HDFS and Jobtracker..."
-#Startup HDFS + Zookeeper
+#Initialize the HA state - run the command in one of the namenodes
+echo "Initializing the HA state..."
+hdfs zkfc -formatZK
+sleep 0.3
+
+echo "Installing journal nodes..."
 for node in $MASTERS; do
 echo $node
+apt-get install hadoop-hdfs-journalnode & sleep 0.3
+service hadoop-hdfs-journalnode start
+sleep 0.3
+done
+wait
+sleep 10
+
+
+echo "Starting the namenodes..."
+service hadoop-hdfs-namenode start
+
+#Run only for the secondary namenode
+ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
+
+#TODO: Currently restarting to avoid previous running services from the bundle - Change to start after cleanning bundle image
+#echo "Starting up HDFS and Jobtracker..."
+#Startup HDFS + Zookeeper
+#for node in $MASTERS; do
+#echo $node
 #service zookeeper stop doesn't work because zookeeper daemon on emi is running with the old configuration and doesn't have access to the new log dirs
 #ssh -t -t $SSH_OPTS root@$node `ps ax | grep -i '/usr/lib/zookeeper' | grep -v grep | awk '{print $1}' | xargs kill -9` & sleep 10.0
 #ssh -t -t $SSH_OPTS root@$node "service zookeeper-server init" & sleep 10.0
 #ssh -t -t $SSH_OPTS root@$node "service zookeeper-server start" & sleep 10.0
 
-ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs hdfs namenode -format -force" & sleep 10.0 #TODO: Can formatting be avoided?
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode restart" & sleep 10.0
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
-done
+#ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs hdfs namenode -format -force" & sleep 10.0 #TODO: Can formatting be avoided?
+#ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode start" & sleep 10.0
+#ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
+#done
 
 
 echo "Starting up datanodes..."
@@ -299,6 +327,23 @@ ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" 
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode restart" & sleep 10.0
 done
 
+echo "Starting job trackers..."
+for node in $MASTERS; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart" & sleep 10.0
+jps | grep Tracker
+done
+wait
+
+
+echo "Starting Zookeeper failover controller on namenodes..."
+for node in $NAMENODES; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "apt-get install hadoop-hdfs-zkfc" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start" & sleep 0.3
+jps | grep Tracker
+done
+wait
 
 echo "RSYNC'ing /root/mesos-installation to other cluster nodes..."
 for node in $SLAVES $OTHER_MASTERS; do

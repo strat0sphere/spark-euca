@@ -34,7 +34,9 @@
 --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh
 --installation-type mesos-emi
 --run-tests True
---cohost True
+--ft 3
+--cohost
+--namenode-ha
 launch mesos-cluster-emi
 """
 
@@ -152,7 +154,9 @@ def parse_args():
   parser.add_option("--restore", type="string", default="False",  
       help="Restore HDFS from previous backup")
   parser.add_option("--cohost", action="store_true", default=False,
-  help="Host mesos and Zoo on the same nodes") 
+  help="Host mesos and Zoo on the same nodes")
+  parser.add_option("--namenode-ha", action="store_true", default=True,
+  help="Run HDFS with high availability namenodes") 
 
 
 
@@ -529,7 +533,7 @@ def setup_mesos_emi_cluster(master, opts):
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
     #print "opts.run_tests: " + opts.run_tests
-    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
+    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost) + " " + str(opts.namenode-ha))
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
     #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
@@ -598,6 +602,9 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   active_master = master_nodes[0].public_dns_name
   active_master_private = master_nodes[0].private_dns_name
   
+  namenode = active_master
+  standby_namenode = master_nodes[1].public_dns_name
+
   #for zoo : zoo_nodes:
 
 
@@ -615,24 +622,29 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   if zoo_nodes != [] or opts.cohost == True:
     zoo_list = '\n'.join([i.public_dns_name for i in zoo_nodes])
     zoo_list_private_ip = '\n'.join([i.private_ip_address for i in zoo_nodes])
-    
-    cluster_url = "zk://" + ",".join(
+    zoo_string = ",".join(
         ["%s:2181" % i.public_dns_name for i in zoo_nodes])
-    cluster_url_private_ip = "zk://" + ",".join(
+    zoo_string_private_ip=",".join(
         ["%s:2181" % i.private_ip_address for i in zoo_nodes])
+    journal_string =",".join(
+        ["%s:8485" % i.public_dns_name for i in zoo_nodes])
     
     #If instances are cohosted concatenate masters and zoos
     if opts.cohost == True:
         zoo_list += '\n'.join([i.public_dns_name for i in master_nodes])
-        cluster_url += ",".join(
+        zoo_string += ",".join(
         ["%s:2181" % i.public_dns_name for i in master_nodes])
         
         zoo_list_private_ip += '\n'.join([i.private_ip_address for i in master_nodes])
-        cluster_url_private_ip += ",".join(
+        zoo_string_private_ip += ",".join(
         ["%s:2181" % i.private_ip_address for i in master_nodes])
+        
+        journal_string =",".join(
+        ["%s:8485" % i.public_dns_name for i in master_nodes])
     
-    cluster_url += "/mesos"    
-    cluster_url_private_ip += "/mesos"
+    cluster_url = "zk://" + zoo_string + "/mesos"    
+    cluster_url_private_ip = "zk://" + zoo_string_private_ip + "/mesos"
+    journal_url = "qjournal://" + journal_string #will be concatenated on the configuration files with the cluster_name
 
   else:
     zoo_list = "NONE"
@@ -661,8 +673,12 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "zoo_dns_mappings_public": '\n'.join([' '.join([i.ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in zoo_nodes]),
     "zoo_list": zoo_list,
     "zoo_list_private_ip": zoo_list_private_ip,
+    "namenode": name_node,
+    "standby_namenode": standby_namenode,
     "cluster_url": cluster_url,
     "cluster_url_private_ip": cluster_url_private_ip,
+    "zoo_string": zoo_string,
+    "zoo_string_private_ip": zoo_string_private_ip,
     "swap": str(opts.swap),
     "modules": '\n'.join(modules),
     "mesos_setup_version": opts.mesos_setup_version,
