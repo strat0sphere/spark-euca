@@ -673,7 +673,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "zoo_dns_mappings_public": '\n'.join([' '.join([i.ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in zoo_nodes]),
     "zoo_list": zoo_list,
     "zoo_list_private_ip": zoo_list_private_ip,
-    "namenode": name_node,
+    "namenode": namenode,
     "standby_namenode": standby_namenode,
     "journal_url": journal_url,
     "cluster_url": cluster_url,
