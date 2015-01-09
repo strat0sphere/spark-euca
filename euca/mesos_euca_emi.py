@@ -36,7 +36,6 @@
 --run-tests True
 --ft 3
 --cohost
---namenode-ha
 launch mesos-cluster-emi
 """
 
@@ -155,9 +154,6 @@ def parse_args():
       help="Restore HDFS from previous backup")
   parser.add_option("--cohost", action="store_true", default=False,
   help="Host mesos and Zoo on the same nodes")
-  parser.add_option("--namenode-ha", action="store_true", default=True,
-  help="Run HDFS with high availability namenodes") 
-
 
 
   (opts, args) = parser.parse_args()
@@ -533,7 +529,7 @@ def setup_mesos_emi_cluster(master, opts):
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
     #print "opts.run_tests: " + opts.run_tests
-    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost) + " " + str(opts.namenode-ha))
+    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
     #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")

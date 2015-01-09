@@ -14,7 +14,6 @@ echo "Setting up Mesos on `hostname`..."
 run_tests=$1
 restore=$2
 cohost=$3
-namenode-ha=$4
 
 export RESTORE=$restore #If it is a restore session the backup module will restore files from S3
 
@@ -272,14 +271,12 @@ sleep 0.3
 done
 wait
 
-if [ $namenode-ha == True ]; then
 echo "Copying configurations for high-availability"
 for node in $NAMENODES; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "mv /etc/hadoop/conf.mesos-cluster/core-site-ha.xml /etc/hadoop/conf.mesos-cluster/core-site.xml" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "mv /etc/hadoop/conf.mesos-cluster/hdfs-site-ha.xml /etc/hadoop/conf.mesos-cluster/hdfs-site.xml" & sleep 0.3
 done
-fi
 
 #Initialize the HA state - run the command in one of the namenodes
 echo "Initializing the HA state..."
