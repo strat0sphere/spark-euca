@@ -271,12 +271,8 @@ done
 wait
 sleep 5
 
-#Formatting namenode
-ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force" & sleep 5.0
-
-
 #Initialize the HA state - run the command in one of the namenodes
-echo "Initializing the HA state on namenode $NAMENODE..."
+echo "Initializing the HA state on zookeeper from $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK" & sleep 0.3
 
 echo "Installing journal nodes..."
@@ -296,6 +292,8 @@ then
     exit
 fi
 
+echo "Formatting namenode $NAMENODE ..."
+ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force" & sleep 5.0
 
 echo "Starting namenode $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
