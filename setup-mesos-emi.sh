@@ -38,7 +38,6 @@ ZOOS=`cat zoos`
 
 NAMENODES=`head -n 2 masters` #TODO: They should be the same with $NAMENODE and $STANDBY_NAMENODE but check
 echo $NAMENODES > namenodes
-#STANDBY_NAMENODE=`cat namenodes | sed '1d'`
 
 #TODO: Change - should never go on the if statement - always at least 1 zoo
 if [[ $ZOOS = *NONE* ]]; then
@@ -229,6 +228,7 @@ zid=$(($zid+1))
 sleep 0.3
 done
 wait
+sleep 5
 
 echo "RSYNC'ing config dirs and spark-euca dir to ZOOs and OTHER_MASTERS..."
 #TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
@@ -248,11 +248,11 @@ rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc
 rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc
 done
 wait
+sleep 5
 
 echo "Starting up zookeeper ensemble..."
 zid=1
 for zoo in $ZOOS; do
-#ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server init --myid=$zid --force" & sleep 10.0
 ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server start" & sleep 10.0
 
@@ -266,36 +266,27 @@ fi
 echo "Checking that zookeeper election finished and quorum is running..."
 for zoo in $ZOOS; do
 #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
-ssh -t -t $SSH_OPTS root@$zoo "echo srvr | nc localhost 2181 | grep Mode"
-sleep 0.3
+ssh -t -t $SSH_OPTS root@$zoo "echo srvr | nc localhost 2181 | grep Mode" & sleep 0.3
 done
 wait
-
-echo "Copying configurations for high-availability"
-for node in $NAMENODES; do
-echo $node
-ssh -t -t $SSH_OPTS root@$node "mv /etc/hadoop/conf.mesos-cluster/core-site-ha.xml /etc/hadoop/conf.mesos-cluster/core-site.xml" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$node "mv /etc/hadoop/conf.mesos-cluster/hdfs-site-ha.xml /etc/hadoop/conf.mesos-cluster/hdfs-site.xml" & sleep 0.3
-done
+sleep 5
 
 #Initialize the HA state - run the command in one of the namenodes
 echo "Initializing the HA state..."
-hdfs zkfc -formatZK
-sleep 0.3
+ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK" & sleep 0.3
 
 echo "Installing journal nodes..."
 for node in $MASTERS; do
 echo $node
-apt-get install hadoop-hdfs-journalnode & sleep 0.3
-service hadoop-hdfs-journalnode start
-sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-journalnode" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start" & sleep 0.3
 done
 wait
 sleep 10
 
 
 echo "Starting the namenodes..."
-service hadoop-hdfs-namenode start
+ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
 
 #Run only for the secondary namenode
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby" & sleep 0.3
@@ -323,6 +314,8 @@ echo $node
 ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" & sleep 10.0 #Making sure there is not tasktracker left running on the EMI
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode restart" & sleep 10.0
 done
+wait
+sleep 5
 
 echo "Starting job trackers..."
 for node in $MASTERS; do
@@ -331,16 +324,18 @@ ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart
 jps | grep Tracker
 done
 wait
+sleep 5
 
 
 echo "Starting Zookeeper failover controller on namenodes..."
 for node in $NAMENODES; do
 echo $node
-ssh -t -t $SSH_OPTS root@$node "apt-get install hadoop-hdfs-zkfc" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-zkfc" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start" & sleep 0.3
 jps | grep Tracker
 done
 wait
+sleep 5
 
 echo "RSYNC'ing /root/mesos-installation to other cluster nodes..."
 for node in $SLAVES $OTHER_MASTERS; do
@@ -348,6 +343,7 @@ echo $node
 rsync -e "ssh $SSH_OPTS" -az /root/mesos-installation $node:/root
 done
 wait
+sleep 5
 
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 
@@ -357,6 +353,8 @@ ssh $SSH_OPTS root@$node "update-rc.d -f start-mesos-master remove" & sleep 0.3 
 ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-master.sh" & sleep 0.3
 ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh mesos-master-start; update-rc.d mesos-master-start defaults; service mesos-master-start" & sleep 10.0
 done
+wait
+sleep 5
 
 
 echo "Adding slave startup script to /etc/init.d and starting Mesos-slave..."
@@ -366,14 +364,9 @@ echo $node
 ssh $SSH_OPTS root@$node "export LD_LIBRARY_PATH=/root/mesos-installation/lib/"
 ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-slave.sh start-mesos-slave; update-rc.d start-mesos-slave defaults; service start-mesos-slave" & sleep 10.0
 done
+wait
+sleep 5
 
-
-
-
-# Copy spark conf by default
-#echo "Deploying spark config files..."
-#chmod u+x /root/spark/conf/spark-env.sh #TODO: Is this needed?
-#/root/spark-euca/copy-dir /root/spark/conf
 
 echo "Initializing modules..."
 

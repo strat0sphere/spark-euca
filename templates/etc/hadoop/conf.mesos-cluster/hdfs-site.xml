@@ -81,31 +81,30 @@
   <value>true</value>
 </property>
 
-</property>
-    <property>
-        <name>dfs.namenode.name.dir</name>
-        <value>file:///mnt/cloudera-hdfs/1/dfs/nn,file:///nfsmount/dfs/nn</value>
-    </property>
-    <property>
-        <name>dfs.datanode.data.dir</name>
-        <value>file:///mnt/cloudera-hdfs/1/dfs/dn,file:///mnt/cloudera-hdfs/2/dfs/dn,file:///mnt/cloudera-hdfs/3/dfs/dn,file:///mnt/cloudera-hdfs/4/dfs/dn</value>
-    </property>
-    <property>
-        <name>dfs.permissions.superusergroup</name>
-        <value>hadoop</value>
-    </property>
-    <property>
-        <name>dfs.replication</name>
-        <value>2</value>
-    </property>
-    <!-->
  <property>
-    <name>dfs.datanode.failed.volumes.tolerated</name>
-    <value>2</value>
-  </property>
+     <name>dfs.namenode.name.dir</name>
+     <value>file:///mnt/cloudera-hdfs/1/dfs/nn,file:///nfsmount/dfs/nn</value>
+ </property>
+ <property>
+     <name>dfs.datanode.data.dir</name>
+     <value>file:///mnt/cloudera-hdfs/1/dfs/dn,file:///mnt/cloudera-hdfs/2/dfs/dn,file:///mnt/cloudera-hdfs/3/dfs/dn,file:///mnt/cloudera-hdfs/4/dfs/dn</value>
+ </property>
+ <property>
+     <name>dfs.permissions.superusergroup</name>
+     <value>hadoop</value>
+ </property>
+ <property>
+     <name>dfs.replication</name>
+     <value>2</value>
+ </property>
+ <!-->
+<property>
+   <name>dfs.datanode.failed.volumes.tolerated</name>
+   <value>2</value>
+ </property>
 -->
-    <property>
-        <name>dfs.client.file-block-storage-locations.timeout</name>
-        <value>3000</value>
-    </property>
+ <property>
+     <name>dfs.client.file-block-storage-locations.timeout</name>
+     <value>3000</value>
+ </property>
 </configuration>
