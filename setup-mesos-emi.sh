@@ -282,9 +282,6 @@ done
 echo "Initializing the HA state on zookeeper from $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK" & sleep 0.3
 
-echo "Formatting namenode $NAMENODE ..."
-ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force" & sleep 5.0
-
 echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
@@ -301,6 +298,9 @@ then
     echo "ERROR: You need at least 3 journal daemonds to run namenode with HA!"
     exit
 fi
+
+echo "Formatting namenode $NAMENODE ..."
+ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force" & sleep 5.0
 
 echo "Starting namenode $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start" & sleep 10
