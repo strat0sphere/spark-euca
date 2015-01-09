@@ -675,6 +675,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "zoo_list_private_ip": zoo_list_private_ip,
     "namenode": name_node,
     "standby_namenode": standby_namenode,
+    "journal_url": journal_url,
     "cluster_url": cluster_url,
     "cluster_url_private_ip": cluster_url_private_ip,
     "zoo_string": zoo_string,
