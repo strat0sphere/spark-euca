@@ -154,6 +154,10 @@ echo "Creating Namenode directories on master..."
 #Create hdfs name node directories on masters
 for node in $MASTERS; do
 echo $node
+
+#Stop namenode to avoid Incompatible clusterIDs error
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop" & sleep 0.3
+
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh" & sleep 0.3
 done
@@ -164,6 +168,9 @@ echo "Creating Datanode directories on slaves..."
 #Create hdfs data node directories on slaves
 for node in $SLAVES; do
 echo $node
+#Stop datanode to avoid Incompatible clusterIDs error
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop" & sleep 0.3
+
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/create-datanode-dirs.sh" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-dirs.sh" & sleep 0.3
 done
@@ -308,9 +315,9 @@ wait
 
 echo "Formating and starting standby namenode $STANDBY_NAMENODE..."
 #Run only for the standby namenode
-ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby -force" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby -force" & sleep 10
 wait
-ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start" & sleep 10
+ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start" & sleep 0.3
 wait
 
 
@@ -318,7 +325,7 @@ echo "Starting up datanodes..."
 for node in $SLAVES; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" & sleep 10.0 #Making sure there is not tasktracker left running on the EMI
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode restart" & sleep 10.0
+ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start" & sleep 10.0
 done
 wait
 sleep 5
@@ -452,10 +459,13 @@ done
 
 #reboot maschines to fix issue with starting up kafka and storm
 echo "Rebooting nodes..."
-for node in $SLAVES $ZOOS $OHER_MASTERS $MASTERS; do
+for node in $SLAVES $ZOOS $OHER_MASTERS; do
 echo Rebooting $node ...
-ssh $SSH_OPTS root@$node "reboot" & sleep 10.0
+ssh $SSH_OPTS root@$node "reboot"
 done
+wait
+
+
 
 
 
