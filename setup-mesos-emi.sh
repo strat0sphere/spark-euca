@@ -148,6 +148,19 @@ wait
 
 echo "Setting up Mesos on `hostname`..."
 
+# Deploy templates
+# TODO: Move configuring templates to a per-module ?
+echo "Creating local config files..."
+./deploy_templates_mesos.py
+
+chmod a+x /root/spark-euca/copy-dir
+
+#Deploy all /etc/hadoop configuration
+/root/spark-euca/copy-dir /etc/hadoop
+
+#Deploy hosts-configuration
+/root/spark-euca/copy-dir /etc/hosts
+
 echo "Configuring HDFS on `hostname`..."
 echo "Creating Namenode directories on master..."
 
@@ -210,18 +223,7 @@ done
 wait
 sleep 5
 fi
-# Deploy templates
-# TODO: Move configuring templates to a per-module ?
-echo "Creating local config files..."
-./deploy_templates_mesos.py
 
-chmod a+x /root/spark-euca/copy-dir
-
-#Deploy all /etc/hadoop configuration
-/root/spark-euca/copy-dir /etc/hadoop
-
-#Deploy hosts-configuration
-/root/spark-euca/copy-dir /etc/hosts
 
 if [[ $NUM_ZOOS != 0 ]]; then
 
@@ -292,9 +294,10 @@ ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK" & sleep 0.3
 echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
-echo $node
+echo "Installing and starting journal node on: $node"
+echo "DEBUG: "; echo `cat /etc/apt/sources.list.d/cloudera-cdh5.list`
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-journalnode" & sleep 0.3
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start" & sleep 0.3
+#ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start" & sleep 0.3
 journals_no=$(($journals_no+1))
 done
 wait
