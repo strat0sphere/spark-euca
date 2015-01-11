@@ -12,10 +12,10 @@ hadoop fs -put /tmp/file0 /user/foo/data
 echo "Getting sample test code from server..."
 rm /root/test-code/simple-project_2.10-1.0.jar
 s3cmd -c /etc/s3cmd/s3cfg get --recursive --disable-multipart s3://mesos-repo/test-code/simple-project-assembly_2.10-1.0.jar /root/test-code
-#wget -P /root/test-code http://php.cs.ucsb.edu/spark-related-packages/test-code/simple-project_2.10-1.0.jar
 
-echo "Executing /root/spark/bin/spark-submit --class WordCount3 --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE"
-/root/spark/bin/spark-submit --class WordCount3 --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project-assembly_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE
+#With HA CLUSTER_NAME is the name of the naming-service
+echo "Executing /root/spark/bin/spark-submit --class WordCount3 --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project_2.10-1.0.jar $CLUSTER_NAME"
+/root/spark/bin/spark-submit --class WordCount3 --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project-assembly_2.10-1.0.jar $CLUSTER_NAME
 
 #Requires Kafka to be already installed
 #echo "Testing spark streaming with Kafka..."

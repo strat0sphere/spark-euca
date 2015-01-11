@@ -155,12 +155,14 @@ echo "Setting up Mesos on `hostname`..."
 echo "Creating local config files..."
 ./deploy_templates_mesos.py
 
-echo "Sending new cloudera-csh5.list file and running apt-get update..."
+echo "Sending new cloudera-csh5.list file, running apt-get update and setting env variables to other nodes..."
 #TODO: Add this to EMI to avoid upgrades from CDH5.1.2
 for node in $ALL_NODES; do
 echo "Running on $node ..."
 rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
 ssh -t -t $SSH_OPTS root@$node "apt-get update"
+rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
+ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
 done
 wait
 
@@ -359,8 +361,8 @@ echo "Starting Zookeeper failover controller on namenodes..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-zkfc"
-wait
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start"
+#wait
+#ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start"
 done
 wait
 
@@ -395,30 +397,26 @@ done
 wait
 
 
-for node in $MASTERS $OTHER_MASTERS; do
 
-    echo "Initializing modules..."
+echo "Initializing modules..."
 
-    # Install / Init module
-    for module in $MODULES; do
-    if [[ -e $module/init.sh ]]; then
-    echo "Initializing $module"
-    source $module/init.sh
-    fi
-    cd /root/spark-euca  # guard against init.sh changing the cwd
-    done
-
-    echo "Setting up modules..."
-    # Setup each module
-    for module in $MODULES; do
-    echo "Setting up $module"
-    source $module/setup.sh
-    sleep 1
-    cd /root/spark-euca  # guard against setup.sh changing the cwd
-    done
-
+# Install / Init module
+for module in $MODULES; do
+if [[ -e $module/init.sh ]]; then
+echo "Initializing $module"
+source $module/init.sh
+fi
+cd /root/spark-euca  # guard against init.sh changing the cwd
 done
-wait
+
+echo "Setting up modules..."
+# Setup each module
+for module in $MODULES; do
+echo "Setting up $module"
+source $module/setup.sh
+sleep 1
+cd /root/spark-euca  # guard against setup.sh changing the cwd
+done
 
 echo "Starting up modules..."
 #Startup each module
@@ -451,14 +449,15 @@ fi
 #Some modules setups (Kafka - Storm) modifies the configuration files on /etc/ and modules on /root dir.
 #So this makes sure that instances have identical file structures
 #echo "Copying master files to other masters..."
-#for node in $OTHER_MASTERS; do
-#echo $node
-#rsync -e "ssh $SSH_OPTS" -az /root $node:/
+for node in $OTHER_MASTERS; do
+echo $node
+rsync -e "ssh $SSH_OPTS" -az /root/ $node:/
+rsync -e "ssh $SSH_OPTS" -az /etc/init.d/ $node:/etc/
 
 #rsync -e "ssh $SSH_OPTS" -az --exclude "/etc/hostname" /etc $node:/
 
 #rsync -e "ssh $SSH_OPTS" -az /mnt $node:/
-#done
+done
 
 
 echo "Checking if services are up..."
