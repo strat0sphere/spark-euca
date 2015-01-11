@@ -102,19 +102,21 @@ wait
 
 if [ "$cohost" == "True" ]; then
 INSTANCES="$SLAVES $ZOOS"
+ALL_NODES="$MASTERS $SLAVES"
 else
 INSTANCES="$SLAVES $OTHER_MASTERS $ZOOS" # List of nodes to try (initially all)
+ALL_NODES="$MASTERS $SLAVES $ZOOS"
 fi
 
 TRIES="0"                          # Number of times we've tried so far
 echo "SSH'ing to other cluster nodes to approve keys..."
 while [ "e$INSTANCES" != "e" ] && [ $TRIES -lt 4 ] ; do
 NEW_INSTANCES=
-for slave in $INSTANCES; do
-echo $slave
-ssh $SSH_OPTS $slave echo -n
+for node in $INSTANCES; do
+echo $node
+ssh $SSH_OPTS $node echo -n
 if [ $? != 0 ] ; then
-NEW_INSTANCES="$NEW_INSTANCES $slave"
+NEW_INSTANCES="$NEW_INSTANCES $node"
 fi
 done
 TRIES=$[$TRIES + 1]
@@ -133,6 +135,15 @@ echo $node
 rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
 scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
 
+done
+wait
+
+echo "Sending new cloudera-csh5.list file and running apt-get update..."
+#TODO: Add this to EMI to avoid upgrades from CDH5.1.2
+for node in $ALL_NODES; do
+echo "Running on $node ..."
+rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
+ssh -t -t $SSH_OPTS root@$node "apt-get update"
 done
 wait
 
@@ -278,12 +289,14 @@ wait
 #Initialize the HA state - run the command in one of the namenodes
 echo "Initializing the HA state on zookeeper from $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK"  & sleep 0.3
+wait
 
 echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
     echo "Installing and starting journal node on: $node"
-    echo "DEBUG: "; echo `cat /etc/apt/sources.list.d/cloudera-cdh5.list`
+    echo "DEBUG: "
+    ssh -t -t $SSH_OPTS root@$node "cat /etc/apt/sources.list.d/cloudera-cdh5.list"
     ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-journalnode" & sleep 0.3
     #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start"
     journals_no=$(($journals_no+1))
