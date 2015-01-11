@@ -138,14 +138,6 @@ scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
 done
 wait
 
-echo "Sending new cloudera-csh5.list file and running apt-get update..."
-#TODO: Add this to EMI to avoid upgrades from CDH5.1.2
-for node in $ALL_NODES; do
-echo "Running on $node ..."
-rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
-ssh -t -t $SSH_OPTS root@$node "apt-get update"
-done
-wait
 
 # NOTE: We need to rsync spark-euca before we can run setup-mesos-slave.sh
 # on other cluster nodes
@@ -162,6 +154,15 @@ echo "Setting up Mesos on `hostname`..."
 # TODO: Move configuring templates to a per-module ?
 echo "Creating local config files..."
 ./deploy_templates_mesos.py
+
+echo "Sending new cloudera-csh5.list file and running apt-get update..."
+#TODO: Add this to EMI to avoid upgrades from CDH5.1.2
+for node in $ALL_NODES; do
+echo "Running on $node ..."
+rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
+ssh -t -t $SSH_OPTS root@$node "apt-get update"
+done
+wait
 
 chmod a+x /root/spark-euca/copy-dir
 
