@@ -202,10 +202,8 @@ if [[ $NUM_ZOOS != 0 ]]; then
         #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
         #Creating dirs on masters and other_masters even if it is not not needed when not co-hosting instances
         #Creating zookeeper configuration directories
-        ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/"  & sleep 0.3
-        wait
-        sleep 5
-        ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server stop" & sleep 0.3
+        ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/"
+        ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server force-stop" #For some weird reason zookeeper on the 1st of the servers cannot be stopped.
     done
     wait
 
