@@ -206,7 +206,7 @@ echo "Creating zookeeper dirs..."
 #Creating zookeeper configuration directories
 ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/"
 
-ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server stop"
+ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server stop" & sleep 0.3
 done
 wait
 
@@ -215,80 +215,81 @@ fi
 #Ungly hack because zookeeper is on the emi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
 if [ "$cohost" == "False" ]; then
-for node in $MASTERS; do
-echo "Removing zookeeper daemon from node: $node"
-ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove"
-done
-wait
+    for node in $MASTERS; do
+        echo "Removing zookeeper daemon from node: $node"
+        ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove"
+    done
+    wait
 fi
 
 
 if [[ $NUM_ZOOS != 0 ]]; then
 
-echo "Adding zookeeper hostnames and ports to configuration file..."
-zid=1
-for zoo in $ZOOS; do
-echo "Adding configuration for zoo: $zoo"
-echo "" >> /etc/zookeeper/conf.dist/zoo.cfg
-echo "server.$zid=$zoo:2888:3888" >> /etc/zookeeper/conf.dist/zoo.cfg
-zid=$(($zid+1))
-done
-wait
+    echo "Adding zookeeper hostnames and ports to configuration file..."
+    zid=1
+    for zoo in $ZOOS; do
+    echo "Adding configuration for zoo: $zoo"
+    echo "" >> /etc/zookeeper/conf.dist/zoo.cfg
+    echo "server.$zid=$zoo:2888:3888" >> /etc/zookeeper/conf.dist/zoo.cfg
+    zid=$(($zid+1))
+    done
+    wait
 
 
-echo "RSYNC'ing config dirs and spark-euca dir to ZOOs and OTHER_MASTERS..."
-#TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
+    echo "RSYNC'ing config dirs and spark-euca dir to ZOOs and OTHER_MASTERS..."
+    #TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
 
-if [ "$cohost" == "True" ]; then
-NODES="$ZOOS"
-else
-NODES="$ZOOS $OTHER_MASTERS"
-fi
+    if [ "$cohost" == "True" ]; then
+        NODES="$ZOOS"
+    else
+        NODES="$ZOOS $OTHER_MASTERS"
+    fi
 
-for node in $ZOOS $OTHER_MASTERS; do
-echo $node
-rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root
-rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc
-rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc
-rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc
-rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc
-rsync -e "ssh $SSH_OPTS" -az /etc/hadoop $node:/etc
-done
-wait
+    for node in $NODES; do
+    echo $node
+    rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root
+    rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /etc/hadoop $node:/etc
+    done
+    wait
 
 
-echo "Starting up zookeeper ensemble..."
-zid=1
-for zoo in $ZOOS; do
-ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server init --myid=$zid --force"
-ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server start"
+    echo "Starting up zookeeper ensemble..."
+    zid=1
+    for zoo in $ZOOS; do
+    echo "Starting zookeeper on node $zoo ..."
+    ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server init --myid=$zid --force"  & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server start"  & sleep 0.3
 
-zid=$(($zid+1))
+    zid=$(($zid+1))
 
-done
-wait
+    done
+    wait
 fi
 
 echo "Checking that zookeeper election finished and quorum is running..."
 for zoo in $ZOOS; do
-#ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
-ssh -t -t $SSH_OPTS root@$zoo "echo srvr | nc localhost 2181 | grep Mode"
+    #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
+    ssh -t -t $SSH_OPTS root@$zoo "echo srvr | nc localhost 2181 | grep Mode"
 done
 wait
 
 
 #Initialize the HA state - run the command in one of the namenodes
 echo "Initializing the HA state on zookeeper from $NAMENODE..."
-ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK"
+ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK"  & sleep 0.3
 
 echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
-echo "Installing and starting journal node on: $node"
-echo "DEBUG: "; echo `cat /etc/apt/sources.list.d/cloudera-cdh5.list`
-ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-journalnode"
-#ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start"
-journals_no=$(($journals_no+1))
+    echo "Installing and starting journal node on: $node"
+    echo "DEBUG: "; echo `cat /etc/apt/sources.list.d/cloudera-cdh5.list`
+    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-journalnode" & sleep 0.3
+    #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start"
+    journals_no=$(($journals_no+1))
 done
 wait
 
@@ -299,6 +300,14 @@ then
     exit
 fi
 
+#Checking that journal nodes are up
+for node in $MASTERS; do
+    echo "Running jps on node $node ..."
+    ssh -t -t $SSH_OPT root@$node "jps"
+done
+wait
+
+
 echo "Formatting namenode $NAMENODE ..."
 ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force"
 wait
@@ -307,7 +316,7 @@ echo "Starting namenode $NAMENODE..."
 ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start"
 wait
 
-echo "Formating and starting standby namenode $STANDBY_NAMENODE..."
+echo "Formatting and starting standby namenode $STANDBY_NAMENODE..."
 #Run only for the standby namenode
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby -force"
 wait
