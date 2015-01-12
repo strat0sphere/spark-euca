@@ -492,6 +492,9 @@ ssh $SSH_OPTS root@$node "ps -ef | grep zoo"
 
 echo "ps -ef | grep mesos"
 ssh $SSH_OPTS root@$node "ps -ef | grep mesos"
+
+echo "jps"
+ssh $SSH_OPTS root@$node "jps"
 done
 
 #reboot maschines to fix issue with starting up kafka and storm
