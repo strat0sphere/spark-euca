@@ -494,11 +494,11 @@ ssh $SSH_OPTS root@$node "ps -ef | grep mesos"
 done
 
 #reboot maschines to fix issue with starting up kafka and storm
-echo "Rebooting nodes..."
-for node in $SLAVES $ZOOS $OHER_MASTERS; do
-echo Rebooting $node ...
-ssh $SSH_OPTS root@$node "reboot"
-done
+#echo "Rebooting nodes..."
+#for node in $SLAVES $ZOOS $OHER_MASTERS; do
+#echo Rebooting $node ...
+#ssh $SSH_OPTS root@$node "reboot"
+#done
 
 
 
