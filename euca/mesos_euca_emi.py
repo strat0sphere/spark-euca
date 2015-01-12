@@ -642,6 +642,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
         zoo_list_private_ip += '\n'.join([i.private_ip_address for i in master_nodes])
         zoo_string_private_ip += ",".join(
         ["%s:2181" % i.private_ip_address for i in master_nodes])
+        zoo_string_private_ip_no_port += ",".join(
+        ["%s" % i.private_ip_address for i in master_nodes])
         
         journal_string =";".join(
         ["%s:8485" % i.public_dns_name for i in master_nodes])

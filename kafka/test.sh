@@ -20,6 +20,7 @@ mvn clean package -P cluster
 
 #Submit Storm topology
 #/root/storm-mesos-0.9.2-incubating/bin/storm jar /root/storm-kafka-0.8-plus-test/target/storm-kafka-0.8-plus-test-0.2.0-SNAPSHOT-jar-with-dependencies.jar storm.kafka.KafkaSpoutTestTopology $ACTIVE_MASTER_PRIVATE sentences $ACTIVE_MASTER_PRIVATE
+echo "executing... /root/storm-mesos-0.9.2-incubating/bin/storm jar /root/storm-kafka-0.8-plus-test/target/storm-kafka-0.8-plus-test-0.2.0-SNAPSHOT-jar-with-dependencies.jar storm.kafka.KafkaSpoutTestTopology $ZOO_STRING_PRIVATE_IP_NO_PORT sentences $ACTIVE_MASTER_PRIVATE "
 /root/storm-mesos-0.9.2-incubating/bin/storm jar /root/storm-kafka-0.8-plus-test/target/storm-kafka-0.8-plus-test-0.2.0-SNAPSHOT-jar-with-dependencies.jar storm.kafka.KafkaSpoutTestTopology $ZOO_STRING_PRIVATE_IP_NO_PORT sentences $ACTIVE_MASTER_PRIVATE
 #Manual tests-TODO: Automate 
 #Run producer to test the sentences topology
