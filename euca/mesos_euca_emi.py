@@ -540,6 +540,11 @@ def setup_mesos_emi_cluster(master, opts):
     #ssh(master, opts, "reboot")
     #print "Waiting for master and other nodes to reboot..."
     #time.sleep(60)
+    
+    print "*** DEBUG ***"
+    ssh(master, opts, "ps -ef | grep storm")
+    ssh(master, opts, "ps -ef | grep kafka")
+    
     print "Mesos cluster started at http://%s:5050" % master
 
 # Wait for a whole cluster (masters, slaves and ZooKeeper) to start up
