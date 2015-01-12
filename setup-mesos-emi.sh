@@ -399,63 +399,11 @@ done
 wait
 
 
-
-echo "Initializing modules..."
-
-# Install / Init module
-for module in $MODULES; do
-if [[ -e $module/init.sh ]]; then
-echo "Initializing $module"
-source $module/init.sh
-fi
-cd /root/spark-euca  # guard against init.sh changing the cwd
-done
-
-echo "Setting up modules..."
-# Setup each module
-for module in $MODULES; do
-echo "Setting up $module"
-source $module/setup.sh
-sleep 1
-cd /root/spark-euca  # guard against setup.sh changing the cwd
-done
-
-echo "Starting up modules..."
-#Startup each module
-for module in $MODULES; do
-if [[ -e $module/startup.sh ]]; then
-echo "Starting up $module"
-source $module/startup.sh
-sleep 1
-fi
-cd /root/spark-euca  # guard against setup.sh changing the cwd
-done
-
-# Test modules
-
-echo "Testing modules..."
-#echo "run_tests=$run_tests"
-if [ "$run_tests" == "True" ]; then
-
-# Add test code
-for module in $MODULES; do
-echo "Adding test code & running tests for $module"
-if [[ -e $module/test.sh ]]; then
-source $module/test.sh
-sleep 1
-fi
-cd /root/spark-euca  # guard against setup-test.sh changing the cwd
-done
-fi
-
-echo "Transfering module dirs to other masters..."
+echo "Transfer /etc configuration on OTHER_MASTERS ..."
 for module in $MODULES; do
     for node in $OTHER_MASTERS; do
         echo "Transfering dir $module to $node ..."
-        if [[ -e /root/$module ]]; then
-            rsync -e "ssh $SSH_OPTS" -az /root/$module $node:/root
-            wait
-        fi
+
         if [[ -e /etc/$module ]]; then
             rsync -e "ssh $SSH_OPTS" -az /etc/$module $node:/etc
             wait
@@ -463,6 +411,72 @@ for module in $MODULES; do
     done
 done
 wait
+
+for node in $MASTERS; do
+    echo "Initializing modules on node $node ..."
+
+    # Install / Init module
+    for module in $MODULES; do
+    if [[ -e $module/init.sh ]]; then
+    echo "Initializing $module"
+    ssh $SSH_OPTS root@$node "source $module/init.sh"
+    fi
+    ssh $SSH_OPTS root@$node "cd /root/spark-euca"  # guard against init.sh changing the cwd
+    done
+
+    echo "Setting up modules on node $node ..."
+    # Setup each module
+    for module in $MODULES; do
+    echo "Setting up $module"
+    ssh $SSH_OPTS root@$node "source $module/setup.sh"
+    sleep 1
+    ssh $SSH_OPTS root@$node "cd /root/spark-euca"  # guard against setup.sh changing the cwd
+    done
+done
+wait
+    echo "Starting up modules..."
+    #Startup each module
+    for module in $MODULES; do
+    if [[ -e $module/startup.sh ]]; then
+    echo "Starting up $module"
+    source $module/startup.sh
+    sleep 1
+    fi
+    cd /root/spark-euca  # guard against setup.sh changing the cwd
+    done
+
+    # Test modules
+
+    echo "Testing modules..."
+    #echo "run_tests=$run_tests"
+    if [ "$run_tests" == "True" ]; then
+
+    # Add test code
+    for module in $MODULES; do
+    echo "Adding test code & running tests for $module"
+    if [[ -e $module/test.sh ]]; then
+    source $module/test.sh
+    sleep 1
+    fi
+    cd /root/spark-euca  # guard against setup-test.sh changing the cwd
+    done
+    fi
+
+#echo "Transfering module dirs to other masters..."
+#for module in $MODULES; do
+#    for node in $OTHER_MASTERS; do
+#        echo "Transfering dir $module to $node ..."
+#        if [[ -e /root/$module ]]; then
+#            rsync -e "ssh $SSH_OPTS" -az /root/$module $node:/root
+#            wait
+#        fi
+#        if [[ -e /etc/$module ]]; then
+#            rsync -e "ssh $SSH_OPTS" -az /etc/$module $node:/etc
+#            wait
+#        fi
+#    done
+#done
+#wait
 
 #Some modules setups (Kafka - Storm) modifies the configuration files on /etc/ and modules on /root dir.
 #So this makes sure that instances have identical file structures
