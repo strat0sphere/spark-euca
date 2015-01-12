@@ -537,9 +537,9 @@ def setup_mesos_emi_cluster(master, opts):
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
     #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
-    ssh(master, opts, "reboot")
-    print "Waiting for master and other nodes to reboot..."
-    time.sleep(60)
+    #ssh(master, opts, "reboot")
+    #print "Waiting for master and other nodes to reboot..."
+    #time.sleep(60)
     print "Mesos cluster started at http://%s:5050" % master
 
 # Wait for a whole cluster (masters, slaves and ZooKeeper) to start up
