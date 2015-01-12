@@ -495,20 +495,20 @@ wait
 echo "Checking if services are up..."
 for node in $MASTERS $OTHER_MASTERS; do
 echo $node
-echo "ps -ef | grep storm"
+echo "Running ps -ef | grep storm on node $node ..."
 ssh $SSH_OPTS root@$node "ps -ef | grep storm"
 
-echo "ps -ef | grep kafka"
+echo "Running ps -ef | grep kafka on node $node ..."
 ssh $SSH_OPTS root@$node "ps -ef | grep kafka"
 
-echo "ps -ef | grep zoo"
+echo "Running ps -ef | grep zoo on node $node ..."
 ssh $SSH_OPTS root@$node "ps -ef | grep zoo"
 
-echo "ps -ef | grep mesos"
+echo "Running ps -ef | grep mesos on node $node ..."
 ssh $SSH_OPTS root@$node "ps -ef | grep mesos"
 
-echo "jps"
-ssh $SSH_OPTS root@$node "jps"
+echo "Running jps"
+ssh $SSH_OPTS root@$node "jps on node $node ..."
 done
 
 #reboot maschines to fix issue with starting up kafka and storm
