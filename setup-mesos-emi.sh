@@ -368,6 +368,14 @@ ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-zk
 done
 wait
 
+#Checking that all services are up
+for node in $MASTERS; do
+echo "Running jps on node $node ..."
+ssh -t -t $SSH_OPT root@$node "jps"
+done
+wait
+
+
 
 echo "RSYNC'ing /root/mesos-installation to other cluster nodes..."
 for node in $SLAVES $OTHER_MASTERS; do
@@ -419,21 +427,22 @@ for node in $MASTERS; do
     for module in $MODULES; do
     if [[ -e $module/init.sh ]]; then
     echo "Initializing $module"
-    ssh $SSH_OPTS root@$node "source $module/init.sh"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh"
     fi
-    ssh $SSH_OPTS root@$node "cd /root/spark-euca"  # guard against init.sh changing the cwd
     done
 
     echo "Setting up modules on node $node ..."
     # Setup each module
     for module in $MODULES; do
     echo "Setting up $module"
-    ssh $SSH_OPTS root@$node "source $module/setup.sh"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/setup.sh"
     sleep 1
-    ssh $SSH_OPTS root@$node "cd /root/spark-euca"  # guard against setup.sh changing the cwd
     done
 done
 wait
+
+    cd /root/spark-euca/
+
     echo "Starting up modules..."
     #Startup each module
     for module in $MODULES; do
