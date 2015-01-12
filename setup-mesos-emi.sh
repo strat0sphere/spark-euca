@@ -453,12 +453,13 @@ for module in $MODULES; do
     for node in $OTHER_MASTERS; do
         echo "Transfering dir $module to $node ..."
         if [[ -e /root/$module ]]; then
-            rsync -e "ssh $SSH_OPTS" -az /root/$module /root
+            rsync -e "ssh $SSH_OPTS" -az /root/$module $node:/root
+            wait
         fi
         if [[ -e /etc/$module ]]; then
-            rsync -e "ssh $SSH_OPTS" -az /etc/$module /etc
+            rsync -e "ssh $SSH_OPTS" -az /etc/$module $node:/etc
+            wait
         fi
-        cd /root/spark-euca  # guard against setup-test.sh changing the cwd
     done
 done
 wait
