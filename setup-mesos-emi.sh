@@ -446,12 +446,27 @@ cd /root/spark-euca  # guard against setup-test.sh changing the cwd
 done
 fi
 
+echo "Transfering module dirs to other masters..."
+for module in $MODULES; do
+    for node in $OTHER_MASTERS; do
+        echo "Transfering dir $module to $node ..."
+        if [[ -e /root/$module ]]; then
+            rsync -e "ssh $SSH_OPTS" -az /root/$module /root
+        fi
+        if [[ -e /etc/$module ]]; then
+            rsync -e "ssh $SSH_OPTS" -az /etc/$module /etc
+        fi
+        cd /root/spark-euca  # guard against setup-test.sh changing the cwd
+    done
+done
+wait
+
 #Some modules setups (Kafka - Storm) modifies the configuration files on /etc/ and modules on /root dir.
 #So this makes sure that instances have identical file structures
 #echo "Copying master files to other masters..."
 for node in $OTHER_MASTERS; do
 echo $node
-rsync -e "ssh $SSH_OPTS" -az /root/ $node:/
+#rsync -e "ssh $SSH_OPTS" -az /root/ $node:/
 rsync -e "ssh $SSH_OPTS" -az /etc/init.d/ $node:/etc/
 
 #rsync -e "ssh $SSH_OPTS" -az --exclude "/etc/hostname" /etc $node:/
