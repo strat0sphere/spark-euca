@@ -628,6 +628,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
         ["%s:2181" % i.public_dns_name for i in zoo_nodes])
     zoo_string_private_ip=",".join(
         ["%s:2181" % i.private_ip_address for i in zoo_nodes])
+    zoo_string_private_ip_no_port=",".join(
+        ["%s" % i.private_ip_address for i in zoo_nodes])
     journal_string =",".join(
         ["%s:8485" % i.public_dns_name for i in zoo_nodes])
     
@@ -682,6 +684,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "cluster_url_private_ip": cluster_url_private_ip,
     "zoo_string": zoo_string,
     "zoo_string_private_ip": zoo_string_private_ip,
+    "zoo_string_private_ip_no_port": zoo_string_private_ip_no_port,
     "swap": str(opts.swap),
     "modules": '\n'.join(modules),
     "mesos_setup_version": opts.mesos_setup_version,

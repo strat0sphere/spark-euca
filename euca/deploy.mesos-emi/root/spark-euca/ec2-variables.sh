@@ -28,6 +28,7 @@ export CLUSTER_URL_PRIVATE_IP="{{cluster_url_private_ip}}"
 echo "CLUSTER_URL_PRIVATE_IP=$CLUSTER_URL_PRIVATE_IP" >> /etc/environment
 export ZOO_STRING="{{zoo_string}}"
 export ZOO_STRING_PRIVATE_IP="{{zoo_string_private_ip}}"
+export ZOO_STRING_PRIVATE_IP_NO_PORT="{{zoo_string_private_ip_no_port}}"
 export NAMENODE="{{namenode}}"
 export STANDBY_NAMENODE="{{standby_namenode}}"
 export JOURNAL_URL="{{journal_url}}"
