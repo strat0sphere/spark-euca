@@ -467,15 +467,15 @@ wait
 #Some modules setups (Kafka - Storm) modifies the configuration files on /etc/ and modules on /root dir.
 #So this makes sure that instances have identical file structures
 #echo "Copying master files to other masters..."
-for node in $OTHER_MASTERS; do
-echo $node
+#for node in $OTHER_MASTERS; do
+#echo $node
 #rsync -e "ssh $SSH_OPTS" -az /root/ $node:/
-rsync -e "ssh $SSH_OPTS" -az /etc/init.d/ $node:/etc/
+#rsync -e "ssh $SSH_OPTS" -az /etc/init.d/ $node:/etc/
 
 #rsync -e "ssh $SSH_OPTS" -az --exclude "/etc/hostname" /etc $node:/
 
 #rsync -e "ssh $SSH_OPTS" -az /mnt $node:/
-done
+#done
 
 
 echo "Checking if services are up..."
