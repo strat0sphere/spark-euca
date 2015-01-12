@@ -45,6 +45,7 @@ update-rc.d storm-ui-start defaults
 
 #Create dir for logs
 mkdir /mnt/storm-logs
+mkdir /mnt/storm-local
 
 #Avoid Failed to load native Mesos library from /usr/local/lib:/opt/local/lib:/usr/lib when calling from unix service command
 cp /root/mesos-installation/lib/libmesos.so /usr/local/lib/

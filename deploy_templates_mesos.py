@@ -80,6 +80,7 @@ template_vars = {
   "zoo_list_private_ip": os.getenv("ZOOS_PRIVATE_IP"),
   "zoo_string": os.getenv("ZOO_STRING"),
   "zoo_string_private_ip": os.getenv("ZOO_STRING_PRIVATE_IP"),
+  "zoo_string_private_ip_no_port": os.getenv("ZOO_STRING_PRIVATE_IP_NO_PORT"),
   "namenode": os.getenv("NAMENODE"),
   "standby_namenode": os.getenv("STANDBY_NAMENODE"),
   "journal_url": os.getenv("JOURNAL_URL"),
