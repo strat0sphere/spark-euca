@@ -36,6 +36,6 @@ echo "executing... /root/storm-mesos-0.9.2-incubating/bin/storm jar /root/storm-
 #/root/spark/bin/spark-submit --class testingsparkwithscala.KafkaWordCountProducer --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project-assembly_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE:9092 test-sentence 2 10
 
 #Run consumer
-#/root/spark/bin/spark-submit --class testingsparkwithscala.KafkaWordCount --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project-assembly_2.10-1.0.jar $ACTIVE_MASTER_PRIVATE spark-group test-sentence 1
+#/root/spark/bin/spark-submit --class testingsparkwithscala.KafkaWordCount --master mesos://$CLUSTER_URL_PRIVATE_IP ~/test-code/simple-project-assembly_2.10-1.0.jar $ZOO_STRING_PRIVATE_IP_NO_PORT spark-group test-sentence 1
 
 popd
