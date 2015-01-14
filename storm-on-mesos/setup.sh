@@ -20,27 +20,27 @@ cd /root/storm-mesos-${STORM_RELEASE}
 #Add zookeepers in storm.yaml in the expected format
 ZOOS_PRIVATE=`cat /root/spark-euca/zoos_private`
 
-echo ''  >> /etc/storm/storm.yaml
-echo 'storm.zookeeper.servers:' >> /etc/storm/storm.yaml
+echo ''  >> /etc/storm-on-mesos/storm.yaml
+echo 'storm.zookeeper.servers:' >> /etc/storm-on-mesos/storm.yaml
 
 for zoo in $ZOOS_PRIVATE; do
 echo $zoo
-echo '- "'$zoo'"' >> /etc/storm/storm.yaml
+echo '- "'$zoo'"' >> /etc/storm-on-mesos/storm.yaml
 done
 
 #copy configuration template
 echo "Copying configurations..."
-cp /etc/storm/storm.yaml ./conf
-cp /etc/storm/logback/cluster.xml ./logback
+cp /etc/storm-on-mesos/storm.yaml ./conf
+cp /etc/storm-on-mesos/logback/cluster.xml ./logback
 
 
 #Adding soft links to automatically start services on reboot
-chmod +x /etc/storm/start-nimbus.sh
-ln -s /etc/storm/start-nimbus.sh /etc/init.d/storm-nimbus-start
+chmod +x /etc/storm-on-mesos/start-nimbus.sh
+ln -s /etc/storm-on-mesos/start-nimbus.sh /etc/init.d/storm-nimbus-start
 update-rc.d storm-nimbus-start defaults
 
-chmod +x /etc/storm/start-storm-ui.sh
-ln -s /etc/storm/start-storm-ui.sh /etc/init.d/storm-ui-start
+chmod +x /etc/storm-on-mesos/start-storm-ui.sh
+ln -s /etc/storm-on-mesos/start-storm-ui.sh /etc/init.d/storm-ui-start
 update-rc.d storm-ui-start defaults
 
 #Create dir for logs
