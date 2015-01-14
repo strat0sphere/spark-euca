@@ -451,7 +451,7 @@ for node in $MASTERS; do
     for module in $MODULES; do
     if [[ -e $module/startup.sh ]]; then
     echo "Starting up $module"
-    source $module/startup.sh
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/startup.sh"
     sleep 1
     fi
     done
@@ -509,7 +509,7 @@ wait
 
 
 echo "Checking if services are up..."
-for node in $MASTERS $OTHER_MASTERS; do
+for node in $MASTERS; do
 echo $node
 echo "Running ps -ef | grep storm on node $node ..."
 ssh $SSH_OPTS root@$node "ps -ef | grep storm"
@@ -523,8 +523,8 @@ ssh $SSH_OPTS root@$node "ps -ef | grep zoo"
 echo "Running ps -ef | grep mesos on node $node ..."
 ssh $SSH_OPTS root@$node "ps -ef | grep mesos"
 
-echo "Running jps"
-ssh $SSH_OPTS root@$node "jps on node $node ..."
+echo "Running jps on node $node ..."
+ssh $SSH_OPTS root@$node "jps"
 done
 
 #reboot maschines to fix issue with starting up kafka and storm
