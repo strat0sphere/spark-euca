@@ -72,6 +72,10 @@ export PYTHON_PATH="/usr/bin/python" #"{{python_path}}" - (which python)
 export PYTHON_EGG_POSTFIX="py2.7-linux-x86_64" #"{{python_egg_postfix}}"
 export PYTHON_EGG_PUREPY_POSTFIX="py2.7" #"{{python_egg_purepy_postfix}}"
 export STORM_RELEASE="0.9.2-incubating"
+echo STORM_RELEASE=$STORM_RELEASE >> /etc/environment
 export KAFKA_VERSION="0.8.1.1"
+echo KAFKA_VERSION=$KAFKA_VERSION >> /etc/environment
 export KAFKA_SCALA_BINARY="2.9.2-$KAFKA_VERSION"
+echo KAFKA_SCALA_BINARY=$KAFKA_SCALA_BINARY >> /etc/environment
+
 

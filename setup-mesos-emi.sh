@@ -407,16 +407,21 @@ done
 wait
 
 
-echo "Transfer /etc configuration on OTHER_MASTERS ..."
-for module in $MODULES; do
-    for node in $OTHER_MASTERS; do
+echo "Setting up installation environment for OTHER_MASTERS ..."
+for node in $OTHER_MASTERS; do
+    for module in $MODULES; do
         echo "Transfering dir $module to $node ..."
 
         if [[ -e /etc/$module ]]; then
             rsync -e "ssh $SSH_OPTS" -az /etc/$module $node:/etc
             wait
         fi
+
     done
+    wait
+
+    #Env variables required for installation
+    source /etc/environment
 done
 wait
 
@@ -429,6 +434,7 @@ for node in $MASTERS; do
     echo "Initializing $module"
     ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh"
     fi
+    cd /root/spark-euca  # guard against setup.sh changing the cwd
     done
 
     echo "Setting up modules on node $node ..."
@@ -437,11 +443,8 @@ for node in $MASTERS; do
     echo "Setting up $module"
     ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/setup.sh"
     sleep 1
+    cd /root/spark-euca  # guard against setup.sh changing the cwd
     done
-done
-wait
-
-    cd /root/spark-euca/
 
     echo "Starting up modules..."
     #Startup each module
@@ -451,8 +454,12 @@ wait
     source $module/startup.sh
     sleep 1
     fi
-    cd /root/spark-euca  # guard against setup.sh changing the cwd
     done
+
+done
+wait
+
+    cd /root/spark-euca/
 
     # Test modules
 
