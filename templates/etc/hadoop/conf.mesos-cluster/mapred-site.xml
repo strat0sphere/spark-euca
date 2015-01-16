@@ -95,7 +95,6 @@
     <value>{{standby_namenode}}:8023</value>
   </property>
   <property>
-  <property>
     <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}.jt1</name>
     <!-- HTTP redirect address for jt1 -->
     <value>{{namenode}}:50030</value>
