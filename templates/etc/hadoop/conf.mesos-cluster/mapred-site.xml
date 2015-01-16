@@ -5,8 +5,11 @@
 
 <configuration>
 
+    <property>
+        <name>hadoop.log.dir</name>
+        <value>/mnt/hadoop-0.20-mapreduce/</value>
+    </property>
     <!-- Hadoop on Mesos configuration -->
-
     <property>
         <name>mapred.jobtracker.taskScheduler</name>
         <value>org.apache.hadoop.mapred.MesosScheduler</value>
