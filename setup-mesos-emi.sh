@@ -364,6 +364,9 @@ ssh -t -t $SSH_OPT root@$node "jps"
 done
 wait
 
+echo "Creating tmp dir on HDFS..."
+sudo -u hdfs hadoop fs -mkdir hdfs://$CLUSTER_NAME/tmp
+sudo -u hdfs hadoop fs -chmod -R 1777 hdfs://$CLUSTER_NAME/tmp
 
 echo "Creating necessary dir for HA on jobtracker..."
 sudo -u mapred hadoop fs -mkdir hdfs://$CLUSTER_NAME/jobtracker/jobsinfo
