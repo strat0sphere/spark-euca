@@ -239,7 +239,7 @@ def launch_cluster(conn, opts, cluster_name):
     master_group.authorize('tcp', 8080, 8081, '0.0.0.0/0')
     master_group.authorize('tcp', 5050, 5051, '0.0.0.0/0')
     master_group.authorize('tcp', 19999, 19999, '0.0.0.0/0')
-    master_group.authorize('tcp', 50030, 50030, '0.0.0.0/0')
+    master_group.authorize('tcp', 50030, 50031, '0.0.0.0/0')
     master_group.authorize('tcp', 50070, 50070, '0.0.0.0/0')
     master_group.authorize('tcp', 60070, 60070, '0.0.0.0/0')
     master_group.authorize('tcp', 38090, 38090, '0.0.0.0/0')
@@ -247,7 +247,9 @@ def launch_cluster(conn, opts, cluster_name):
     master_group.authorize('tcp', 40000, 40000, '0.0.0.0/0') #apache hama
     master_group.authorize('tcp', 40013, 40013, '0.0.0.0/0') #apache hama
     master_group.authorize('tcp', 8020, 8020, '0.0.0.0/0') #hdfs HA nameservice
-    master_group.authorize('tcp', 8485, 8485, '0.0.0.0/0') #journal nodes  
+    master_group.authorize('tcp', 8485, 8485, '0.0.0.0/0') #journal nodes
+    master_group.authorize('tcp', 8023, 8023, '0.0.0.0/0') #jt HA   
+    
     #If cohosted with zookeeper open necessary ports
     if opts.cohost:
         zoo_group.authorize('tcp', 2181, 2181, '0.0.0.0/0')
@@ -278,7 +280,8 @@ def launch_cluster(conn, opts, cluster_name):
       zoo_group.authorize('tcp', 2888, 2888, '0.0.0.0/0')
       zoo_group.authorize('tcp', 3888, 3888, '0.0.0.0/0')
       zoo_group.authorize('tcp', 8020, 8020, '0.0.0.0/0') #hdfs HA nameservic
-      zoo_group.authorize('tcp', 8485, 8485, '0.0.0.0/0') #journal nodes     
+      zoo_group.authorize('tcp', 8485, 8485, '0.0.0.0/0') #journal nodes
+      zoo_group.authorize('tcp', 8023, 8023, '0.0.0.0/0') #jt HA        
    
 
 

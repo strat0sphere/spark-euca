@@ -29,10 +29,125 @@
         <value>true</value>
       </property>
     -->
+    
+    <!--  HA Properties -->
     <property>
         <name>mapred.job.tracker</name>
-        <value>{{active_master_private}}:9001</value>
+        <value>{{cluster_name}}</value>
+        <description>In an HA setup, the logical name of the JobTracker active-standby pair. In a non-HA setup mapred.job.tracker is a host:port string specifying the JobTracker's RPC address, but in an HA configuration the logical name must not include a port number.
+            </description>
     </property>
+    <property>
+        <name>mapred.jobtracker.restart.recover</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>mapred.job.tracker.persist.jobstatus.active</name>
+        <value>true</value>
+        <description>Whether to make job status persistent in HDFS. Must be set to true for JobTracker HA.</description>
+    </property>
+    <property>
+        <name>mapred.job.tracker.persist. jobstatus.hours</name>
+        <value>1</value>
+        <description>The number of hours job status information is retained in HDFS. Must be greater than zero for JobTracker HA.</description>
+    </property>
+    <property>
+        <name>mapred.job.tracker.persist.jobstatus.dir</name>
+        <value>/jobtracker/jobsInfo</value>
+        <description>The HDFS directory in which job status information is kept persistently. The directory must exist and be owned by the mapred user.</description>
+    </property>
+  
+    <!-- ***************** -->
+   
+  <property>
+    <name>mapred.jobtrackers.{{cluster_name}}</name>
+    <value>jt1,jt2</value>
+    <description>Comma-separated list of JobTracker IDs.</description>
+  </property>
+  <property>
+    <name>mapred.jobtracker.rpc-address.{{cluster_name}}.jt1</name>
+    <!-- RPC address for jt1 -->
+    <value>{{namenode}}:8021</value>
+  </property>
+  <property>
+    <name>mapred.jobtracker.rpc-address.{{cluster_name}}.jt2</name>
+    <!-- RPC address for jt2 -->
+    <value>{{standby_namenode}}:8021</value>
+  </property>
+  <property>
+    <name>mapred.job.tracker.http.address.{{cluster_name}}.jt1</name>
+    <!-- HTTP bind address for jt1 -->
+    <value>0.0.0.0:50030</value>
+  </property>
+  <property>
+    <name>mapred.job.tracker.http.address.{{cluster_name}}.jt2</name>
+    <!-- HTTP bind address for jt2 -->
+    <value>0.0.0.0:50031</value>
+  </property>
+  <property>
+    <name>mapred.ha.jobtracker.rpc-address.{{cluster_name}}.jt1</name>
+    <!-- RPC address for jt1 HA daemon -->
+    <value>{{namenode}}:8023</value>
+  </property>
+  <property>
+    <name>mapred.ha.jobtracker.rpc-address.{{cluster_name}}.jt2</name>
+    <!-- RPC address for jt2 HA daemon -->
+    <value>{{standby_namenode}}:8023</value>
+  </property>
+  <property>
+  <property>
+    <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}.jt1</name>
+    <!-- HTTP redirect address for jt1 -->
+    <value>{{namenode}}:50030</value>
+  </property>
+  <property>
+    <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}.jt2</name>
+    <!-- HTTP redirect address for jt2 -->
+    <value>{{namenode}}:50030</value>
+  </property>
+  <property>
+    <name>mapred.client.failover.proxy.provider.{{cluster_name}}</name>
+    <value>org.apache.hadoop.mapred.ConfiguredFailoverProxyProvider</value>
+  </property>
+  <property>
+    <name>mapred.client.failover.max.attempts</name>
+    <value>15</value>
+  </property>
+  <property>
+    <name>mapred.client.failover.sleep.base.millis</name>
+    <value>500</value>
+  </property>
+  <property>
+    <name>mapred.client.failover.sleep.max.millis</name>
+    <value>1500</value>
+  </property>
+ <property>
+    <name>mapred.client.failover.connection.retries</name>
+    <value>0</value>
+  </property>
+ <property>
+    <name>mapred.client.failover.connection.retries.on.timeouts</name>
+    <value>0</value>
+  </property>
+  <property>
+    <name>mapred.ha.fencing.methods</name>
+    <value>shell(/bin/true)</value>
+  </property>
+  
+  <!--  Automatic JT failover parameters -->
+  
+  <property>
+    <name>mapred.ha.automatic-failover.enabled</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>mapred.ha.zkfc.port</name>
+    <value>8019</value>
+    <!-- Pick a different port for each failover controller when running one machine -->
+  </property>
+  
+  <!-- ***************************************** -->
+    
     <!--
   <property>
     <name>mapred.tasktracker.map.tasks.maximum</name>

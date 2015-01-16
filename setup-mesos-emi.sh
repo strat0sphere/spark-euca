@@ -348,17 +348,6 @@ done
 wait
 
 
-echo "Starting job trackers..."
-for node in $MASTERS; do
-echo $node
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker restart"
-wait
-ssh -t -t $SSH_OPTS root@$node "jps | grep Tracker"
-done
-wait
-
-
-
 echo "Starting Zookeeper failover controller on namenodes..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
 echo $node
@@ -374,6 +363,39 @@ echo "Running jps on node $node ..."
 ssh -t -t $SSH_OPT root@$node "jps"
 done
 wait
+
+
+echo "Creating necessary dir for HA on jobtracker..."
+sudo -u mapred hadoop fs -mkdir hdfs://$CLUSTER_NAME/jobtracker/jobsinfo
+
+echo "Adding HA on the jobtracker..."
+for node in $NAMENODE $STANDBY_NAMENODE; do
+echo $node
+echo "Removing old job tracker from node $node ..."
+ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
+echo "Installing HA jobtracker on node $node ..."
+ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha"
+echo "Installing the failover controller package on node $node ..."
+ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-zkfc"
+done
+wait
+
+
+echo "Initialize the HA State in Zookeeper"...
+service hadoop-0.20-mapreduce-zkfc init
+
+echo "Starting jobtracker HA services..."
+for node in $NAMENODE $STANDBY_NAMENODE; do
+echo $node
+echo "Starting ZK daemon on node $node ..."
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-zkfc start"
+echo "Starting jobtracker on node $node..."
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha start"
+wait
+ssh -t -t $SSH_OPTS root@$node "jps | grep Tracker"
+done
+wait
+
 
 
 
