@@ -160,8 +160,8 @@ echo "Sending new cloudera-csh5.list file, running apt-get update and setting en
 for node in $ALL_NODES; do
 echo "Running on $node ..."
 rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
-echo "Rsyncing custom hadoop configuration to node $node ..."
-rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
+#echo "Rsyncing custom hadoop configuration to node $node ..."
+#rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
 ssh -t -t $SSH_OPTS root@$node "apt-get update"
 rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
 ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
@@ -386,6 +386,7 @@ ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-map
 echo "Installing HA jobtracker on node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait"
 ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/"
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha restart"
 
 echo "Installing the failover controller package on node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait"
