@@ -385,11 +385,12 @@ echo "Removing old job tracker from node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
 echo "Installing HA jobtracker on node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait"
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha stop"
 ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/"
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha restart"
 
 echo "Installing the failover controller package on node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait"
+ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-zkfc stop"
 ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/"
 done
 wait
