@@ -160,6 +160,8 @@ echo "Sending new cloudera-csh5.list file, running apt-get update and setting en
 for node in $ALL_NODES; do
 echo "Running on $node ..."
 rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
+echo "Rsyncing custom hadoop configuration to node $node ..."
+rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
 ssh -t -t $SSH_OPTS root@$node "apt-get update"
 rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
 ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
@@ -302,9 +304,8 @@ echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
     echo "Installing and starting journal node on: $node"
-    echo "DEBUG: "
-    ssh -t -t $SSH_OPTS root@$node "cat /etc/apt/sources.list.d/cloudera-cdh5.list"
     ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-journalnode" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-journalnode /etc/default/"
     #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start"
     journals_no=$(($journals_no+1))
 done
@@ -330,6 +331,7 @@ ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force"
 wait
 
 echo "Starting namenode $NAMENODE..."
+ssh -t -t $SSH_OPTS root@$NAMENODE "cp /etc/default-custom/hadoop-hdfs-namenode /etc/default/"
 ssh -t -t $SSH_OPT root@$NAMENODE "service hadoop-hdfs-namenode start"
 wait
 
@@ -337,6 +339,7 @@ echo "Formatting and starting standby namenode $STANDBY_NAMENODE..."
 #Run only for the standby namenode
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "sudo -u hdfs hdfs namenode -bootstrapStandby -force"
 wait
+ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "cp /etc/default-custom/hadoop-hdfs-namenode /etc/default/"
 ssh -t -t $SSH_OPTS root@$STANDBY_NAMENODE "service hadoop-hdfs-namenode start"
 wait
 
@@ -345,6 +348,7 @@ echo "Starting up datanodes..."
 for node in $SLAVES; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" #Making sure there is not tasktracker left running on the EMI
+ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-datanode /etc/default/"
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start"
 done
 wait
@@ -354,6 +358,7 @@ echo "Starting Zookeeper failover controller on namenodes..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-zkfc"
+ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-zkfc /etc/default/"
 #wait
 #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start"
 done
@@ -380,8 +385,11 @@ echo "Removing old job tracker from node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
 echo "Installing HA jobtracker on node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha"
+ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/"
+
 echo "Installing the failover controller package on node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-zkfc"
+ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/"
 done
 wait
 
