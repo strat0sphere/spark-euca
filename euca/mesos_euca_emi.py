@@ -249,12 +249,14 @@ def launch_cluster(conn, opts, cluster_name):
     master_group.authorize('tcp', 8020, 8020, '0.0.0.0/0') #hdfs HA nameservice
     master_group.authorize('tcp', 8485, 8485, '0.0.0.0/0') #journal nodes
     master_group.authorize('tcp', 8023, 8023, '0.0.0.0/0') #jt HA   
+    master_group.authorize('tcp', 8021, 8021, '0.0.0.0/0') #jt HA
+    master_group.authorize('tcp', 2812, 2812, '0.0.0.0/0') #monit web ui    
     
     #If cohosted with zookeeper open necessary ports
     if opts.cohost:
-        zoo_group.authorize('tcp', 2181, 2181, '0.0.0.0/0')
-        zoo_group.authorize('tcp', 2888, 2888, '0.0.0.0/0')
-        zoo_group.authorize('tcp', 3888, 3888, '0.0.0.0/0') 
+        master_group.authorize('tcp', 2181, 2181, '0.0.0.0/0')
+        master_group.authorize('tcp', 2888, 2888, '0.0.0.0/0')
+        master_group.authorize('tcp', 3888, 3888, '0.0.0.0/0') 
         
     if opts.ganglia:
       master_group.authorize('tcp', 5080, 5080, '0.0.0.0/0')
@@ -270,6 +272,7 @@ def launch_cluster(conn, opts, cluster_name):
     slave_group.authorize('tcp', 60060, 60060, '0.0.0.0/0')
     slave_group.authorize('tcp', 60075, 60075, '0.0.0.0/0')
     slave_group.authorize('tcp', 40015, 40015, '0.0.0.0/0') ##apache hama web UI
+    slave_group.authorize('tcp', 2812, 2812, '0.0.0.0/0') #monit web ui    
   
   if zoo_group.rules == []: # Group was just now created
       zoo_group.authorize(src_group=master_group)
@@ -281,7 +284,8 @@ def launch_cluster(conn, opts, cluster_name):
       zoo_group.authorize('tcp', 3888, 3888, '0.0.0.0/0')
       zoo_group.authorize('tcp', 8020, 8020, '0.0.0.0/0') #hdfs HA nameservic
       zoo_group.authorize('tcp', 8485, 8485, '0.0.0.0/0') #journal nodes
-      zoo_group.authorize('tcp', 8023, 8023, '0.0.0.0/0') #jt HA        
+      zoo_group.authorize('tcp', 8023, 8023, '0.0.0.0/0') #jt HA
+      zoo_group.authorize('tcp', 2812, 2812, '0.0.0.0/0') #monit web ui        
    
 
 
