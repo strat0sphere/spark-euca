@@ -50,7 +50,7 @@
         <description>Whether to make job status persistent in HDFS. Must be set to true for JobTracker HA.</description>
     </property>
     <property>
-        <name>mapred.job.tracker.persist. jobstatus.hours</name>
+        <name>mapred.job.tracker.persist.jobstatus.hours</name>
         <value>1</value>
         <description>The number of hours job status information is retained in HDFS. Must be greater than zero for JobTracker HA.</description>
     </property>
@@ -105,7 +105,7 @@
   <property>
     <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}.jt2</name>
     <!-- HTTP redirect address for jt2 -->
-    <value>{{namenode}}:50030</value>
+    <value>{{standby_namenode}}:50030</value>
   </property>
   <property>
     <name>mapred.client.failover.proxy.provider.{{cluster_name}}</name>
