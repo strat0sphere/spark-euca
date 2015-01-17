@@ -184,8 +184,9 @@ echo $node
 #Stop namenode to avoid Incompatible clusterIDs error
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop"
 
-ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh"
+ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/*"
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh"
+ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-log-dirs.sh"
 done
 wait
 
@@ -197,8 +198,9 @@ echo $node
 #Stop datanode to avoid Incompatible clusterIDs error
 ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop"
 
-ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/create-datanode-dirs.sh"
+ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/*; "
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-dirs.sh"
+ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-log-dirs.sh"
 done
 wait
 
@@ -216,7 +218,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
         #ssh $SSH_OPTS $zoo "/root/mesos/third_party/zookeeper-*/bin/zkServer.sh start </dev/null >/dev/null" & sleep 0.1
         #Creating dirs on masters and other_masters even if it is not not needed when not co-hosting instances
         #Creating zookeeper configuration directories
-        ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/"
+        ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run"
         ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server force-stop" #For some weird reason zookeeper on the 1st of the servers cannot be stopped.
     done
     wait
