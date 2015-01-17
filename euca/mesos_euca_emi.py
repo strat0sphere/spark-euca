@@ -250,6 +250,7 @@ def launch_cluster(conn, opts, cluster_name):
     master_group.authorize('tcp', 8485, 8485, '0.0.0.0/0') #journal nodes
     master_group.authorize('tcp', 8023, 8023, '0.0.0.0/0') #jt HA   
     master_group.authorize('tcp', 8021, 8021, '0.0.0.0/0') #jt HA
+    master_group.authorize('tcp', 8018, 8019, '0.0.0.0/0') #zkfc
     master_group.authorize('tcp', 2812, 2812, '0.0.0.0/0') #monit web ui    
     
     #If cohosted with zookeeper open necessary ports
