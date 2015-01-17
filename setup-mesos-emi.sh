@@ -160,8 +160,8 @@ echo "Sending new cloudera-csh5.list file, running apt-get update and setting en
 for node in $ALL_NODES; do
 echo "Running on $node ..."
 rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
-#echo "Rsyncing custom hadoop configuration to node $node ..."
-#rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
+echo "Rsyncing custom hadoop configuration to node $node ..."
+rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
 ssh -t -t $SSH_OPTS root@$node "apt-get update"
 rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
 ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
