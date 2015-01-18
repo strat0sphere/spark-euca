@@ -25,7 +25,7 @@
     <!-- TODO: Change tar.gz to be configurable-->
     <property>
         <name>mapred.mesos.executor.uri</name>
-        <value>hdfs://{{cluster_name}}/hadoop-2.3.0-cdh5.1.2-mesos.0.20.tar.gz</value>
+        <value>hdfs://{{cluster_name}}-jt/hadoop-2.3.0-cdh5.1.2-mesos.0.20.tar.gz</value>
     </property>
     <!--<property>
         <name>hadoop.skip.worker.version.check</name>
@@ -36,7 +36,7 @@
     <!--  HA Properties -->
     <property>
         <name>mapred.job.tracker</name>
-        <value>{{cluster_name}}</value>
+        <value>{{cluster_name}}-jt</value>
         <description>In an HA setup, the logical name of the JobTracker active-standby pair. In a non-HA setup mapred.job.tracker is a host:port string specifying the JobTracker's RPC address, but in an HA configuration the logical name must not include a port number.
             </description>
     </property>
@@ -63,52 +63,52 @@
     <!-- ***************** -->
    
   <property>
-    <name>mapred.jobtrackers.{{cluster_name}}</name>
+    <name>mapred.jobtrackers.{{cluster_name}}-jt</name>
     <value>jt1,jt2</value>
     <description>Comma-separated list of JobTracker IDs.</description>
   </property>
   <property>
-    <name>mapred.jobtracker.rpc-address.{{cluster_name}}.jt1</name>
+    <name>mapred.jobtracker.rpc-address.{{cluster_name}}-jt.jt1</name>
     <!-- RPC address for jt1 -->
     <value>{{namenode}}:8021</value>
   </property>
   <property>
-    <name>mapred.jobtracker.rpc-address.{{cluster_name}}.jt2</name>
+    <name>mapred.jobtracker.rpc-address.{{cluster_name}}-jt.jt2</name>
     <!-- RPC address for jt2 -->
     <value>{{standby_namenode}}:8021</value>
   </property>
   <property>
-    <name>mapred.job.tracker.http.address.{{cluster_name}}.jt1</name>
+    <name>mapred.job.tracker.http.address.{{cluster_name}}-jt.jt1</name>
     <!-- HTTP bind address for jt1 -->
     <value>0.0.0.0:50030</value>
   </property>
   <property>
-    <name>mapred.job.tracker.http.address.{{cluster_name}}.jt2</name>
+    <name>mapred.job.tracker.http.address.{{cluster_name}}-jt.jt2</name>
     <!-- HTTP bind address for jt2 -->
     <value>0.0.0.0:50030</value>
   </property>
   <property>
-    <name>mapred.ha.jobtracker.rpc-address.{{cluster_name}}.jt1</name>
+    <name>mapred.ha.jobtracker.rpc-address.{{cluster_name}}-jt.jt1</name>
     <!-- RPC address for jt1 HA daemon -->
     <value>{{namenode}}:8023</value>
   </property>
   <property>
-    <name>mapred.ha.jobtracker.rpc-address.{{cluster_name}}.jt2</name>
+    <name>mapred.ha.jobtracker.rpc-address.{{cluster_name}}-jt.jt2</name>
     <!-- RPC address for jt2 HA daemon -->
     <value>{{standby_namenode}}:8023</value>
   </property>
   <property>
-    <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}.jt1</name>
+    <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}-jt.jt1</name>
     <!-- HTTP redirect address for jt1 -->
     <value>{{namenode}}:50031</value>
   </property>
   <property>
-    <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}.jt2</name>
+    <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}-jt.jt2</name>
     <!-- HTTP redirect address for jt2 -->
     <value>{{standby_namenode}}:50031</value>
   </property>
   <property>
-    <name>mapred.client.failover.proxy.provider.{{cluster_name}}</name>
+    <name>mapred.client.failover.proxy.provider.{{cluster_name}}-jt</name>
     <value>org.apache.hadoop.mapred.ConfiguredFailoverProxyProvider</value>
   </property>
   <property>
