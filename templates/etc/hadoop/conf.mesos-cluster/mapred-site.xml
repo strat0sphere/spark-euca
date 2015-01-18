@@ -85,7 +85,7 @@
   <property>
     <name>mapred.job.tracker.http.address.{{cluster_name}}.jt2</name>
     <!-- HTTP bind address for jt2 -->
-    <value>0.0.0.0:50031</value>
+    <value>0.0.0.0:50030</value>
   </property>
   <property>
     <name>mapred.ha.jobtracker.rpc-address.{{cluster_name}}.jt1</name>
@@ -100,12 +100,12 @@
   <property>
     <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}.jt1</name>
     <!-- HTTP redirect address for jt1 -->
-    <value>{{namenode}}:50030</value>
+    <value>{{namenode}}:50031</value>
   </property>
   <property>
     <name>mapred.ha.jobtracker.http-redirect-address.{{cluster_name}}.jt2</name>
     <!-- HTTP redirect address for jt2 -->
-    <value>{{standby_namenode}}:50030</value>
+    <value>{{standby_namenode}}:50031</value>
   </property>
   <property>
     <name>mapred.client.failover.proxy.provider.{{cluster_name}}</name>
