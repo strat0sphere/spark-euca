@@ -283,7 +283,7 @@ def launch_cluster(conn, opts, cluster_name):
       zoo_group.authorize('tcp', 2181, 2181, '0.0.0.0/0')
       zoo_group.authorize('tcp', 2888, 2888, '0.0.0.0/0')
       zoo_group.authorize('tcp', 3888, 3888, '0.0.0.0/0')
-      zoo_group.authorize('tcp', 8020, 8020, '0.0.0.0/0') #hdfs HA nameservic
+      zoo_group.authorize('tcp', 8018, 8020, '0.0.0.0/0') #hdfs HA nameservic
       zoo_group.authorize('tcp', 8485, 8485, '0.0.0.0/0') #journal nodes
       zoo_group.authorize('tcp', 8023, 8023, '0.0.0.0/0') #jt HA
       zoo_group.authorize('tcp', 2812, 2812, '0.0.0.0/0') #monit web ui        

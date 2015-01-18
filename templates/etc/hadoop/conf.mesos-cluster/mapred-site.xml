@@ -144,7 +144,7 @@
   </property>
   <property>
     <name>mapred.ha.zkfc.port</name>
-    <value>8018</value>
+    <value>8019</value>
     <!-- Pick a different port for each failover controller when running one machine -->
   </property>
   

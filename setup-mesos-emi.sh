@@ -378,11 +378,17 @@ sudo -u hdfs hadoop fs -chmod -R 1777 hdfs://$CLUSTER_NAME/tmp
 echo "Creating necessary dir for HA on jobtracker..."
 sudo -u mapred hadoop fs -mkdir -p hdfs://$CLUSTER_NAME/jobtracker/jobsinfo
 
+for node in $MASTERS; do
+echo "Removing old job tracker from node $node ..."
+ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
+done
+
+
+#sudo -u mapred hadoop mrhaadmin -transitionToActive -forcemanual jt1
+
 echo "Adding HA on the jobtracker..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
 echo $node
-echo "Removing old job tracker from node $node ..."
-ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
 echo "Installing HA jobtracker on node $node ..."
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait"
 ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha stop"
@@ -397,7 +403,8 @@ wait
 
 
 echo "Initialize the HA State in Zookeeper"...
-service hadoop-0.20-mapreduce-zkfc init
+#service hadoop-0.20-mapreduce-zkfc init
+sudo -u mapred hadoop mrzkfc -formatZK -force
 
 echo "Starting jobtracker HA services..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
