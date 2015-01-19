@@ -7,7 +7,7 @@
 
     <property>
         <name>hadoop.log.dir</name>
-        <value>/mnt/hadoop-0.20-mapreduce/</value>
+        <value>/mnt/hadoop/log/hadoop-0.20-mapreduce/</value>
     </property>
     <!-- Hadoop on Mesos configuration -->
     <property>
