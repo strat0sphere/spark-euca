@@ -161,6 +161,8 @@ set httpd port 2812 and
 #processes: 
 	#master: zookeeper-server, hadoop-hdfs-zkfc, hadoop-hdfs-namenode, hadoop-hdfs-journalnode, hadoop-0.20-mapreduce-zkfc, hadoop-0.20-mapreduce-jobtrackerha (kafka, storm-nimbus, storm-ui, mesos-master)
 	#slave: hadoop-hdfs-datanode (mesos-slave)
+	
+####### master ############	
   
   check process zookeeper-server with pidfile /var/run/zookeeper/zookeeper-server.pid
     start program = "/etc/init.d/zookeeper-server start" with timeout 60 seconds
@@ -195,18 +197,40 @@ set httpd port 2812 and
     start program = "/etc/init.d/hadoop-0.20-mapreduce-jobtrackerha start" with timeout 60 seconds
     stop program  = "/etc/init.d/hadoop-0.20-mapreduce-jobtrackerha stop"
     #depends on yyyy
-  
-  check process hadoop-hdfs-datanode with pidfile /var/run/hadoop-hdfs/hadoop-hdfs-datanode.pid
-    start program = "/etc/init.d/hadoop-hdfs-datanode start" with timeout 60 seconds
-    stop program  = "/etc/init.d/hadoop-hdfs-datanode stop"
-    #depends on yyyy
-    
     
    check process kafka-server with pidfile /var/run/kafka-server.pid
     start program = "/etc/init.d/kafka-server start" with timeout 60 seconds
     stop program  = "/etc/init.d/kafka-server stop"
     #depends on yyyy
   
+  check process storm-nimbus with pidfile /var/run/storm/storm-nimbus.pid
+    start program = "/etc/init.d/storm-nimbus start" with timeout 60 seconds
+    stop program  = "/etc/init.d/storm-nimbus stop"
+    #depends on yyyy
+ 
+  check process storm-ui with pidfile /var/run/storm/storm-ui.pid
+    start program = "/etc/init.d/storm-ui start" with timeout 60 seconds
+    stop program  = "/etc/init.d/storm-ui stop"
+    #depends on yyyy 
+    
+  check process mesos-master with pidfile /var/run/mesos/mesos-master.pid
+    start program = "/etc/init.d/mesos-master start" with timeout 60 seconds
+    stop program  = "/etc/init.d/mesos-master stop"
+    #depends on yyyy 
+
+
+####### slave ############
+  
+  check process hadoop-hdfs-datanode with pidfile /var/run/hadoop-hdfs/hadoop-hdfs-datanode.pid
+    start program = "/etc/init.d/hadoop-hdfs-datanode start" with timeout 60 seconds
+    stop program  = "/etc/init.d/hadoop-hdfs-datanode stop"
+    #depends on yyyy
+    
+    check process mesos-slave with pidfile /var/run/mesos/mesos-slave.pid
+    start program = "/etc/init.d/mesos-slave start" with timeout 60 seconds
+    stop program  = "/etc/init.d/mesos-slave stop"
+    #depends on yyyy 
+
 
 #    
 ## Check that a process is running, in this case Apache, and that it respond
