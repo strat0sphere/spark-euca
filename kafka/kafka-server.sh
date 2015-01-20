@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# chkconfig: 345 80 20
+# description: kafka
+
+# pidfile: /var/run/kafka-server.pid
+### BEGIN INIT INFO
+# Provides:          kafka-server
+# Required-Start:    $network $local_fs
+# Required-Stop:
+# Should-Start:      $named
+# Should-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Kafka server
+### END INIT INFO
+
 source /lib/lsb/init-functions
 
 USER=root
@@ -13,6 +28,7 @@ start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
 $DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
+ps ax | grep -i 'kafka.Kafka' | grep -v grep | awk '{print $1}' > /var/run/kafka-server.pid
 ;;
 stop)
 # Stop daemons.
