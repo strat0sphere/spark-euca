@@ -523,6 +523,16 @@ wait
     done
     fi
 
+
+#Install monit to every node
+
+for node in $ALL_NODES; do
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
+done
+
+
 #echo "Transfering module dirs to other masters..."
 #for module in $MODULES; do
 #    for node in $OTHER_MASTERS; do
