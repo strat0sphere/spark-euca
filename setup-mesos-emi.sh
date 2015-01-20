@@ -435,8 +435,8 @@ echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 for node in $MASTERS; do
 echo $node
 ssh $SSH_OPTS root@$node "update-rc.d -f start-mesos-master remove" #remove previous service on emi
-ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-master.sh"
-ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-master.sh mesos-master-start; update-rc.d mesos-master-start defaults; service mesos-master-start"
+ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-master.sh"
+ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/mesos-master.sh mesos-master; update-rc.d mesos-master defaults; service mesos-master start"
 done
 wait
 
@@ -447,7 +447,7 @@ echo "Adding slave startup script to /etc/init.d and starting Mesos-slave..."
 for node in $SLAVES; do
 echo $node
 ssh $SSH_OPTS root@$node "export LD_LIBRARY_PATH=/root/mesos-installation/lib/"
-ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/start-mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/start-mesos-slave.sh start-mesos-slave; update-rc.d start-mesos-slave defaults; service start-mesos-slave"
+ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/mesos-slave.sh mesos-slave; update-rc.d mesos-slave defaults; service mesos-slave start"
 done
 wait
 
