@@ -35,13 +35,15 @@ cp /etc/storm-on-mesos/logback/cluster.xml ./logback
 
 
 #Adding soft links to automatically start services on reboot
-chmod +x /etc/storm-on-mesos/start-nimbus.sh
-ln -s /etc/storm-on-mesos/start-nimbus.sh /etc/init.d/storm-nimbus-start
-update-rc.d storm-nimbus-start defaults
+cp /root/spark-euca/storm-nimbus.sh ./bin
+chmod +x ./bin/start-nimbus.sh
+ln -s /root/storm-mesos-${STORM_RELEASE}/bin/storm-nimbus.sh /etc/init.d/storm-nimbus
+update-rc.d storm-nimbus defaults
 
-chmod +x /etc/storm-on-mesos/start-storm-ui.sh
-ln -s /etc/storm-on-mesos/start-storm-ui.sh /etc/init.d/storm-ui-start
-update-rc.d storm-ui-start defaults
+cp /root/spark-euca/storm-ui.sh ./bin
+chmod +x ./bin/storm-ui.sh
+ln -s /root/storm-mesos-${STORM_RELEASE}/bin/storm-ui.sh /etc/init.d/storm-ui
+update-rc.d storm-ui defaults
 
 #Create dir for logs
 mkdir /mnt/storm-logs
@@ -49,6 +51,9 @@ mkdir /mnt/storm-local
 
 #Avoid Failed to load native Mesos library from /usr/local/lib:/opt/local/lib:/usr/lib when calling from unix service command
 cp /root/mesos-installation/lib/libmesos.so /usr/local/lib/
+
+#create run dir for pid files
+mkdir /var/run/storm/
 
 
 popd

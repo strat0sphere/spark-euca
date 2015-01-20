@@ -1,25 +1,25 @@
 #!/bin/bash
 
 # chkconfig: 345 80 20
-# description: kafka
+# description: storm-nimbus
 
-# pidfile: /var/run/kafka-server.pid
+# pidfile: /var/run/storm-nimbus.pid
 ### BEGIN INIT INFO
-# Provides:          kafka-server
+# Provides:          storm-nimbus
 # Required-Start:    $network $local_fs
 # Required-Stop:
 # Should-Start:      $named
 # Should-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Kafka server
+# Short-Description: storm nimbus
 ### END INIT INFO
 
 source /lib/lsb/init-functions
 
 USER=root
-DAEMON_PATH=/root/kafka
-DAEMON_NAME=kafka
+DAEMON_PATH=/root/storm-mesos-0.9.2-incubating/
+DAEMON_NAME=mesos-nimbus
 
 PATH=$PATH:$DAEMON_PATH/bin
 
@@ -27,16 +27,15 @@ case "$1" in
 start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
-$DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
-echo $(($$+1)) >  > /var/run/kafka-server.pid
+nohup $DAEMON_PATH/bin/storm-mesos nimbus /mnt/storm-logs/nimbus.out 2>&1 &
+echo $(($$+1)) > /var/run/storm/storm-nimbus.pid
 ;;
 stop)
 # Stop daemons.
 echo -n "Shutting down $DAEMON_NAME: ";echo
-#$DAEMON_PATH/kafka-server-stop.sh
-#ps ax | grep -i 'kafka.Kafka' | grep -v grep | awk '{print $1}' | xargs kill -9
-cat /var/run/kafka-server.pid | xargs kill -9
-rm -rf /var/run/kafka-server.pid
+#$DAEMON_PATH/storm-nimbus-stop.sh
+cat /var/run/storm-nimbus.pid | xargs kill -9
+rm -rf /var/run/storm-nimbus.pid
 ;;
 restart)
 $0 stop
