@@ -35,6 +35,7 @@ stop)
 echo -n "Shutting down $DAEMON_NAME: ";echo
 #$DAEMON_PATH/kafka-server-stop.sh
 ps ax | grep -i 'kafka.Kafka' | grep -v grep | awk '{print $1}' | xargs kill -9
+rm -rf /var/run/kafka-server.pid
 ;;
 restart)
 $0 stop
