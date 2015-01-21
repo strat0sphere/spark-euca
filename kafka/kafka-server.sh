@@ -28,7 +28,9 @@ start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
 $DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
-echo $(($$+1)) > /var/run/kafka-server.pid
+sleep 2.0
+ps ax | grep -i 'kafka.Kafka' | grep -v grep | awk '{print $1}' > /var/run/kafka-server.pid
+#echo $(($$+1)) > /var/run/kafka-server.pid
 ;;
 stop)
 # Stop daemons.

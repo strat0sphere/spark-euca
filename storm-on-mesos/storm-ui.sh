@@ -18,7 +18,7 @@
 source /lib/lsb/init-functions
 
 USER=root
-DAEMON_PATH=/root/storm-mesos-0.9.2-incubating/
+DAEMON_PATH=/root/storm-mesos-0.9.2-incubating
 DAEMON_NAME=mesos-ui
 
 PATH=$PATH:$DAEMON_PATH/bin
@@ -27,8 +27,9 @@ case "$1" in
 start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
-nohup $DAEMON_PATH/bin/storm ui /mnt/storm-logs/ui.out 2>&1 &
-echo $(($$+1)) > /var/run/storm/storm-ui.pid
+nohup $DAEMON_PATH/bin/storm ui > /mnt/storm-logs/ui.out 2>&1 &
+ps ax | grep -i 'backtype.storm.ui.core' | grep -v grep | awk '{print $1}' > /var/run/storm/storm-nimbus.pid
+#echo $(($$+1)) > /var/run/storm/storm-ui.pid
 ;;
 stop)
 # Stop daemons.
