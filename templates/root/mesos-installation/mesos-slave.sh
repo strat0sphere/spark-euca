@@ -30,7 +30,9 @@ mkdir /var/run/mesos
 echo -n "Starting $DAEMON_NAME: ";echo
 
 nohup $DAEMON_PATH/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master={{cluster_url_private_ip}} </dev/null >/dev/null 2>&1 &
-echo $(($$+1)) > /var/run/mesos/mesos-slave.pid
+sleep 3.0
+ps ax | grep -i 'mesos-slave' | grep -v grep | awk '{print $1}' > /var/run/mesos/mesos-slave.pid
+#echo $(($$+1)) > /var/run/mesos/mesos-slave.pid
 ;;
 stop)
 # Stop daemons.

@@ -28,7 +28,8 @@ start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
 nohup $DAEMON_PATH/bin/storm ui > /mnt/storm-logs/ui.out 2>&1 &
-ps ax | grep -i 'backtype.storm.ui.core' | grep -v grep | awk '{print $1}' > /var/run/storm/storm-nimbus.pid
+sleep 3.0
+ps ax | grep -i 'backtype.storm.ui.core' | grep -v grep | awk '{print $1}' > /var/run/storm/storm-ui.pid
 #echo $(($$+1)) > /var/run/storm/storm-ui.pid
 ;;
 stop)

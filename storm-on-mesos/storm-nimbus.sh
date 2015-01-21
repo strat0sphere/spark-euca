@@ -28,6 +28,7 @@ start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
 nohup $DAEMON_PATH/bin/storm-mesos nimbus > /mnt/storm-logs/nimbus.out 2>&1 &
+sleep 3.0
 ps ax | grep -i 'xml storm.mesos.MesosNimbus' | grep -v grep | awk '{print $1}' > /var/run/storm/storm-nimbus.pid
 #echo $(($$+1)) > /var/run/storm/storm-nimbus.pid
 ;;
