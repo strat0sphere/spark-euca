@@ -27,7 +27,7 @@ case "$1" in
 start)
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
-$DAEMON_PATH/bin/kafka-server.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
+$DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > /mnt/kafka-logs/kafka.out 2>&1 &
 echo $(($$+1)) > /var/run/kafka-server.pid
 ;;
 stop)

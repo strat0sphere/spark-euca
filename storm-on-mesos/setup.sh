@@ -35,12 +35,12 @@ cp /etc/storm-on-mesos/logback/cluster.xml ./logback
 
 
 #Adding soft links to automatically start services on reboot
-cp /root/spark-euca/storm-nimbus.sh ./bin
-chmod +x ./bin/start-nimbus.sh
+cp /root/spark-euca/storm-on-mesos/storm-nimbus.sh ./bin
+chmod +x ./bin/storm-nimbus.sh
 ln -s /root/storm-mesos-${STORM_RELEASE}/bin/storm-nimbus.sh /etc/init.d/storm-nimbus
 update-rc.d storm-nimbus defaults
 
-cp /root/spark-euca/storm-ui.sh ./bin
+cp /root/spark-euca/storm-on-mesos/storm-ui.sh ./bin
 chmod +x ./bin/storm-ui.sh
 ln -s /root/storm-mesos-${STORM_RELEASE}/bin/storm-ui.sh /etc/init.d/storm-ui
 update-rc.d storm-ui defaults

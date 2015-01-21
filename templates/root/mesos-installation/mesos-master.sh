@@ -26,6 +26,7 @@ PATH=$PATH:$DAEMON_PATH/bin
 case "$1" in
 start)
 # Start daemon.
+mkdir /var/run/mesos
 echo -n "Starting $DAEMON_NAME: ";echo
 nohup $DAEMON_PATH/bin/storm-mesos/sbin/mesos-master --cluster={{cluster_name}} --log_dir=/mnt/mesos-logs --zk={{cluster_url_private_ip}} --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
 echo $(($$+1)) > /var/run/mesos/mesos-master.pid
