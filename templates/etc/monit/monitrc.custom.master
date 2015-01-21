@@ -119,7 +119,7 @@ set httpd port 2812 and
 #use address localhost  # only accept connection from localhost
 #    allow localhost        # allow localhost to connect to the server and
 #    allow admin:monit      # require user 'admin' with password 'monit'
-    allow @monit           # allow users of group 'monit' to connect (rw)
+    allow monit:monit           # allow users of group 'monit' to connect (rw)
 #    allow @users readonly  # allow users of group 'users' to connect readonly
 #
 ###############################################################################
@@ -185,7 +185,6 @@ set httpd port 2812 and
     start program = "/etc/init.d/hadoop-hdfs-journalnode start" with timeout 60 seconds
     stop program  = "/etc/init.d/hadoop-hdfs-journalnode stop"
     #depends on yyyy
-    
  
  check process hadoop-0.20-mapreduce-zkfc with pidfile /var/run/hadoop-0.20-mapreduce/hadoop-hadoop-mrzkfc.pid
     start program = "/etc/init.d/hadoop-0.20-mapreduce-zkfc start" with timeout 60 seconds
