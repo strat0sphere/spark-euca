@@ -1,11 +1,11 @@
-#!/bin/bash
+    #!/bin/bash
 
 # chkconfig: 345 80 20
 # description: mesos-master
 
 # pidfile: /var/run/mesos/mesos-master.pid
 ### BEGIN INIT INFO
-# Provides:          storm-nimbus
+# Provides:          mesos-master
 # Required-Start:    $network $local_fs
 # Required-Stop:
 # Should-Start:      $named
@@ -18,7 +18,7 @@
 source /lib/lsb/init-functions
 
 USER=root
-DAEMON_PATH=/root/mesos-installation/
+DAEMON_PATH=/root/mesos-installation
 DAEMON_NAME=mesos-master
 
 PATH=$PATH:$DAEMON_PATH/bin
@@ -28,7 +28,7 @@ start)
 # Start daemon.
 mkdir /var/run/mesos
 echo -n "Starting $DAEMON_NAME: ";echo
-nohup $DAEMON_PATH/bin/storm-mesos/sbin/mesos-master --cluster={{cluster_name}} --log_dir=/mnt/mesos-logs --zk={{cluster_url_private_ip}} --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
+nohup $DAEMON_PATH/sbin/mesos-master --cluster={{cluster_name}} --log_dir=/mnt/mesos-logs --zk={{cluster_url_private_ip}} --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
 echo $(($$+1)) > /var/run/mesos/mesos-master.pid
 ;;
 stop)
