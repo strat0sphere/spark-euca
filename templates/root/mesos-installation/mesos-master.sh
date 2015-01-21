@@ -1,4 +1,4 @@
-    #!/bin/bash
+#!/bin/bash
 
 # chkconfig: 345 80 20
 # description: mesos-master
