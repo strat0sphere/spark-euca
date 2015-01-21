@@ -526,9 +526,15 @@ wait
 
 #Install monit to every node
 
-for node in $ALL_NODES; do
+for node in $MASTERS; do
 ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh master"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
+done
+
+for node in $SLAVES; do
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh slave"
 ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
 done
 

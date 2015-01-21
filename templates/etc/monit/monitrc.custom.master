@@ -219,19 +219,6 @@ set httpd port 2812 and
     #depends on yyyy 
 
 
-####### slave ############
-  
-  check process hadoop-hdfs-datanode with pidfile /var/run/hadoop-hdfs/hadoop-hdfs-datanode.pid
-    start program = "/etc/init.d/hadoop-hdfs-datanode start" with timeout 60 seconds
-    stop program  = "/etc/init.d/hadoop-hdfs-datanode stop"
-    #depends on yyyy
-    
-    check process mesos-slave with pidfile /var/run/mesos/mesos-slave.pid
-    start program = "/etc/init.d/mesos-slave start" with timeout 60 seconds
-    stop program  = "/etc/init.d/mesos-slave stop"
-    #depends on yyyy 
-
-
 #    
 ## Check that a process is running, in this case Apache, and that it respond
 ## to HTTP and HTTPS requests. Check its resource usage such as cpu and memory,
