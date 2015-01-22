@@ -56,6 +56,7 @@ nohup $DAEMON_PATH/sbin/mesos-slave --log_dir=/mnt/mesos-logs --work_dir=/mnt/me
 #sleep 3.0
 #ps ax | grep -i 'mesos-slave' | grep -v grep | awk '{print $1}' > $PID_FILE
 echo $(($$+1)) > $PID_FILE
+fi
 ;;
 stop)
 # Stop daemons.

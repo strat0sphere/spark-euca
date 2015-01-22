@@ -54,6 +54,7 @@ $DAEMON_PATH/bin/kafka-server-start.sh $DAEMON_PATH/config/server.properties > $
 #sleep 3.0
 #ps ax | grep -i 'kafka.Kafka' | grep -v grep | awk '{print $1}' > $PID_FILE
 echo $(($$+1)) > $PID_FILE
+fi
 ;;
 stop)
 # Stop daemons.

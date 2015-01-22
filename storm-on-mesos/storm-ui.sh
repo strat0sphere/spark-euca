@@ -54,6 +54,7 @@ nohup $DAEMON_PATH/bin/storm ui > /mnt/storm-logs/ui.out 2>&1 &
 #sleep 3.0
 #ps ax | grep -i 'backtype.storm.ui.core' | grep -v grep | awk '{print $1}' > $PID_FILE
 echo $(($$+1)) > $PID_FILE
+fi
 ;;
 stop)
 # Stop daemons.

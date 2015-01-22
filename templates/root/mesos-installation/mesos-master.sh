@@ -55,6 +55,7 @@ nohup $DAEMON_PATH/sbin/mesos-master --cluster={{cluster_name}} --log_dir=/mnt/m
 #sleep 3.0
 #ps ax | grep -i 'mesos-master' | grep -v grep | awk '{print $1}' > $PID_FILE
 echo $(($$+1)) > $PID_FILE
+fi
 ;;
 stop)
 # Stop daemons.
