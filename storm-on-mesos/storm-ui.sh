@@ -19,19 +19,21 @@ source /lib/lsb/init-functions
 
 USER=root
 DAEMON_PATH=/root/storm-mesos-0.9.2-incubating
-DAEMON_NAME=mesos-ui
+DAEMON_NAME=storm-ui
 
 PATH=$PATH:$DAEMON_PATH/bin
 
 PID_FILE=/var/run/storm/storm-ui.pid
 
 # Check if a service is running
-isrunning() {
+is_running(){
 ISRUNNING="0"
+# Check if a service is running
 # Do we have PID-file?
-if [ -f "$PIDDIR/$1.pid" ]; then
+if [ -f "$1" ]; then
 # Check if proc is running
-pid=`cat "$PIDDIR/$1.pid" 2> /dev/null`
+pid=`cat "$1" 2> /dev/null`
+echo "pid = $pid"
 if [ "$pid" != "" ]; then
 if [ -d /proc/$pid ]; then
 # Process is running
@@ -39,21 +41,20 @@ ISRUNNING="1"
 fi
 fi
 fi
-#ISRUNNING="0"
 }
-
 case "$1" in
 start)
-if isrunning $PID_FILE ; then
+is_running $PID_FILE
+if [ "$ISRUNNING" == "1" ]; then
 echo "Error: $DAEMON_NAME is running. Stop it first." >&2
 exit 1
 else
 # Start daemon.
 echo -n "Starting $DAEMON_NAME: ";echo
 nohup $DAEMON_PATH/bin/storm ui > /mnt/storm-logs/ui.out 2>&1 &
-#sleep 3.0
-#ps ax | grep -i 'backtype.storm.ui.core' | grep -v grep | awk '{print $1}' > $PID_FILE
-echo $(($$+1)) > $PID_FILE
+sleep 3.0
+ps ax | grep -i 'backtype.storm.ui.core' | grep -v grep | awk '{print $1}' > $PID_FILE
+#echo $(($$+1)) > $PID_FILE
 fi
 ;;
 stop)

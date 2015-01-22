@@ -26,12 +26,14 @@ PATH=$PATH:$DAEMON_PATH/bin
 PID_FILE=/var/run/mesos/mesos-master.pid
 
 # Check if a service is running
-isrunning() {
+is_running(){
 ISRUNNING="0"
+# Check if a service is running
 # Do we have PID-file?
-if [ -f "$PIDDIR/$1.pid" ]; then
+if [ -f "$1" ]; then
 # Check if proc is running
-pid=`cat "$PIDDIR/$1.pid" 2> /dev/null`
+pid=`cat "$1" 2> /dev/null`
+echo "pid = $pid"
 if [ "$pid" != "" ]; then
 if [ -d /proc/$pid ]; then
 # Process is running
@@ -39,22 +41,20 @@ ISRUNNING="1"
 fi
 fi
 fi
-#ISRUNNING="0"
 }
-
 case "$1" in
 start)
-if isrunning $PID_FILE ; then
+is_running $PID_FILE
+if [ "$ISRUNNING" == "1" ]; then
 echo "Error: $DAEMON_NAME is running. Stop it first." >&2
 exit 1
 else
 # Start daemon.
 mkdir /var/run/mesos
 echo -n "Starting $DAEMON_NAME: ";echo
-nohup $DAEMON_PATH/sbin/mesos-master --cluster={{cluster_name}} --log_dir=/mnt/mesos-logs --zk={{cluster_url_private_ip}} --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
-#sleep 3.0
-#ps ax | grep -i 'mesos-master' | grep -v grep | awk '{print $1}' > $PID_FILE
-echo $(($$+1)) > $PID_FILE
+nohup $DAEMON_PATH/sbin/mesos-master --cluster=ha --log_dir=/mnt/mesos-logs --zk=zk://10.2.246.253:2181,10.2.246.240:2181,10.2.246.247:2181/mesos --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
+sleep 3.0
+ps ax | grep -i 'sbin/mesos-master' | grep -v grep | awk '{print $1}' > $PID_FILE
 fi
 ;;
 stop)
