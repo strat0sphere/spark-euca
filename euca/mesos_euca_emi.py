@@ -255,6 +255,7 @@ def launch_cluster(conn, opts, cluster_name):
     
     #If cohosted with zookeeper open necessary ports
     if opts.cohost:
+        print "Opening additional ports for zookeeper... "
         master_group.authorize('tcp', 2181, 2181, '0.0.0.0/0')
         master_group.authorize('tcp', 2888, 2888, '0.0.0.0/0')
         master_group.authorize('tcp', 3888, 3888, '0.0.0.0/0') 

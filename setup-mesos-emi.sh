@@ -221,7 +221,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
         #Creating dirs on masters and other_masters even if it is not not needed when not co-hosting instances
         #Creating zookeeper configuration directories
         ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run"
-        ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server force-stop" #For some weird reason zookeeper on the 1st of the servers cannot be stopped.
+        ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server force-stop" #Zoo on the 1st of the servers cannot be stopped normally.
     done
     wait
 
@@ -434,7 +434,6 @@ echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 
 for node in $MASTERS; do
 echo $node
-ssh $SSH_OPTS root@$node "update-rc.d -f start-mesos-master remove" #remove previous service on emi
 ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-master.sh"
 ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/mesos-master.sh mesos-master; update-rc.d mesos-master defaults; service mesos-master start"
 done
@@ -525,6 +524,9 @@ wait
 
 
 #Install monit to every node
+for node in $MASTERS $SLAVES; do
+rsync -e "ssh $SSH_OPTS" -az /etc/monit $node:/etc
+done
 
 for node in $MASTERS; do
 ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
