@@ -223,6 +223,9 @@ if [[ $NUM_ZOOS != 0 ]]; then
         ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run"
         ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server force-stop" #Zoo on the 1st of the servers cannot be stopped normally.
         ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/zookeeper /etc/default/"
+        echo "Deleting zoo logs from emi to avoid confusion..."
+        ssh -t -t $SSH_OPTS root@$node "rm -rf /var/log/zookeeper/zookeeper.log"
+        ssh -t -t $SSH_OPTS root@$node "rm -rf /var/log/zookeeper/zookeeper.out"
     done
     wait
 
