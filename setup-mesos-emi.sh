@@ -527,7 +527,7 @@ wait
     fi
 
 
-#Install monit to every node
+echo "Installing monit to every node..."
 for node in $MASTERS $SLAVES; do
 rsync -e "ssh $SSH_OPTS" -az /etc/monit $node:/etc
 done
