@@ -85,18 +85,6 @@ ssh $SSH_OPTS `hostname` echo -n &
 wait
 
 
-#TODO: Replace hard-coded with $ZooDataDir
-#if [[ $NUM_ZOOS != 0 ]] ; then
-#echo "SSH'ing to ZooKeeper server(s) to approve keys..."
-#zid=1
-#for zoo in $ZOOS; do
-#echo $zoo
-#ssh $SSH_OPTS $zoo echo -n \; mkdir -p /mnt/zookeeper/dataDir/ \; echo $zid \> /mnt/zookeeper/dataDir/ &
-#zid=$(($zid+1))
-#
-#done
-#fi
-
 # Try to SSH to each cluster node to approve their key. Since some nodes may
 # be slow in starting, we retry failed slaves up to 3 times.
 
@@ -170,10 +158,10 @@ wait
 
 chmod a+x /root/spark-euca/copy-dir
 
-#Deploy all /etc/hadoop configuration
+echo "Deploying all /etc/hadoop configuration to slaves..."
 /root/spark-euca/copy-dir /etc/hadoop
 
-#Deploy hosts-configuration
+echo "Deploying hosts-configuration to slaves..."
 /root/spark-euca/copy-dir /etc/hosts
 
 echo "Configuring HDFS on `hostname`..."
@@ -192,9 +180,7 @@ ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-log-dirs.s
 done
 wait
 
-
 echo "Creating Datanode directories on slaves..."
-#Create hdfs data node directories on slaves
 for node in $SLAVES; do
 echo $node
 #Stop datanode to avoid Incompatible clusterIDs error
@@ -205,13 +191,6 @@ ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-d
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-log-dirs.sh"
 done
 wait
-
-# Always include 'scala' module if it's not defined as a work around
-# for older versions of the scripts.
-#if [[ ! $MODULES =~ *scala* ]]; then
-#MODULES=$(printf "%s\n%s\n" "scala" $MODULES)
-#fi
-
 
 #Necessary ungly hack: - Stop zookeeper daemon running on emi before deploying the new configuration
 if [[ $NUM_ZOOS != 0 ]]; then
@@ -255,7 +234,6 @@ if [[ $NUM_ZOOS != 0 ]]; then
         #rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper/conf.dist/log4j.properties $zoo:/etc/zookeeper/conf.dist/
     done
     wait
-
 
     echo "RSYNC'ing config dirs and spark-euca dir to ZOOs and OTHER_MASTERS..."
     #TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
@@ -388,7 +366,6 @@ ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker stop"
 ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
 done
 
-
 #sudo -u mapred hadoop mrhaadmin -transitionToActive -forcemanual jt1
 
 echo "Adding HA on the jobtracker..."
@@ -411,6 +388,7 @@ echo "Initialize the HA State in Zookeeper"...
 #service hadoop-0.20-mapreduce-zkfc init
 sudo -u mapred hadoop mrzkfc -formatZK -force
 
+
 echo "Starting jobtracker HA services..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
 echo $node
@@ -424,8 +402,6 @@ done
 wait
 
 
-
-
 echo "RSYNC'ing /root/mesos-installation to other cluster nodes..."
 for node in $SLAVES $OTHER_MASTERS; do
 echo $node
@@ -435,7 +411,6 @@ wait
 
 
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
-
 for node in $MASTERS; do
 echo $node
 ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-master.sh"
@@ -444,9 +419,7 @@ done
 wait
 
 
-
 echo "Adding slave startup script to /etc/init.d and starting Mesos-slave..."
-
 for node in $SLAVES; do
 echo $node
 ssh $SSH_OPTS root@$node "export LD_LIBRARY_PATH=/root/mesos-installation/lib/"
@@ -593,13 +566,6 @@ ssh $SSH_OPTS root@$node "ps -ef | grep mesos"
 echo "Running jps on node $node ..."
 ssh $SSH_OPTS root@$node "jps"
 done
-
-#reboot maschines to fix issue with starting up kafka and storm
-#echo "Rebooting nodes..."
-#for node in $SLAVES $ZOOS $OHER_MASTERS; do
-#echo Rebooting $node ...
-#ssh $SSH_OPTS root@$node "reboot"
-#done
 
 
 
