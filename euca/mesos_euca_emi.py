@@ -35,7 +35,7 @@
 --installation-type mesos-emi
 --run-tests True
 --ft 3
---cohost
+--clusterName
 launch mesos-cluster-emi
 """
 
