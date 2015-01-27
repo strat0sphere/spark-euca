@@ -27,7 +27,7 @@ echo "$ZOOS_PRIVATE_IP" > zoos_private #List with zoos private IPs needed on sto
 
 #If instances are co-hosted then masters will also act as Zoos
 if [ "$cohost" == "True" ]; then
-echo "cohost:$cohost"
+    echo "cohost:$cohost"
 fi
 
 MASTERS=`cat masters`
@@ -41,26 +41,26 @@ echo $NAMENODES > namenodes
 
 #TODO: Change - should never go on the if statement - always at least 1 zoo
 if [[ $ZOOS = *NONE* ]]; then
-NUM_ZOOS=0
-ZOOS=""
+    NUM_ZOOS=0
+    ZOOS=""
 else
-ZOOS=`cat zoos | wc -l`
+    ZOOS=`cat zoos | wc -l`
 fi
 
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=5"
 
 if [[ "x$JAVA_HOME" == "x" ]] ; then
-echo "Expected JAVA_HOME to be set in .bash_profile!"
+    echo "Expected JAVA_HOME to be set in .bash_profile!"
 exit 1
 fi
 
 if [[ "x$SCALA_HOME" == "x" ]] ; then
-echo "Expected SCALA_HOME to be set in .bash_profile!"
+    echo "Expected SCALA_HOME to be set in .bash_profile!"
 exit 1
 fi
 
 if [[ `tty` == "not a tty" ]] ; then
-echo "Expecting a tty or pty! (use the ssh -t option)."
+    echo "Expecting a tty or pty! (use the ssh -t option)."
 exit 1
 fi
 
@@ -72,12 +72,12 @@ source /root/spark-euca/setup-mesos-emi-slave.sh
 
 echo "SSH'ing to master machine(s) to approve key(s)..."
 for master in $MASTERS; do
-echo $master
-#Delete previous PUBLIC_DNS env variable if exists (restore session)
-echo "Seding previous PUBLIC_DNS value..."
-ssh $SSH_OPTS $master "sed -i '/PUBLIC_DNS=/d' /etc/environment"
-ssh $SSH_OPTS $master "echo 'PUBLIC_DNS=$master' >> /etc/environment"
-ssh $SSH_OPTS $master echo -n &
+    echo $master
+    #Delete previous PUBLIC_DNS env variable if exists (restore session)
+    echo "Seding previous PUBLIC_DNS value..."
+    ssh $SSH_OPTS $master "sed -i '/PUBLIC_DNS=/d' /etc/environment"
+    ssh $SSH_OPTS $master "echo 'PUBLIC_DNS=$master' >> /etc/environment"
+    ssh $SSH_OPTS $master echo -n &
 done
 
 ssh $SSH_OPTS localhost echo -n &
@@ -89,40 +89,39 @@ wait
 # be slow in starting, we retry failed slaves up to 3 times.
 
 if [ "$cohost" == "True" ]; then
-INSTANCES="$SLAVES $ZOOS"
-ALL_NODES="$MASTERS $SLAVES"
+    INSTANCES="$SLAVES $ZOOS"
+    ALL_NODES="$MASTERS $SLAVES"
 else
-INSTANCES="$SLAVES $OTHER_MASTERS $ZOOS" # List of nodes to try (initially all)
-ALL_NODES="$MASTERS $SLAVES $ZOOS"
+    INSTANCES="$SLAVES $OTHER_MASTERS $ZOOS" # List of nodes to try (initially all)
+    ALL_NODES="$MASTERS $SLAVES $ZOOS"
 fi
 
 TRIES="0"                          # Number of times we've tried so far
 echo "SSH'ing to other cluster nodes to approve keys..."
 while [ "e$INSTANCES" != "e" ] && [ $TRIES -lt 4 ] ; do
-NEW_INSTANCES=
-for node in $INSTANCES; do
-echo $node
-ssh $SSH_OPTS $node echo -n
-if [ $? != 0 ] ; then
-NEW_INSTANCES="$NEW_INSTANCES $node"
-fi
-done
-TRIES=$[$TRIES + 1]
-if [ "e$NEW_INSTANCES" != "e" ] && [ $TRIES -lt 4 ] ; then
-sleep 15
-INSTANCES="$NEW_INSTANCES"
-echo "Re-attempting SSH to cluster nodes to approve keys..."
-else
-break;
-fi
+    NEW_INSTANCES=
+    for node in $INSTANCES; do
+        echo $node
+        ssh $SSH_OPTS $node echo -n
+        if [ $? != 0 ] ; then
+            NEW_INSTANCES="$NEW_INSTANCES $node"
+        fi
+    done
+    TRIES=$[$TRIES + 1]
+    if [ "e$NEW_INSTANCES" != "e" ] && [ $TRIES -lt 4 ] ; then
+        sleep 15
+        INSTANCES="$NEW_INSTANCES"
+        echo "Re-attempting SSH to cluster nodes to approve keys..."
+    else
+        break;
+    fi
 done
 
 echo "RSYNC'ing /root/spark-euca to other cluster nodes..."
 for node in $INSTANCES; do
-echo $node
-rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
-scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
-
+    echo $node
+    rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
+    scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
 done
 wait
 
@@ -131,8 +130,8 @@ wait
 # on other cluster nodes
 echo "Running slave setup script on other cluster nodes..."
 for node in $SLAVES; do
-echo $node
-ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh"
+    echo $node
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh"
 done
 wait
 
@@ -146,13 +145,13 @@ echo "Creating local config files..."
 echo "Sending new cloudera-csh5.list file, running apt-get update and setting env variables to other nodes..."
 #TODO: Add this to EMI to avoid upgrades from CDH5.1.2
 for node in $ALL_NODES; do
-echo "Running on $node ..."
-rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
-echo "Rsyncing custom hadoop configuration to node $node ..."
-rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
-ssh -t -t $SSH_OPTS root@$node "apt-get update"
-rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
-ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
+    echo "Running on $node ..."
+    rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
+    echo "Rsyncing custom hadoop configuration to node $node ..."
+    rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
+    ssh -t -t $SSH_OPTS root@$node "apt-get update"
+    rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
+    ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
 done
 wait
 
@@ -169,26 +168,26 @@ echo "Creating Namenode directories on master..."
 
 #Create hdfs name node directories on masters
 for node in $MASTERS; do
-echo $node
+    echo $node
 
-#Stop namenode to avoid Incompatible clusterIDs error
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop"
+    #Stop namenode to avoid Incompatible clusterIDs error
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop"
 
-ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/*"
-ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh"
-ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-log-dirs.sh"
+    ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/*"
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh"
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-log-dirs.sh"
 done
 wait
 
 echo "Creating Datanode directories on slaves..."
 for node in $SLAVES; do
-echo $node
-#Stop datanode to avoid Incompatible clusterIDs error
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop"
+    echo $node
+    #Stop datanode to avoid Incompatible clusterIDs error
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop"
 
-ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/*; "
-ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-dirs.sh"
-ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-log-dirs.sh"
+    ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/*; "
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-datanode-dirs.sh"
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-log-dirs.sh"
 done
 wait
 
@@ -328,28 +327,28 @@ wait
 
 echo "Starting up datanodes..."
 for node in $SLAVES; do
-echo $node
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" #Making sure there is not tasktracker left running on the EMI
-ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-datanode /etc/default/"
-ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start"
+    echo $node
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-tasktracker stop" #Making sure there is not tasktracker left running on the EMI
+    ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-datanode /etc/default/"
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode start"
 done
 wait
 
 
 echo "Starting Zookeeper failover controller on namenodes..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
-echo $node
-ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-zkfc; wait"
-ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-zkfc /etc/default/"
-#wait
-#ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start"
+    echo $node
+    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-zkfc; wait"
+    ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-zkfc /etc/default/"
+    #wait
+    #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start"
 done
 wait
 
 #Checking that all services are up
 for node in $MASTERS; do
-echo "Running jps on node $node ..."
-ssh -t -t $SSH_OPT root@$node "jps"
+    echo "Running jps on node $node ..."
+    ssh -t -t $SSH_OPT root@$node "jps"
 done
 wait
 
@@ -361,25 +360,25 @@ echo "Creating necessary dir for HA on jobtracker..."
 sudo -u mapred hadoop fs -mkdir -p hdfs://$CLUSTER_NAME/jobtracker/jobsinfo
 
 for node in $MASTERS; do
-echo "Removing old job tracker from node $node ..."
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker stop"
-ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
+    echo "Removing old job tracker from node $node ..."
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker stop"
+    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
 done
 
 #sudo -u mapred hadoop mrhaadmin -transitionToActive -forcemanual jt1
 
 echo "Adding HA on the jobtracker..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
-echo $node
-echo "Installing HA jobtracker on node $node ..."
-ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait"
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha stop"
-ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/"
+    echo $node
+    echo "Installing HA jobtracker on node $node ..."
+    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait"
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha stop"
+    ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/"
 
-echo "Installing the failover controller package on node $node ..."
-ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait"
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-zkfc stop"
-ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/"
+    echo "Installing the failover controller package on node $node ..."
+    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait"
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-zkfc stop"
+    ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/"
 done
 wait
 
@@ -391,39 +390,39 @@ sudo -u mapred hadoop mrzkfc -formatZK -force
 
 echo "Starting jobtracker HA services..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
-echo $node
-echo "Starting ZK daemon on node $node ..."
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-zkfc start"
-echo "Starting jobtracker on node $node..."
-ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha start"
-wait
-ssh -t -t $SSH_OPTS root@$node "jps | grep Tracker"
+    echo $node
+    echo "Starting ZK daemon on node $node ..."
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-zkfc start"
+    echo "Starting jobtracker on node $node..."
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha start"
+    wait
+    ssh -t -t $SSH_OPTS root@$node "jps | grep Tracker"
 done
 wait
 
 
 echo "RSYNC'ing /root/mesos-installation to other cluster nodes..."
 for node in $SLAVES $OTHER_MASTERS; do
-echo $node
-rsync -e "ssh $SSH_OPTS" -az /root/mesos-installation $node:/root
+    echo $node
+    rsync -e "ssh $SSH_OPTS" -az /root/mesos-installation $node:/root
 done
 wait
 
 
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 for node in $MASTERS; do
-echo $node
-ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-master.sh"
-ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/mesos-master.sh mesos-master; update-rc.d mesos-master defaults; service mesos-master start"
+    echo $node
+    ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-master.sh"
+    ssh $SSH_OPTS root@$node "cd /etc/init.d/; ln -s /root/mesos-installation/mesos-master.sh mesos-master; update-rc.d mesos-master defaults; service mesos-master start"
 done
 wait
 
 
 echo "Adding slave startup script to /etc/init.d and starting Mesos-slave..."
 for node in $SLAVES; do
-echo $node
-ssh $SSH_OPTS root@$node "export LD_LIBRARY_PATH=/root/mesos-installation/lib/"
-ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/mesos-slave.sh mesos-slave; update-rc.d mesos-slave defaults; service mesos-slave start"
+    echo $node
+    ssh $SSH_OPTS root@$node "export LD_LIBRARY_PATH=/root/mesos-installation/lib/"
+    ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/mesos-slave.sh mesos-slave; update-rc.d mesos-slave defaults; service mesos-slave start"
 done
 wait
 
@@ -448,33 +447,32 @@ wait
 
 for node in $MASTERS; do
     echo "Initializing modules on node $node ..."
-
     # Install / Init module
     for module in $MODULES; do
-    if [[ -e $module/init.sh ]]; then
-    echo "Initializing $module"
-    ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh"
-    fi
-    cd /root/spark-euca  # guard against setup.sh changing the cwd
+        if [[ -e $module/init.sh ]]; then
+            echo "Initializing $module"
+            ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh"
+        fi
+        cd /root/spark-euca  # guard against setup.sh changing the cwd
     done
 
     echo "Setting up modules on node $node ..."
     # Setup each module
     for module in $MODULES; do
-    echo "Setting up $module"
-    ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/setup.sh"
-    sleep 1
-    cd /root/spark-euca  # guard against setup.sh changing the cwd
+        echo "Setting up $module"
+        ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/setup.sh"
+        sleep 1
+        cd /root/spark-euca  # guard against setup.sh changing the cwd
     done
 
     echo "Starting up modules..."
     #Startup each module
     for module in $MODULES; do
-    if [[ -e $module/startup.sh ]]; then
-    echo "Starting up $module"
-    ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/startup.sh"
-    sleep 1
-    fi
+        if [[ -e $module/startup.sh ]]; then
+            echo "Starting up $module"
+            ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/startup.sh"
+            sleep 1
+        fi
     done
 
 done
@@ -490,31 +488,31 @@ wait
 
     # Add test code
     for module in $MODULES; do
-    echo "Adding test code & running tests for $module"
-    if [[ -e $module/test.sh ]]; then
-    source $module/test.sh
-    sleep 1
-    fi
-    cd /root/spark-euca  # guard against setup-test.sh changing the cwd
+        echo "Adding test code & running tests for $module"
+        if [[ -e $module/test.sh ]]; then
+            source $module/test.sh
+            sleep 1
+        fi
+        cd /root/spark-euca  # guard against setup-test.sh changing the cwd
     done
     fi
 
 
 echo "Installing monit to every node..."
 for node in $MASTERS $SLAVES; do
-rsync -e "ssh $SSH_OPTS" -az /etc/monit $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /etc/monit $node:/etc
 done
 
 for node in $MASTERS; do
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh master"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh master"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
 done
 
 for node in $SLAVES; do
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh slave"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh slave"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
 done
 
 
