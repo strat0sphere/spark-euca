@@ -208,14 +208,14 @@ set httpd port 2812 and
     stop program  = "/etc/init.d/storm-nimbus stop"
     #depends on yyyy
  
-  check process storm-ui with pidfile /var/run/storm/storm-ui.pid
-    start program = "/etc/init.d/storm-ui start" with timeout 60 seconds
-    stop program  = "/etc/init.d/storm-ui stop"
+  #check process storm-ui with pidfile /var/run/storm/storm-ui.pid
+    #start program = "/etc/init.d/storm-ui start" with timeout 60 seconds
+    #stop program  = "/etc/init.d/storm-ui stop"
     #depends on yyyy 
     
-  check process mesos-master with pidfile /var/run/mesos/mesos-master.pid
-    start program = "/etc/init.d/mesos-master start" with timeout 60 seconds
-    stop program  = "/etc/init.d/mesos-master stop"
+  #check process mesos-master with pidfile /var/run/mesos/mesos-master.pid
+    #start program = "/etc/init.d/mesos-master start" with timeout 60 seconds
+    #stop program  = "/etc/init.d/mesos-master stop"
     #depends on yyyy 
 
 

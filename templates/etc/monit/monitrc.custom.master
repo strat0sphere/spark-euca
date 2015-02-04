@@ -202,15 +202,15 @@ set httpd port 2812 and
     stop program  = "/etc/init.d/kafka-server stop"
     #depends on yyyy
   
-  check process storm-nimbus with pidfile /var/run/storm/storm-nimbus.pid
-    start program = "/etc/init.d/storm-nimbus start" with timeout 60 seconds
-    stop program  = "/etc/init.d/storm-nimbus stop"
+  #check process storm-nimbus with pidfile /var/run/storm/storm-nimbus.pid
+    #start program = "/etc/init.d/storm-nimbus start" with timeout 60 seconds
+    #stop program  = "/etc/init.d/storm-nimbus stop"
     #if 5 restarts within 5 cycles then timeout
     #depends on yyyy
  
-  check process storm-ui with pidfile /var/run/storm/storm-ui.pid
-    start program = "/etc/init.d/storm-ui start" with timeout 60 seconds
-    stop program  = "/etc/init.d/storm-ui stop"
+  #check process storm-ui with pidfile /var/run/storm/storm-ui.pid
+    #start program = "/etc/init.d/storm-ui start" with timeout 60 seconds
+    #stop program  = "/etc/init.d/storm-ui stop"
     #depends on yyyy 
     
   check process mesos-master with pidfile /var/run/mesos/mesos-master.pid
