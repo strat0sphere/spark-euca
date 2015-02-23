@@ -78,5 +78,7 @@ echo KAFKA_VERSION=$KAFKA_VERSION >> /etc/environment
 export KAFKA_SCALA_BINARY="2.9.2-$KAFKA_VERSION"
 echo KAFKA_SCALA_BINARY=$KAFKA_SCALA_BINARY >> /etc/environment
 echo "HADOOP_MAPRED_HOME=/usr/lib/hadoop-0.20-mapreduce/" >> /etc/environment
+echo "HADOOP_HOME=/usr/lib/hadoop-0.20-mapreduce/" >> /etc/environment
+echo "HADOOP_LIBEXEC_DIR=/usr/lib/hadoop/libexec/" >> /etc/environment
 
 
