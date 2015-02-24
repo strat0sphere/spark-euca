@@ -619,7 +619,9 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   active_master_private = master_nodes[0].private_dns_name
   
   namenode = active_master
+  namenode_prv_ip = master_nodes[0].private_ip_address
   standby_namenode = master_nodes[1].public_dns_name
+  standby_namenode_prv_ip =  master_nodes[1].private_ip_address
 
   #for zoo : zoo_nodes:
 

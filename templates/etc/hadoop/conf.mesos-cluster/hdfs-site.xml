@@ -28,11 +28,11 @@
 	</property>
 	<property>
 	  <name>dfs.namenode.rpc-address.{{cluster_name}}.nn1</name>
-	  <value>{{namenode}}:8020</value>
+	  <value>{{namenode_prv_ip}}:8020</value>
 	</property>
 	<property>
 	  <name>dfs.namenode.rpc-address.{{cluster_name}}.nn2</name>
-	  <value>{{standby_namenode}}:8020</value>
+	  <value>{{standby_namenode_prv_ip}}:8020</value>
 	</property>
 	<property>
 	  <name>dfs.namenode.http-address.{{cluster_name}}.nn1</name>
