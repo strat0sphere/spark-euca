@@ -20,7 +20,7 @@
     </property>
     <property>
         <name>mapred.mesos.master</name>
-        <value>{{cluster_url}}</value>
+        <value>{{cluster_url_private_ip}}</value>
     </property>
     <!-- TODO: Change tar.gz to be configurable-->
     <property>

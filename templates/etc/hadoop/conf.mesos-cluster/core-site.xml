@@ -46,7 +46,7 @@
     <!--  Automatic failover -->
     <property>
   <name>ha.zookeeper.quorum</name>
-  <value>{{zoo_string}}</value>
+  <value>{{zoo_string_private_ip}}</value>
 </property>
     
     <!--  jets3t properties to be used with hadoop distcp command -->
