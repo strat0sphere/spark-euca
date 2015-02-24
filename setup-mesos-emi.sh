@@ -245,6 +245,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
 
     for node in $NODES; do
     echo $node
+    rsync -e "ssh $SSH_OPTS" -az /root/spark $node:/root
     rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root
     rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc
     rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc
