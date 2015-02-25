@@ -22,21 +22,7 @@
 
 """
 #example run
-./mesos-euca-emi -i ~/vagrant_euca/stratos.pem
--k stratos
---ft 3 
--s 2
--emi-master emi-283B3B45
--e emi-35E93896  
--t m2.2xlarge 
---no-ganglia 
--w 120 
---user-data-file ~/vagrant_euca/clear-key-ubuntu.sh
---installation-type mesos-emi
---run-tests True
---ft 3
---clusterName
-launch mesos-cluster-emi
+./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 2048 launch es1
 """
 
 #clean master emi: emi-283B3B45
