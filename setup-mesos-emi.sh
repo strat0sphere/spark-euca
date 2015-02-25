@@ -255,6 +255,9 @@ if [[ $NUM_ZOOS != 0 ]]; then
     done
     wait
 
+    #Add HDFS backup to S3  to main server
+    echo "30 00 	* * *	root 	/root/spark-euca/backup/backup-to-s3.sh" >> /etc/crontab
+
 
     echo "Starting up zookeeper ensemble..."
     zid=1
