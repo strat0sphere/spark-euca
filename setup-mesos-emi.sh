@@ -519,9 +519,9 @@ done
 
 #TODO: Check type of node inside script with env variable instead of doing this 3 times
 echo "Setting up monit for master..."
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh master"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
+source /root/spark-euca/monit/init.sh
+source /root/spark-euca/monit/setup.sh master
+source /root/spark-euca/monit/startup.sh
 
 echo "Setting up monit for other masters..."
 for node in $OTHER_MASTERS; do
