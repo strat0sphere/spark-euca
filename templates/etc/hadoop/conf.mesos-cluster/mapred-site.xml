@@ -75,7 +75,7 @@
   <property>
     <name>mapred.jobtracker.rpc-address.{{cluster_name}}-jt.jt2</name>
     <!-- RPC address for jt2 -->
-    <value>{{namenode_prv_ip_prv_ip}}:8021</value>
+    <value>{{namenode_prv_ip}}:8021</value>
   </property>
   <property>
     <name>mapred.job.tracker.http.address.{{cluster_name}}-jt.jt1</name>
