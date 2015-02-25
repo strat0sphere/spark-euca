@@ -402,6 +402,16 @@ done
 wait
 
 
+echo "Cleaning up instance from old logs on default dirs..."
+
+for node in $ALL_NODES; do
+
+    ssh -t -t $SSH_OPTS root@$node "rm -rf /var/log/hadoop-hdfs/*"
+
+done
+wait
+
+
 echo "RSYNC'ing /root/mesos-installation to other cluster nodes..."
 for node in $SLAVES $OTHER_MASTERS; do
     echo $node
@@ -504,12 +514,20 @@ for node in $MASTERS $SLAVES; do
     rsync -e "ssh $SSH_OPTS" -az /etc/monit $node:/etc
 done
 
-for node in $MASTERS; do
+#TODO: Check type of node inside script with env variable instead of doing this 3 times
+echo "Setting up monit for master..."
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh master"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
+
+echo "Setting up monit for other masters..."
+for node in $OTHER_MASTERS; do
     ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
-    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh master"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh other-master"
     ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/startup.sh"
 done
 
+echo "Setting up monit for slaves..."
 for node in $SLAVES; do
     ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh"
     ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/setup.sh slave"
