@@ -7,6 +7,11 @@ apt-get --yes --force-yes install libcurl4-nss-dev
 apt-get --yes --force-yes install libsasl2-dev
 apt-get --yes --force-yes install maven
 
+if [[ "x$MESOS_SETUP_VERSION" == "x0.21" ]] ; then
+apt-get --yes --force-yes install libapr1-dev
+apt-get --yes --force-yes install libsvn-dev
+fi
+
 download_method=$1
 if [[ "$DOWNLOAD_METHOD" == "git" ]] ; then
 apt-get --yes --force-yes install autoconf
