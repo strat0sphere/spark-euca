@@ -50,6 +50,7 @@ echo "Error: $DAEMON_NAME is running. Stop it first." >&2
 exit 1
 else
 # Start daemon.
+#--registry_fetch_timeout=5mins --registry_store_timeout=25secs
 mkdir /var/run/mesos
 echo -n "Starting $DAEMON_NAME: ";echo
 nohup $DAEMON_PATH/sbin/mesos-master --cluster={{cluster_name}} --log_dir=/mnt/mesos-logs --zk={{cluster_url_private_ip}} --work_dir=/mnt/mesos-work-dir/ --quorum=1 start </dev/null >/dev/null 2>&1 &
