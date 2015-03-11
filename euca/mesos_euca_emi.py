@@ -260,7 +260,8 @@ def launch_cluster(conn, opts, cluster_name):
     slave_group.authorize('tcp', 60060, 60060, '0.0.0.0/0')
     slave_group.authorize('tcp', 60075, 60075, '0.0.0.0/0')
     slave_group.authorize('tcp', 40015, 40015, '0.0.0.0/0') ##apache hama web UI
-    slave_group.authorize('tcp', 2812, 2812, '0.0.0.0/0') #monit web ui    
+    slave_group.authorize('tcp', 2812, 2812, '0.0.0.0/0') #monit web ui
+    slave_group.authorize('tcp', 31000, 32000, '0.0.0.0/0') #task tracker web ui    
   
   if zoo_group.rules == []: # Group was just now created
       zoo_group.authorize(src_group=master_group)
@@ -633,7 +634,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     zoo_string_private_ip_no_port=",".join(
         ["%s" % i.private_ip_address for i in zoo_nodes])
     journal_string =",".join(
-        ["%s:8485" % i.public_dns_name for i in zoo_nodes])
+        ["%s:8485" % i.private_ip_address for i in zoo_nodes])
     
     #If instances are cohosted concatenate masters and zoos
     if opts.cohost == True:
