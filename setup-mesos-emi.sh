@@ -164,7 +164,7 @@ echo "Deploying hosts-configuration to slaves..."
 /root/spark-euca/copy-dir /etc/hosts
 
 echo "Configuring HDFS on `hostname`..."
-echo "Creating Namenode directories on master..."
+echo "Creating HDFS directories on master..."
 
 #Create hdfs name node directories on masters
 for node in $MASTERS; do
@@ -374,6 +374,8 @@ done
 echo "Adding HA on the jobtracker..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
+    echo "Creating tmp mapred dir..."
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh"
     echo "Installing HA jobtracker on node $node ..."
     ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait"
     ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha stop"

@@ -4,7 +4,10 @@
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-
+	 <property>
+        <name>mapred.local.dir</name>
+        <value>/mnt/hadoop-mapred</value>
+    </property>
     <property>
         <name>hadoop.log.dir</name>
         <value>/mnt/hadoop/log/hadoop-0.20-mapreduce/</value>
