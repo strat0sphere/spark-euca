@@ -22,6 +22,7 @@ export MASTERS="{{master_list}}"
 export SLAVES="{{slave_list}}"
 export ZOOS="{{zoo_list}}"
 export ZOOS_PRIVATE_IP="{{zoo_list_private_ip}}"
+export ZOOS_PRIVATE_DNS_NAME="{{zoo_list_private_dns_name}}"
 export CLUSTER_URL="{{cluster_url}}"
 echo "CLUSTER_URL=$CLUSTER_URL" >> /etc/environment
 export CLUSTER_URL_PRIVATE_IP="{{cluster_url_private_ip}}"

@@ -224,7 +224,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
 
     echo "Adding zookeeper hostnames and ports to configuration file..."
     zid=1
-    for zoo in $ZOOS; do
+    for zoo in $ZOOS_PRIVATE_IP; do
         echo "Adding configuration for zoo: $zoo"
         echo "" >> /etc/zookeeper/conf.dist/zoo.cfg
         echo "server.$zid=$zoo:2888:3888" >> /etc/zookeeper/conf.dist/zoo.cfg

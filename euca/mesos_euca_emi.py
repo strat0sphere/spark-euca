@@ -627,6 +627,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   if zoo_nodes != [] or opts.cohost == True:
     zoo_list = '\n'.join([i.public_dns_name for i in zoo_nodes])
     zoo_list_private_ip = '\n'.join([i.private_ip_address for i in zoo_nodes])
+    zoo_list_private_dns_name = '\n'.join([i.private_dns_name for i in zoo_nodes]) 
     zoo_string = ",".join(
         ["%s:2181" % i.public_dns_name for i in zoo_nodes])
     zoo_string_private_ip=",".join(
@@ -643,6 +644,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
         ["%s:2181" % i.public_dns_name for i in master_nodes])
         
         zoo_list_private_ip += '\n'.join([i.private_ip_address for i in master_nodes])
+        zoo_list_private_dns_name += '\n'.join([i.zoo_list_private_dns_name for i in master_nodes])
         zoo_string_private_ip += ",".join(
         ["%s:2181" % i.private_ip_address for i in master_nodes])
         zoo_string_private_ip_no_port += ",".join(
