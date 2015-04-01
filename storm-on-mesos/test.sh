@@ -9,6 +9,6 @@ cd storm-mesos-${STORM_RELEASE}
 sleep 30.0
 #Print sth to prove its working
 tail /mnt/storm-logs/nimbus.log
-./bin/storm kill WordCount
+/root/storm-mesos-0.9.2-incubating/bin/storm kill WordCount
 
 popd
