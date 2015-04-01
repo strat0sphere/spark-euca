@@ -24,6 +24,7 @@ echo "$SLAVES" > slaves
 echo "$ZOOS" > zoos
 
 echo "$ZOOS_PRIVATE_IP" > zoos_private #List with zoos private IPs needed on storm and kafka setup scripts
+echo "$ZOOS_PRIVATE_DNS_NAME" > zoos_private_dns_name #List with zoos private IPs needed on storm and kafka setup scripts
 
 #If instances are co-hosted then masters will also act as Zoos
 if [ "$cohost" == "True" ]; then
@@ -224,7 +225,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
 
     echo "Adding zookeeper hostnames and ports to configuration file..."
     zid=1
-    for zoo in $ZOOS_PRIVATE_IP; do
+    for zoo in $ZOOS_PRIVATE_DNS_NAME; do
         echo "Adding configuration for zoo: $zoo"
         echo "" >> /etc/zookeeper/conf.dist/zoo.cfg
         echo "server.$zid=$zoo:2888:3888" >> /etc/zookeeper/conf.dist/zoo.cfg
