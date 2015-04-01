@@ -96,6 +96,13 @@
      <value>file:///mnt/cloudera-hdfs/1/dfs/dn,file:///mnt/cloudera-hdfs/2/dfs/dn,file:///mnt/cloudera-hdfs/3/dfs/dn,file:///mnt/cloudera-hdfs/4/dfs/dn</value>
  </property>
  <property>
+<name>dfs.datanode.du.reserved</name>
+<!-- cluster variant -->
+<value>1000000000</value>
+<description>Reserved space in bytes per volume. Always leave this much space free for non dfs use.
+</description>
+</property>
+ <property>
      <name>dfs.permissions.superusergroup</name>
      <value>hadoop</value>
  </property>
