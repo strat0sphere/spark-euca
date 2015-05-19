@@ -247,7 +247,8 @@ def launch_cluster(conn, opts, cluster_name):
         master_group.authorize('tcp', 3888, 3888, '0.0.0.0/0') 
         
     if opts.ganglia:
-      master_group.authorize('tcp', 5080, 5080, '0.0.0.0/0')
+      master_group.authorize('tcp', 80, 80, '0.0.0.0/0')
+      #Also needed 8649 and 8651 but check if only for master
   if slave_group.rules == []: # Group was just now created
     slave_group.authorize(src_group=master_group)
     slave_group.authorize(src_group=slave_group)
