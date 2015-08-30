@@ -53,7 +53,7 @@ else
 mkdir /var/run/mesos
 echo -n "Starting $DAEMON_NAME: ";echo
 
-nohup $DAEMON_PATH/sbin/mesos-slave --executor_registration_timeout=5mins --log_dir=/mnt/mesos-logs --work_dir=/mnt/mesos-work-dir/ --master={{cluster_url_private_ip}} </dev/null >/dev/null 2>&1 &
+nohup $DAEMON_PATH/sbin/mesos-slave --executor_registration_timeout=5mins --log_dir=/mnt/mesos-logs --work_dir=/root/mesos-work-dir/ --master={{cluster_url_private_ip}} </dev/null >/dev/null 2>&1 &
 sleep 3.0
 ps ax | grep -i 'sbin/mesos-slave' | grep -v grep | awk '{print $1}' > $PID_FILE
 fi
