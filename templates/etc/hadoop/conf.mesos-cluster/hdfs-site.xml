@@ -120,4 +120,9 @@
      <name>dfs.client.file-block-storage-locations.timeout</name>
      <value>3000</value>
  </property>
+ 
+ <property>
+        <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
+        <value>false</value>
+</property>
 </configuration>
