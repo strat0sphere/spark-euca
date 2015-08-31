@@ -22,7 +22,7 @@
 
 """
 #example run
-./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch es1
+./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-44643D7C -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch es1
 """
 
 #clean master emi: emi-283B3B45
@@ -62,8 +62,8 @@ def parse_args():
                     help="Show this help message and exit")
   parser.add_option("-s", "--slaves", type="int", default=1,
       help="Number of slaves to launch (default: 1)")
-  parser.add_option("-w", "--wait", type="int", default=120,
-      help="Seconds to wait for nodes to start (default: 120)")
+  parser.add_option("-w", "--wait", type="int", default=60,
+      help="Seconds to wait for nodes to start (default: 60)")
   parser.add_option("-k", "--key-pair",
       help="Key pair to use on instances")
   parser.add_option("-i", "--identity-file",
@@ -109,6 +109,8 @@ def parse_args():
   parser.add_option("--ganglia", action="store_true", default=True,
       help="Setup Ganglia monitoring on cluster (default: on). NOTE: " +
            "the Ganglia page will be publicly accessible")
+  parser.add_option("--one-security-group", action="store_true", default=True,
+      help="Use only one security group for masters, slaves, zoos")
   parser.add_option("--no-ganglia", action="store_false", dest="ganglia",
       help="Disable Ganglia monitoring for the cluster")
   parser.add_option("-u", "--user", default="root",
@@ -210,13 +212,21 @@ def launch_cluster(conn, opts, cluster_name):
     print >> stderr, "ERROR: Must provide a key pair name (-k) to use on instances."
     sys.exit(1)
   print "Setting up security groups..."
-  master_group = get_or_make_group(conn, cluster_name + "-master")
-  master_group.owner_id = os.getenv('EC2_USER_ID')
-  slave_group = get_or_make_group(conn, cluster_name + "-slaves")
-  slave_group.owner_id = os.getenv('EC2_USER_ID')
-  zoo_group = get_or_make_group(conn, cluster_name + "-zoo")
-  zoo_group.owner_id = os.getenv('EC2_USER_ID')
   
+  if opts.one_security_group:
+    master_group = get_or_make_group(conn, cluster_name + "-group")
+    master_group.owner_id = os.getenv('EC2_USER_ID')
+    slave_group = master_group
+    zoo_group = master_group
+  
+  else:
+      master_group = get_or_make_group(conn, cluster_name + "-master")
+      master_group.owner_id = os.getenv('EC2_USER_ID')
+      slave_group = get_or_make_group(conn, cluster_name + "-slaves")
+      slave_group.owner_id = os.getenv('EC2_USER_ID')
+      zoo_group = get_or_make_group(conn, cluster_name + "-zoo")
+      zoo_group.owner_id = os.getenv('EC2_USER_ID')
+      
   if master_group.rules == []: # Group was just now created
     master_group.authorize(src_group=master_group)
     master_group.authorize(src_group=slave_group)
@@ -280,9 +290,11 @@ def launch_cluster(conn, opts, cluster_name):
 
 
   # Check if instances are already running in our groups
-  existing_masters, existing_slaves, existing_zoos = get_existing_cluster(conn, opts, cluster_name,
+  # Grouped instances are instances that run on the same security group in order to allow communication
+  # using private IPs and without DNS resolving
+  existing_masters, existing_slaves, existing_zoos, existing_grouped = get_existing_cluster(conn, opts, cluster_name,
                                                            die_on_error=False)
-  if existing_slaves or (existing_masters and not opts.use_existing_master):
+  if existing_slaves or (existing_masters and not opts.use_existing_master) or existing_grouped:
     print >> stderr, ("ERROR: There are already instances running in " +
         "group %s or %s or %s" % (master_group.name, slave_group.name, zoo_group.name))
     sys.exit(1)
@@ -428,6 +440,7 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
   master_nodes = []
   slave_nodes = []
   zoo_nodes = []
+  grouped_nodes = []
   for res in reservations:
     #print "res.groups", res.groups
     #print "res.groups.name", res.groups[0].name
@@ -440,12 +453,14 @@ def get_existing_cluster(conn, opts, cluster_name, die_on_error=True):
         slave_nodes.append(inst)
       elif group_name == cluster_name + "-zoo":
         zoo_nodes.append(inst)
+      elif group_name == cluster_name + "-group":
+        grouped_nodes.append(inst)
                   
-  if any((master_nodes, slave_nodes, zoo_nodes)):
-    print ("Found %d master(s), %d slaves, %d zookeeper nodes" %
-           (len(master_nodes), len(slave_nodes), len(zoo_nodes)))
-  if master_nodes != [] or not die_on_error:
-    return (master_nodes, slave_nodes, zoo_nodes)
+  if any((master_nodes, slave_nodes, zoo_nodes, grouped_nodes)):
+    print ("Found %d master(s), %d slaves, %d zookeeper nodes, %d same-group nodes" %
+           (len(master_nodes), len(slave_nodes), len(zoo_nodes), len(grouped_nodes)))
+  if master_nodes != [] or grouped_nodes != [] or not die_on_error:
+    return (master_nodes, slave_nodes, zoo_nodes, grouped_nodes)
   else:
     if master_nodes == [] and slave_nodes != []:
       print >> sys.stderr, "ERROR: Could not find master in group " + cluster_name + "-master"
@@ -478,7 +493,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   # "hama-on-mesos"
   modules = ["s3cmd", "spark-on-mesos", "hadoop-on-mesos", "backup", "storm-on-mesos", "kafka" ] #It is also defined on deploy_templates_mesos
 
-  ssh(master, opts, "rm -rf spark-euca && git clone -b ha https://github.com/strat0sphere/spark-euca.git")
+  ssh(master, opts, "rm -rf spark-euca && git clone -b prv_ips https://github.com/strat0sphere/spark-euca.git")
 
   print "Deploying files to master..."
   deploy_files(conn, "deploy.mesos-emi", opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn)
@@ -608,8 +623,10 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   
   namenode = active_master
   namenode_prv_ip = master_nodes[0].private_ip_address
-  standby_namenode = master_nodes[1].public_dns_name
-  standby_namenode_prv_ip =  master_nodes[1].private_ip_address
+  
+  if int(opts.ft) > 1:
+      standby_namenode = master_nodes[1].public_dns_name
+      standby_namenode_prv_ip =  master_nodes[1].private_ip_address
 
   #for zoo : zoo_nodes:
 
@@ -645,7 +662,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
         ["%s:2181" % i.public_dns_name for i in master_nodes])
         
         zoo_list_private_ip += '\n'.join([i.private_ip_address for i in master_nodes])
-        zoo_list_private_dns_name += '\n'.join([i.zoo_list_private_dns_name for i in master_nodes])
+        zoo_list_private_dns_name += '\n'.join([i.private_dns_name for i in master_nodes])
         zoo_string_private_ip += ",".join(
         ["%s:2181" % i.private_ip_address for i in master_nodes])
         zoo_string_private_ip_no_port += ",".join(
@@ -701,8 +718,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "cluster_name": opts.cluster_name,
     "aws_access_key": s3conn['aws_access_key'],
     "aws_secret_key": s3conn['aws_secret_key'],
-    "walrus_ip": s3conn['walrus_ip'],
-    "nodes_number": str(opts.slaves+1)
+    "walrus_ip": s3conn['walrus_ip']
     
   }
 
@@ -730,9 +746,11 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
             with open(local_file, "w") as dest:
               text = src.read()
               for key in template_vars:
-                  if (key is not None):
-                    #print "key" + key
+                  if key is not None and template_vars[key] is not None:
+                    #print  key + ":" + template_vars[key]
                     text = text.replace("{{" + key + "}}", template_vars[key])
+                  else:
+                      print "Value of " + key + "was None!"
               dest.write(text)
               dest.close()
   
@@ -845,10 +863,11 @@ def real_main():
     #euca_ec2_host="eucalyptus.race.cs.ucsb.edu" #TODO: Replace with opts.euca-ec2-host
     euca_id=os.getenv('AWS_ACCESS_KEY')
     euca_key=os.getenv('AWS_SECRET_KEY')
+    walrus_ip=os.getenv('WALRUS_IP')
     euca_region = RegionInfo(name="eucalyptus", endpoint=euca_ec2_host)
     
     #Parameters needed for S3 connection
-    s3conn = {'walrus_ip' : os.getenv('WALRUS_IP'), 'aws_access_key' : euca_id, 'aws_secret_key' : euca_key}
+    s3conn = {'walrus_ip' : walrus_ip, 'aws_access_key' : euca_id, 'aws_secret_key' : euca_key}
     
     ec2conn = boto.connect_ec2(
         aws_access_key_id=euca_id,
@@ -873,7 +892,7 @@ def real_main():
       print >> sys.stderr, "ERROR: You have to start at least 1 slave"
       sys.exit(1)
     if opts.resume:
-      (master_nodes, slave_nodes, zoo_nodes) = get_existing_cluster(
+      (master_nodes, slave_nodes, zoo_nodes, grouped_nodes) = get_existing_cluster(
           conn, opts, cluster_name)
     else:
       (master_nodes, slave_nodes, zoo_nodes) = launch_cluster(conn, opts, cluster_name)
@@ -883,6 +902,7 @@ def real_main():
           time.sleep(10)
           attach_volumes(conn, slave_nodes, opts.vol_size)
           time.sleep(10)
+          
     setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, True, s3conn)
 
   elif action == "destroy":
@@ -890,7 +910,7 @@ def real_main():
         cluster_name + "?\nALL DATA ON ALL NODES WILL BE LOST!!\n" +
         "Destroy cluster " + cluster_name + " (y/N): ")
     if response == "y":
-      (master_nodes, slave_nodes, zoo_nodes) = get_existing_cluster(
+      (master_nodes, slave_nodes, zoo_nodes, grouped_nodes) = get_existing_cluster(
           conn, opts, cluster_name, die_on_error=False)
       print "Terminating master..."
       for inst in master_nodes:
@@ -904,11 +924,15 @@ def real_main():
       for inst in zoo_nodes:
           print "Terminating zoo instance...", inst
           inst.terminate()
+      print "Terminating grouped instances..."
+      for inst in grouped_nodes:
+          print "Terminating  instance...", inst
+          inst.terminate()
 
       # Delete security groups as well
       if opts.delete_groups:
         print "Deleting security groups (this will take some time)..."
-        group_names = [cluster_name + "-master", cluster_name + "-slaves"]
+        group_names = [cluster_name + "-master", cluster_name + "-slaves", cluster_name + "-zoo", cluster_name + "-group"]
 
         attempt = 1;
         while attempt <= 3:
