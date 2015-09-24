@@ -116,7 +116,7 @@ template_dir="/root/spark-euca/templates"
 #the script (which are all located under /root) plus the directories under /etc or any other dirs requiring configuration
 
 #If MPI enabled "mesos-0.20" should be added on the config_dirs
-config_dirs = ["etc", "spark", "hadoop", "s3cmd", "backup", "storm", "kafka"]
+config_dirs = ["etc", "spark", "hadoop", "s3cmd", "storm"]
 
 
 for path, dirs, files in os.walk(template_dir):
