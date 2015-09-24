@@ -867,7 +867,7 @@ def real_main():
     #euca_ec2_host="eucalyptus.race.cs.ucsb.edu" #TODO: Replace with opts.euca-ec2-host
     euca_id=os.getenv('AWS_ACCESS_KEY')
     euca_key=os.getenv('AWS_SECRET_KEY')
-    walrus_ip=os.getenv('WALRUS_IP')
+    walrus_ip="128.111.179.130" # os.getenv('WALRUS_IP') no longer works. 150923
     euca_region = RegionInfo(name="eucalyptus", endpoint=euca_ec2_host)
     
     #Parameters needed for S3 connection
