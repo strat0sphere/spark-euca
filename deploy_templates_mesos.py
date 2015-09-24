@@ -78,7 +78,6 @@ template_vars = {
   "slave_list": os.getenv("SLAVES"),
   "zoo_list": os.getenv("ZOOS"),
   "zoo_list_private_ip": os.getenv("ZOOS_PRIVATE_IP"),
-  "zoo_list_private_dns_name": os.getenv("ZOOS_PRIVATE_DNS_NAME"),
   "zoo_string": os.getenv("ZOO_STRING"),
   "zoo_string_private_ip": os.getenv("ZOO_STRING_PRIVATE_IP"),
   "zoo_string_private_ip_no_port": os.getenv("ZOO_STRING_PRIVATE_IP_NO_PORT"),

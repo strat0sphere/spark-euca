@@ -172,7 +172,7 @@ for node in $MASTERS; do
     echo $node
 
     #Stop namenode to avoid Incompatible clusterIDs error
-    ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-datanode stop"
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-namenode stop"
 
     ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/cloudera-hdfs/*"
     ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-namenode-dirs.sh"

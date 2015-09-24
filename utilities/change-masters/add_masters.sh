@@ -4,7 +4,7 @@
 #old_master=$1
 #new_master=$2
 
-# Change IP addresse and cluster name (ex es1, es2 etc) in every configuration file on the 1st master node - The scripts will copy then these files to the rest of the nodes
+# Change IP addresses and cluster name (ex es1, es2 etc) in every configuration file on the 1st master node - The scripts will copy then these files to the rest of the nodes
 #To do the changes automatically also try the replace_ip.sh script on the current directory.
 #Locations to change: Everything inside the /etc configuration dir
 #/etc/hadoop/conf.mesos-cluster directory dir: All the .xml files

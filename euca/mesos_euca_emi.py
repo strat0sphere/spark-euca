@@ -22,7 +22,7 @@
 
 """
 #example run
-./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-44643D7C -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch es1
+./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-85763E01 -e emi-44643D7C -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch es1
 """
 
 #clean master emi: emi-283B3B45
@@ -541,6 +541,12 @@ def setup_mesos_cluster(master, opts):
 def setup_mesos_emi_cluster(master, opts):
     #ssh(master, opts, "chmod u+x ~/spark-testing/setup.sh")
     #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
+    ssh(master, opts, "rm /etc/environment") # Delete old file that exists on the emi
+    ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
+    ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")
+    ssh(master, opts, "echo PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment")
+    #   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
+    ssh(master, opts, "echo LD_LIBRARY_PATH='/root/mesos/build/src/.libs/' >> /etc/environment")
     ssh(master, opts, "chmod u+x spark-euca/setup-mesos-emi.sh")
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
@@ -645,7 +651,6 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   if zoo_nodes != [] or opts.cohost == True:
     zoo_list = '\n'.join([i.public_dns_name for i in zoo_nodes])
     zoo_list_private_ip = '\n'.join([i.private_ip_address for i in zoo_nodes])
-    zoo_list_private_dns_name = '\n'.join([i.private_dns_name for i in zoo_nodes]) 
     zoo_string = ",".join(
         ["%s:2181" % i.public_dns_name for i in zoo_nodes])
     zoo_string_private_ip=",".join(
@@ -662,7 +667,6 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
         ["%s:2181" % i.public_dns_name for i in master_nodes])
         
         zoo_list_private_ip += '\n'.join([i.private_ip_address for i in master_nodes])
-        zoo_list_private_dns_name += '\n'.join([i.private_dns_name for i in master_nodes])
         zoo_string_private_ip += ",".join(
         ["%s:2181" % i.private_ip_address for i in master_nodes])
         zoo_string_private_ip_no_port += ",".join(
