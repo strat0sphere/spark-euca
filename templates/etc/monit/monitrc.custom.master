@@ -197,9 +197,9 @@ set httpd port 2812 and
     stop program  = "/etc/init.d/hadoop-0.20-mapreduce-jobtrackerha stop"
     #depends on yyyy
     
-   check process kafka-server with pidfile /var/run/kafka-server.pid
-    start program = "/etc/init.d/kafka-server start" with timeout 60 seconds
-    stop program  = "/etc/init.d/kafka-server stop"
+   #check process kafka-server with pidfile /var/run/kafka-server.pid
+   # start program = "/etc/init.d/kafka-server start" with timeout 60 seconds
+   # stop program  = "/etc/init.d/kafka-server stop"
     #depends on yyyy
   
   #check process storm-nimbus with pidfile /var/run/storm/storm-nimbus.pid

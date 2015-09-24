@@ -180,8 +180,8 @@ set httpd port 2812 and
     #depends on yyyy
  
  check process hadoop-0.20-mapreduce-zkfc with pidfile /var/run/hadoop-0.20-mapreduce/hadoop-hadoop-mrzkfc.pid
-    start program = "/etc/init.d/hadoop-0.20-mapreduce-zkfc start" with timeout 60 seconds
-    stop program  = "/etc/init.d/hadoop-0.20-mapreduce-zkfc stop"
+    # start program = "/etc/init.d/hadoop-0.20-mapreduce-zkfc start" with timeout 60 seconds
+    # stop program  = "/etc/init.d/hadoop-0.20-mapreduce-zkfc stop"
     #depends on yyyy
     
    #check process kafka-server with pidfile /var/run/kafka-server.pid
