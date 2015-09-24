@@ -651,6 +651,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
   if zoo_nodes != [] or opts.cohost == True:
     zoo_list = '\n'.join([i.public_dns_name for i in zoo_nodes])
     zoo_list_private_ip = '\n'.join([i.private_ip_address for i in zoo_nodes])
+    zoo_list_private_dns_name = '\n'.join([i.private_dns_name for i in zoo_nodes])
+    print "zoo_list_private_dns_name" + zoo_list_private_dns_name 
     zoo_string = ",".join(
         ["%s:2181" % i.public_dns_name for i in zoo_nodes])
     zoo_string_private_ip=",".join(
@@ -667,6 +669,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
         ["%s:2181" % i.public_dns_name for i in master_nodes])
         
         zoo_list_private_ip += '\n'.join([i.private_ip_address for i in master_nodes])
+        zoo_list_private_dns_name += '\n'.join([i.private_dns_name for i in master_nodes])
         zoo_string_private_ip += ",".join(
         ["%s:2181" % i.private_ip_address for i in master_nodes])
         zoo_string_private_ip_no_port += ",".join(
@@ -679,6 +682,8 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     cluster_url_private_ip = "zk://" + zoo_string_private_ip + "/mesos"
     journal_url = "qjournal://" + journal_string #will be concatenated on the configuration files with the cluster_name
 
+    print "zoo_list_private_dns_name" + zoo_list_private_dns_name 
+    
   else:
     zoo_list = "NONE"
     cluster_url = "master@%s:5050" % active_master
@@ -706,6 +711,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "zoo_dns_mappings_public": '\n'.join([' '.join([i.ip_address, i.public_dns_name, i.private_dns_name, i.private_dns_name.split(".")[0]]) for i in zoo_nodes]),
     "zoo_list": zoo_list,
     "zoo_list_private_ip": zoo_list_private_ip,
+    "zoo_list_private_dns_name": zoo_list_private_dns_name,
     "namenode": namenode,
     "namenode_prv_ip": namenode_prv_ip,
     "standby_namenode": standby_namenode,
