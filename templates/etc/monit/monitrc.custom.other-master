@@ -169,13 +169,6 @@ set httpd port 2812 and
     stop program  = "/etc/init.d/zookeeper-server stop"
     #depends on yyyy
     
- 
- check process hadoop-hdfs-zkfc with pidfile /var/run/hadoop-hdfs/hadoop-hdfs-zkfc.pid
-    start program = "/etc/init.d/hadoop-hdfs-zkfc start" with timeout 60 seconds
-    stop program  = "/etc/init.d/hadoop-hdfs-zkfc stop"
-    #depends on yyyy
-    
-    
   check process hadoop-hdfs-namenode with pidfile /var/run/hadoop-hdfs/hadoop-hdfs-namenode.pid
     start program = "/etc/init.d/hadoop-hdfs-namenode start" with timeout 60 seconds
     stop program  = "/etc/init.d/hadoop-hdfs-namenode stop"
@@ -189,12 +182,6 @@ set httpd port 2812 and
  check process hadoop-0.20-mapreduce-zkfc with pidfile /var/run/hadoop-0.20-mapreduce/hadoop-hadoop-mrzkfc.pid
     start program = "/etc/init.d/hadoop-0.20-mapreduce-zkfc start" with timeout 60 seconds
     stop program  = "/etc/init.d/hadoop-0.20-mapreduce-zkfc stop"
-    #depends on yyyy
-    
-    
-  check process hadoop-0.20-mapreduce-jobtrackerha with pidfile /var/run/hadoop-0.20-mapreduce/hadoop-hadoop-jobtrackerha.pid
-    start program = "/etc/init.d/hadoop-0.20-mapreduce-jobtrackerha start" with timeout 60 seconds
-    stop program  = "/etc/init.d/hadoop-0.20-mapreduce-jobtrackerha stop"
     #depends on yyyy
     
    #check process kafka-server with pidfile /var/run/kafka-server.pid
