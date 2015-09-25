@@ -96,6 +96,8 @@ else
     ALL_NODES="$MASTERS $SLAVES $ZOOS"
 fi
 
+echo ALL_NODES > all_nodes
+
 TRIES="0"                          # Number of times we've tried so far
 echo "SSH'ing to other cluster nodes to approve keys..."
 while [ "e$INSTANCES" != "e" ] && [ $TRIES -lt 4 ] ; do
@@ -149,11 +151,16 @@ for node in $ALL_NODES; do
     rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 0.1
     echo "Rsyncing custom hadoop configuration to node $node ..."
     rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/ & sleep 0.1
-    ssh -t -t $SSH_OPTS root@$node "apt-get update" & sleep 0.1
+#ssh -t -t $SSH_OPTS root@$node "apt-get update" & sleep 0.1
     rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/ & sleep 0.1
     ssh -t -t $SSH_OPTS root@$node "source /etc/environment" & sleep 0.1
 done
 wait
+
+
+echo "DEBUG: Testing pssh"
+parallel-ssh --hosts masters -v "hostname"
+parallel-ssh --hosts all_nodes "apt-get update"
 
 chmod a+x /root/spark-euca/copy-dir
 
@@ -495,9 +502,6 @@ for node in $MASTERS; do
 
 done
 wait
-
-echo "DEBUG: Testing pssh"
-parallel-ssh --hosts masters -v "hostname"
 
     cd /root/spark-euca/
 
