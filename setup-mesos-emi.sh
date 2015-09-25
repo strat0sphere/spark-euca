@@ -495,6 +495,10 @@ for node in $MASTERS; do
 done
 wait
 
+# Separately start storm only for driving master
+echo "Starting Storm on driving master"
+source /root/spark-euca/storm-on-mesos/startup-on-master.sh
+
     cd /root/spark-euca/
 
     # Test modules
