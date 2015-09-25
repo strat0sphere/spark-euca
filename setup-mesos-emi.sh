@@ -34,6 +34,7 @@ fi
 MASTERS=`cat masters`
 NUM_MASTERS=`cat masters | wc -l`
 OTHER_MASTERS=`cat masters | sed '1d'`
+echo $OTHER_MASTERS > other_masters
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
 
@@ -160,7 +161,9 @@ wait
 
 echo "DEBUG: Testing pssh"
 parallel-ssh --hosts masters -v "hostname"
-parallel-ssh --hosts all_nodes "apt-get update"
+parallel-ssh --hosts other_masters "apt-get update"
+parallel-ssh --hosts slaves "apt-get update"
+apt-get update
 
 chmod a+x /root/spark-euca/copy-dir
 
