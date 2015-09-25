@@ -7,7 +7,7 @@ apt-get --yes --force-yes install libcurl4-nss-dev
 apt-get --yes --force-yes install libsasl2-dev
 apt-get --yes --force-yes install maven
 
-if [[ "x$MESOS_SETUP_VERSION" == "x0.21" ]] ; then
+if [[ "x$MESOS_SETUP_VERSION" == "x0.21.1" ]] ; then
 apt-get --yes --force-yes install libapr1-dev
 apt-get --yes --force-yes install libsvn-dev
 fi
@@ -32,11 +32,11 @@ mkdir /root/mesos-installation/
 mkdir build
 cd build
 ../configure --prefix=/root/mesos-installation/
-make
+make -j 2
 
 # Install (***Optional***).
 
-make install
+make -j 2 install
 
 #TODO: SET LD_LIBRARY_PATH CORRECTLY ON EMI
 #delete previous LD_LIBRARY_PATH
@@ -47,5 +47,5 @@ export LD_LIBRARY_PATH=/root/mesos-installation/lib/
 # Run test suite -- Also builds example frameworks
 #make check #Run make check at the end because some tests fail (VERSION 0.18.1)
 
-/root/spark-euca/copy-dir /root/mesos-$MESOS_SETUP_VERSION
+#/root/spark-euca/copy-dir /root/mesos-$MESOS_SETUP_VERSION
 /root/spark-euca/copy-dir /root/mesos-installation/

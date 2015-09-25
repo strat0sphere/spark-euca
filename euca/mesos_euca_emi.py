@@ -86,7 +86,7 @@ def parse_args():
       help="Github repo from which to checkout supplied commit hash")
   parser.add_option("--hadoop-major-version", default="1",
       help="Major version of Hadoop (default: 0.20.0)")
-  parser.add_option("--mesos-setup-version", default="0.20.0",
+  parser.add_option("--mesos-setup-version", default="0.21.1",
       help="Major version of Hadoop (default: 1)")
   parser.add_option("-D", metavar="[ADDRESS:]PORT", dest="proxy_port",
       help="Use SSH dynamic port forwarding to create a SOCKS proxy at " +
@@ -527,15 +527,32 @@ def setup_spark_standalone_cluster(master, opts):
     print "Ganglia started at http://%s:5080/ganglia" % master
 
 def setup_mesos_cluster(master, opts):
-  #ssh(master, opts, "chmod u+x ~/spark-testing/setup.sh")
-  #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
+  pkg_mngr = "apt-get --yes --force-yes"
+  ssh(master, opts, pkg_mngr + " update")
+  #ssh(master, opts, pkg_mngr + " install wget")
+  ssh(master, opts, pkg_mngr + " install git")
+  
+  if opts.os_type == "ubuntu":
+      ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
+      ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
+  elif opts.os_type == "centos":
+      ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
+      ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64/ /usr/lib/jvm/java-1.7.0/")
+      ssh(master, opts, pkg_mngr + " install wget")
+      
+  ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
+  ssh(master, opts, "tar xvf scala-2.11.1.tgz")
+  ssh(master, opts, "mv scala-2.11.1 scala")
+  ssh(master, opts, "rm scala-2.11.1.tgz")
+  
+  ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
+  ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")
+  ssh(master, opts, "echo PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment")
+  #   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
+  ssh(master, opts, "echo LD_LIBRARY_PATH='/root/mesos/build/src/.libs/' >> /etc/environment")
+
   ssh(master, opts, "chmod u+x spark-euca/setup-mesos.sh")
-  #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
-  #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
   ssh(master, opts, "spark-euca/setup-mesos.sh " + opts.os_type)
-  #ssh(master, opts, "echo 'Starting-all...'")
-  #ssh(master, opts, "/root/spark/sbin/start-all.sh")
-  #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
 
   print "Mesos cluster started at http://%s:5050" % master
 
@@ -559,10 +576,6 @@ def setup_mesos_emi_cluster(master, opts):
     #ssh(master, opts, "reboot")
     #print "Waiting for master and other nodes to reboot..."
     #time.sleep(60)
-    
-    print "*** DEBUG ***"
-    ssh(master, opts, "ps -ef | grep storm")
-    ssh(master, opts, "ps -ef | grep kafka")
     
     print "Mesos cluster started at http://%s:5050" % master
 
