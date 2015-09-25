@@ -467,7 +467,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, opts, deploy_ssh_key):
   #Required packets to run MLlib
   ssh(master, opts, pkg_mngr + " install gfortran")
   ssh(master, opts, pkg_mngr + " install libgfortran3")
-  ssh(master, opts, pkg_mngr + "install libatlas3gf-base libopenblas-base")
+  ssh(master, opts, pkg_mngr + " install libatlas3gf-base libopenblas-base")
   ssh(master, opts, "update-alternatives --config libblas.so.3gf --skip-auto")
   ssh(master, opts, "update-alternatives --config liblapack.so.3gf --skip-auto")
   #If we want to format the attached volume with xfs the following should not be in comments & prepare-slaves.sh should be modified as well

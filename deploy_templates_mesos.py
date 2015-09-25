@@ -77,10 +77,24 @@ template_vars = {
   "active_master_private": os.getenv("ACTIVE_MASTER_PRIVATE"),
   "slave_list": os.getenv("SLAVES"),
   "zoo_list": os.getenv("ZOOS"),
+  "zoo_list_private_ip": os.getenv("ZOOS_PRIVATE_IP"),
+  "zoo_list_private_dns_name": os.getenv("ZOOS_PRIVATE_DNS_NAME"),
+  "zoo_string": os.getenv("ZOO_STRING"),
+  "zoo_string_private_ip": os.getenv("ZOO_STRING_PRIVATE_IP"),
+  "zoo_string_private_ip_no_port": os.getenv("ZOO_STRING_PRIVATE_IP_NO_PORT"),
+  "namenode": os.getenv("NAMENODE"),
+  "standby_namenode": os.getenv("STANDBY_NAMENODE"),
+  "namenode_prv_ip": os.getenv("NAMENODE_PRV_IP"),
+  "standby_namenode_prv_ip": os.getenv("STANDBY_NAMENODE_PRV_IP"),
+  "journal_url": os.getenv("JOURNAL_URL"),
+  "cluster_url": os.getenv("CLUSTER_URL"),
+  "cluster_url_private_ip": os.getenv("CLUSTER_URL_PRIVATE_IP"),
   "masters_dns_mappings": os.getenv("MASTERS_DNS_MAPPINGS"),
   "slaves_dns_mappings": os.getenv("SLAVES_DNS_MAPPINGS"),
   "masters_dns_mappings_public": os.getenv("MASTERS_DNS_MAPPINGS_PUBLIC"),
   "slaves_dns_mappings_public": os.getenv("SLAVES_DNS_MAPPINGS_PUBLIC"),
+  "zoo_dns_mappings": os.getenv("ZOO_DNS_MAPPINGS"),
+  "zoo_dns_mappings_public": os.getenv("ZOO_DNS_MAPPINGS_PUBLIC"),
   "mesos_setup_version": os.getenv("MESOS_SETUP_VERSION"),
   "java_home": os.getenv("JAVA_HOME"),
   "cluster_name": os.getenv("CLUSTER_NAME"),
@@ -102,7 +116,7 @@ template_dir="/root/spark-euca/templates"
 #the script (which are all located under /root) plus the directories under /etc or any other dirs requiring configuration
 
 #If MPI enabled "mesos-0.20" should be added on the config_dirs
-config_dirs = ["etc", "spark", "hadoop", "s3cmd", "backup", "storm", "kafka"]
+config_dirs = ["etc", "spark", "hadoop", "s3cmd", "storm"]
 
 
 for path, dirs, files in os.walk(template_dir):
@@ -117,14 +131,14 @@ for path, dirs, files in os.walk(template_dir):
        print "Creating: " + dest_dir 
        os.makedirs(dest_dir)
        
-    print "DEBUG: Configuring dest_dir " + dest_dir
+    #print "DEBUG: Configuring dest_dir " + dest_dir
        
     for filename in files:
       if filename[0] not in '#.~' and filename[-1] != '~':
         dest_file = os.path.join(dest_dir, filename)
         with open(os.path.join(path, filename)) as src:
           with open(dest_file, "w") as dest:
-            print "DEBUG: Configuring " + dest_file
+            #print "DEBUG: Configuring " + dest_file
             text = src.read()
             for key in template_vars:
               #print "DEBUG: key: " + key

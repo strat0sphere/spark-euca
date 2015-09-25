@@ -21,6 +21,20 @@
 export MASTERS="{{master_list}}"
 export SLAVES="{{slave_list}}"
 export ZOOS="{{zoo_list}}"
+export ZOOS_PRIVATE_IP="{{zoo_list_private_ip}}"
+export ZOOS_PRIVATE_DNS_NAME="{{zoo_list_private_dns_name}}"
+export CLUSTER_URL="{{cluster_url}}"
+echo "CLUSTER_URL=$CLUSTER_URL" >> /etc/environment
+export CLUSTER_URL_PRIVATE_IP="{{cluster_url_private_ip}}"
+echo "CLUSTER_URL_PRIVATE_IP=$CLUSTER_URL_PRIVATE_IP" >> /etc/environment
+export ZOO_STRING="{{zoo_string}}"
+export ZOO_STRING_PRIVATE_IP="{{zoo_string_private_ip}}"
+export ZOO_STRING_PRIVATE_IP_NO_PORT="{{zoo_string_private_ip_no_port}}"
+export NAMENODE="{{namenode}}"
+export NAMENODE_PRV_IP="{{namenode_prv_ip}}"
+export STANDBY_NAMENODE="{{standby_namenode}}"
+export STANDBY_NAMENODE_PRV_IP="{{standby_namenode_prv_ip}}"
+export JOURNAL_URL="{{journal_url}}"
 export NODES_NUMBER="{{nodes_number}}" #total number of master and slave nodes - used for mpdboot command
 export HDFS_DATA_DIRS="{{hdfs_data_dirs}}"
 export MAPRED_LOCAL_DIRS="{{mapred_local_dirs}}"
@@ -41,9 +55,12 @@ sed -i '/LD_LIBRARY_PATH=/d' /etc/environment
 echo 'LD_LIBRARY_PATH=/root/mesos-installation/lib/' >> /etc/environment
 
 export MASTERS_DNS_MAPPINGS="{{masters_dns_mappings}}"
-export SLAVES_DNS_MAPPINGS="{{slaves_dns_mappings}}"
 export MASTERS_DNS_MAPPINGS_PUBLIC="{{masters_dns_mappings_public}}"
+export SLAVES_DNS_MAPPINGS="{{slaves_dns_mappings}}"
 export SLAVES_DNS_MAPPINGS_PUBLIC="{{slaves_dns_mappings_public}}"
+export ZOO_DNS_MAPPINGS="{{zoo_dns_mappings}}"
+export ZOO_DNS_MAPPINGS_PUBLIC="{{zoo_dns_mappings_public}}"
+
 
 #Backup specific variables
 export AWS_ACCESS_KEY="{{aws_access_key}}"
@@ -58,6 +75,13 @@ export PYTHON_PATH="/usr/bin/python" #"{{python_path}}" - (which python)
 export PYTHON_EGG_POSTFIX="py2.7-linux-x86_64" #"{{python_egg_postfix}}"
 export PYTHON_EGG_PUREPY_POSTFIX="py2.7" #"{{python_egg_purepy_postfix}}"
 export STORM_RELEASE="0.9.2-incubating"
+echo STORM_RELEASE=$STORM_RELEASE >> /etc/environment
 export KAFKA_VERSION="0.8.1.1"
+echo KAFKA_VERSION=$KAFKA_VERSION >> /etc/environment
 export KAFKA_SCALA_BINARY="2.9.2-$KAFKA_VERSION"
+echo KAFKA_SCALA_BINARY=$KAFKA_SCALA_BINARY >> /etc/environment
+echo "HADOOP_MAPRED_HOME=/usr/lib/hadoop-0.20-mapreduce/" >> /etc/environment
+echo "HADOOP_HOME=/usr/lib/hadoop-0.20-mapreduce/" >> /etc/environment
+echo "HADOOP_LIBEXEC_DIR=/usr/lib/hadoop/libexec/" >> /etc/environment
+
 
