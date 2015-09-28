@@ -47,7 +47,3 @@ export LD_LIBRARY_PATH=/root/mesos-installation/lib/
 # Run test suite -- Also builds example frameworks
 #make check #Run make check at the end because some tests fail (VERSION 0.18.1)
 
-#/root/spark-euca/copy-dir /root/mesos-$MESOS_SETUP_VERSION
-/root/spark-euca/copy-dir-generic /root/mesos-installation/ other_masters
-/root/spark-euca/copy-dir-generic /root/mesos-installation/ slaves
-
