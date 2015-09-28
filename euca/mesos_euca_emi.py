@@ -80,7 +80,7 @@ def parse_args():
   parser.add_option("--emi-master", default="", help="Eucalyptus Machine Image ID to use for the master instance")
   parser.add_option("--emi-zoo", default="", help="Eucalyptus Machine Image ID to use for the zoo instance")
   parser.add_option("-e", "--emi", help="Eucalyptus Machine Image ID to use")
-  parser.add_option("-v", "--spark-version", default="1.0.1",
+  parser.add_option("-v", "--spark-version", default="1.2.1",
       help="Version of Spark to use: 'X.Y.Z' or a specific git hash")
   parser.add_option("--spark-git-repo",
       default="https://github.com/apache/spark",
