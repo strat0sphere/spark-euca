@@ -23,7 +23,8 @@
 """
 #example run
 ./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master  emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch es1
-new not-tested emis:  emi-85763E01 -e emi-44643D7C 
+- new not-tested emis:  emi-85763E01 -e emi-44643D7C 
+- for empty emi installation use emi-6E1C35EC for both masters and slaves
 """
 
 #clean master emi: emi-283B3B45
@@ -494,7 +495,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   # "hama-on-mesos"
   modules = ["s3cmd", "spark-on-mesos", "hadoop-on-mesos", "storm-on-mesos"] #It is also defined on deploy_templates_mesos
 
-  ssh(master, opts, "rm -rf spark-euca && git clone -b mesos-emi https://github.com/strat0sphere/spark-euca.git")
+  ssh(master, opts, "rm -rf spark-euca && git clone -b empty-emi https://github.com/strat0sphere/spark-euca.git")
 
   print "Deploying files to master..."
   deploy_files(conn, "deploy.mesos-emi", opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn)
@@ -551,8 +552,8 @@ def setup_mesos_cluster(master, opts):
   #   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
   ssh(master, opts, "echo LD_LIBRARY_PATH='/root/mesos/build/src/.libs/' >> /etc/environment")
 
-  ssh(master, opts, "chmod u+x spark-euca/setup-mesos.sh")
-  ssh(master, opts, "spark-euca/setup-mesos.sh " + opts.os_type)
+  ssh(master, opts, "chmod u+x spark-euca/setup-mesos2.sh")
+  ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.os_type)
 
   print "Mesos cluster started at http://%s:5050" % master
 
