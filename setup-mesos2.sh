@@ -162,7 +162,7 @@ for node in $ALL_NODES; do
     rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
     echo "Rsyncing custom hadoop configuration to node $node ..."
     rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
-    ssh -t -t $SSH_OPTS root@$node "apt-get update"
+    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes update"
     rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
     ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
 done
