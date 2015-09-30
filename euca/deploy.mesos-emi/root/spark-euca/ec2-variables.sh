@@ -86,4 +86,6 @@ echo "HADOOP_MAPRED_HOME=/usr/lib/hadoop-0.20-mapreduce/" >> /etc/environment
 echo "HADOOP_HOME=/usr/lib/hadoop-0.20-mapreduce/" >> /etc/environment
 echo "HADOOP_LIBEXEC_DIR=/usr/lib/hadoop/libexec/" >> /etc/environment
 
+export DEBIAN_FRONTEND="noninteractive"
+
 

@@ -491,7 +491,12 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
       ssh_write(slave.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
 
   modules = ["s3cmd", "spark-on-mesos", "hadoop-on-mesos", "storm-on-mesos"] #It is also defined on deploy_templates_mesos
-
+  
+  pkg_mngr = "apt-get --yes --force-yes"
+  #ssh(master, opts, pkg_mngr + " install wget")
+  
+  ssh(master, opts, pkg_mngr + " install git")
+  
   ssh(master, opts, "rm -rf spark-euca && git clone -b empty_emi https://github.com/strat0sphere/spark-euca.git")
 
   print "Deploying files to master..."
@@ -527,8 +532,6 @@ def setup_spark_standalone_cluster(master, opts):
 def setup_mesos_cluster(master, opts):
   pkg_mngr = "apt-get --yes --force-yes"
   ssh(master, opts, pkg_mngr + " update")
-  #ssh(master, opts, pkg_mngr + " install wget")
-  ssh(master, opts, pkg_mngr + " install git")
   
   if opts.os_type == "ubuntu":
       ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
