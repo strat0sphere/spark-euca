@@ -2,7 +2,7 @@
 
 wget http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.3.0-cdh5.1.2.tar.gz
 tar zxf hadoop-2.3.0-cdh5.1.2.tar.gz
-
+/Users/stratos/Development/spark-euca/hadoop-on-mesos/build.sh
 git clone https://github.com/strat0sphere/hadoop.git hadoopOnMesos
 cd hadoopOnMesos
 mvn package

@@ -71,8 +71,12 @@ fi
 echo "Setting executable permissions on scripts..."
 find . -regex "^.+.\(sh\|py\)" | xargs chmod a+x
 
-echo "Running setup-slave on master to mount filesystems, etc..."
-source /root/spark-euca/setup-mesos-emi-slave.sh
+echo "Running setup-slave on masters to mount filesystems, etc..."
+for node in $MASTERS; do
+    echo $node
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh" & sleep 0.3
+done
+wait
 
 echo "SSH'ing to master machine(s) to approve key(s)..."
 for master in $MASTERS; do
@@ -128,7 +132,6 @@ for node in $INSTANCES; do
     scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
 done
 wait
-
 
 # NOTE: We need to rsync spark-euca before we can run setup-mesos-slave.sh
 # on other cluster nodes
@@ -201,7 +204,7 @@ echo "Deploying hosts-configuration to slaves..."
 echo "Creating HDFS directories on master..."
 
 #Create hdfs name node directories on masters
-for node in $MASTERS; do
+for node in $NAMENODES; do
     echo $node
 
     #Stop namenode to avoid Incompatible clusterIDs error
