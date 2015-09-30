@@ -170,31 +170,33 @@ wait
 
 chmod a+x /root/spark-euca/copy-dir
 
+### empty emi ###
+echo "Setting up HDFS on host..."
+for node in $MASTERS; do
+echo $node
+ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh"
+done
+
+for node in $NAMENODES; do
+echo "Setting up namenode on $node"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-namenode.sh"
+done
+
+for node in $SLAVES; do
+echo "Setting up datanode on $node"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-datanode.sh"
+done
+
+########
+
+
 echo "Deploying all /etc/hadoop configuration to slaves..."
 /root/spark-euca/copy-dir /etc/hadoop
 
 echo "Deploying hosts-configuration to slaves..."
 /root/spark-euca/copy-dir /etc/hosts
 
-### empty emi ###
-echo "Setting up HDFS on host..."
-for node in $MASTERS; do
-	echo $node
-	ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh"
-done
-
-for node in $NAMENODES; do
-    echo "Setting up namenode on $node"
-    ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-namenode.sh"
-done
-
-for node in $SLAVES; do
-	echo "Setting up datanode on $node"
-	ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh"
-	ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-datanode.sh"
-done
-
-########
 
 echo "Creating HDFS directories on master..."
 
@@ -231,6 +233,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
         #Creating dirs on masters and other_masters even if it is not not needed when not co-hosting instances
         #Creating zookeeper configuration directories
 	## empty emi ##
+    echo "Installing zookeeper-server..."
 	ssh -t -t $SSH_OPTS root@$zoo "apt-get --yes --force-yes install zookeeper-server"
         ####
 	ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run"
