@@ -335,9 +335,7 @@ def launch_cluster(conn, opts, cluster_name):
       except:
         print >> stderr, "Could not find emi " + emi_zoo
         sys.exit(1)
-    
-    
-    
+       
 
   # Create block device mapping so that we can add an EBS volume if asked to
   logging.debug( "Calling boto BlockDeviceMapping()...")
@@ -485,10 +483,11 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
     """
     ssh(master, opts, key_setup)
     dot_ssh_tar = ssh_read(master, opts, ['tar', 'c', '.ssh'])
-    print "Transferring cluster's SSH key to slaves..."
-    for slave in slave_nodes:
-      print slave.public_dns_name
-      ssh_write(slave.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
+        
+    print "Transferring cluster's SSH key to masters, slaves, and zoos..."
+    for node in master_nodes + slave_nodes + zoo_nodes:
+      print node.public_dns_name
+      ssh_write(node.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
 
   modules = ["s3cmd", "spark-on-mesos", "hadoop-on-mesos", "storm-on-mesos"] #It is also defined on deploy_templates_mesos
   
