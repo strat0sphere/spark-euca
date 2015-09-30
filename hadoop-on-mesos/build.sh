@@ -3,11 +3,11 @@
 wget http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.3.0-cdh5.1.2.tar.gz
 tar zxf hadoop-2.3.0-cdh5.1.2.tar.gz
 
-https://github.com/strat0sphere/hadoop.git hadoopOnMesos
+git clone https://github.com/strat0sphere/hadoop.git hadoopOnMesos
 cd hadoopOnMesos
 mvn package
-cp hadoopOnMesos/target/hadoop-mesos-0.0.8.jar /usr/lib/hadoop-0.20-mapreduce/lib/
-cp hadoopOnMesos/target/hadoop-mesos-0.0.8.jar hadoop-2.3.0-cdh5.1.2/share/hadoop/common/lib/
+cp target/hadoop-mesos-0.0.8.jar /usr/lib/hadoop-0.20-mapreduce/lib/
+cp target/hadoop-mesos-0.0.8.jar hadoop-2.3.0-cdh5.1.2/share/hadoop/common/lib/
 
 cd /root/hadoop-2.3.0-cdh5.1.2
 
@@ -30,6 +30,7 @@ popd
 cd /root #make sure you are on root dir
 
 #pack to be ready to upload to HDFS
+echo "Packing hadoop-on-mesos..."
 tar czf hadoop-2.3.0-cdh5.1.2-mesos.0.21.1.tar.gz hadoop-2.3.0-cdh5.1.2
 
 

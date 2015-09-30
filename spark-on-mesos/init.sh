@@ -4,7 +4,7 @@ pushd /root
 
 mkdir /executor_tars
 
-if [[ -e executor_tars/spark-1.2.1-bin-2.3.0-mr1-cdh5.1.2.tgz]]; then
+if [[ -e executor_tars/spark-1.2.1-bin-2.3.0-mr1-cdh5.1.2.tgz ]]; then
     echo "Executor tar exists already!"
 else
     s3cmd -c /etc/s3cmd/s3cfg get --recursive --disable-multipart s3://mesos-repo/executors/spark-1.2.1-bin-2.3.0-mr1-cdh5.1.2.tgz /executor_tars/

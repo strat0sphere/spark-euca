@@ -21,6 +21,8 @@
 export MASTERS="{{master_list}}"
 export SLAVES="{{slave_list}}"
 export ZOOS="{{zoo_list}}"
+export MASTERS_PRIVATE_IP="{{master_list_private_ip}}"
+export SLAVES_PRIVATE_IP="{{slave_list_private_ip}}"
 export ZOOS_PRIVATE_IP="{{zoo_list_private_ip}}"
 export ZOOS_PRIVATE_DNS_NAME="{{zoo_list_private_dns_name}}"
 export CLUSTER_URL="{{cluster_url}}"

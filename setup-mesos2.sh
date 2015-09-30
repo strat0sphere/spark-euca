@@ -23,6 +23,8 @@ echo "$SLAVES" > slaves
 
 echo "$ZOOS" > zoos
 
+echo "$MASTERS_PRIVATE_IP" > masters_private
+echo "$SLAVES_PRIVATE_IP" > slaves_private
 echo "$ZOOS_PRIVATE_IP" > zoos_private #List with zoos private IPs needed on storm and kafka setup scripts
 echo "$ZOOS_PRIVATE_DNS_NAME" > zoos_private_dns_name #List with zoos private IPs needed on storm and kafka setup scripts
 
@@ -142,7 +144,7 @@ echo "Setting up Cluster..."
 echo "Setting up environment for node:"
 for node in $SLAVES $OTHER_MASTERS; do
 echo $node
-ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/environement-setup/setup.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/environment-setup/setup.sh" & sleep 0.3
 ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/environment-setup/setup.sh" & sleep 0.3
 done
 
@@ -179,13 +181,17 @@ echo "Setting up HDFS on host..."
 for node in $MASTERS; do
 	echo $node
 	ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh"
-	ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-master.sh"
+done
+
+for node in $NAMENODES; do
+    echo "Setting up namenode on $node"
+    ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-namenode.sh"
 done
 
 for node in $SLAVES; do
-	echo $node
+	echo "Setting up datanode on $node"
 	ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh"
-	ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-slave.sh"
+	ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-datanode.sh"
 done
 
 ########
@@ -460,7 +466,7 @@ echo "Initializing mesos at `hostname`..."
 source /root/spark-euca/mesos/init.sh
 
 echo "Building and installing mesos at `hostname`..."
-source /root/spark-euca/monit/setup.sh
+source /root/spark-euca/mesos/setup.sh
 
 
 ############
@@ -509,6 +515,7 @@ for node in $OTHER_MASTERS; do
     source /etc/environment
 done
 wait
+
 
 for node in $MASTERS; do
 
