@@ -74,6 +74,7 @@ find . -regex "^.+.\(sh\|py\)" | xargs chmod a+x
 echo "Running setup-slave on masters to mount filesystems, etc..."
 for node in $MASTERS; do
     echo $node
+    ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/setup-mesos-emi-slave.sh"
     ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh" & sleep 0.3
 done
 wait
@@ -138,7 +139,8 @@ wait
 echo "Running slave setup script on other cluster nodes..."
 for node in $SLAVES; do
     echo $node
-    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh"
+    ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/setup-mesos-emi-slave.sh"
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh" & sleep 0.3
 done
 wait
 
