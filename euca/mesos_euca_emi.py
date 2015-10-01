@@ -749,10 +749,6 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "walrus_ip": s3conn['walrus_ip']
     
   }
-
-  print "DEBUG: slave_list" + slave_list
-  print "DEBUG: master_list" + master_list
-  print "DEBUG: zoo_list" + zoo_list
  
   #print "cluster_name: " + template_vars["cluster_name"]
   #print "mesos_euca_emi - master_dns_mapping: " + template_vars["masters_dns_mappings"]
