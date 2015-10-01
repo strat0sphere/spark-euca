@@ -22,7 +22,7 @@
 
 """
 #example run
-./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master  emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch es1
+./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch es1
 - new not-tested emis:  emi-85763E01 -e emi-44643D7C 
 - for empty emi installation use emi-56CB3EE9 for both masters and slaves
 """
@@ -142,7 +142,7 @@ def parse_args():
       help="Set True if you want to run module tests")
   parser.add_option("--restore", type="string", default="False",  
       help="Restore HDFS from previous backup")
-  parser.add_option("--cohost", action="store_true", default=False,
+  parser.add_option("--cohost", action="store_true", default=True,
   help="Host mesos and Zoo on the same nodes")
 
 
@@ -750,6 +750,9 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     
   }
 
+  print "DEBUG: slave_list" + slave_list
+  print "DEBUG: master_list" + master_list
+  print "DEBUG: zoo_list" + zoo_list
  
   #print "cluster_name: " + template_vars["cluster_name"]
   #print "mesos_euca_emi - master_dns_mapping: " + template_vars["masters_dns_mappings"]
