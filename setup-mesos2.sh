@@ -71,13 +71,8 @@ fi
 echo "Setting executable permissions on scripts..."
 find . -regex "^.+.\(sh\|py\)" | xargs chmod a+x
 
-echo "Running setup-slave on masters to mount filesystems, etc..."
-for node in $MASTERS; do
-    echo $node
-    ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/setup-mesos-emi-slave.sh"
-    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh" & sleep 0.3
-done
-wait
+echo "Running setup-slave on master-driver to mount filesystems, etc..."
+/root/spark-euca/setup-mesos-emi-slave.sh
 
 echo "SSH'ing to master machine(s) to approve key(s)..."
 for master in $MASTERS; do
@@ -136,6 +131,16 @@ wait
 
 # NOTE: We need to rsync spark-euca before we can run setup-mesos-slave.sh
 # on other cluster nodes
+
+echo "Running setup-slave on masters to mount filesystems, etc..."
+for node in $OTHER_MASTERS; do
+echo $node
+ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/setup-mesos-emi-slave.sh"
+ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/setup-mesos-emi-slave.sh" & sleep 0.3
+done
+wait
+
+
 echo "Running slave setup script on other cluster nodes..."
 for node in $SLAVES; do
     echo $node
