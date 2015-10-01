@@ -23,6 +23,17 @@ echo "$SLAVES" > slaves
 
 echo "$ZOOS" > zoos
 
+echo "Printing masters:"
+cat masters
+
+echo "Printing slaves:"
+cat slaves
+
+echo "Printing zoos:"
+cat zoos
+
+sleep 3
+
 echo "$MASTERS_PRIVATE_IP" > masters_private
 echo "$SLAVES_PRIVATE_IP" > slaves_private
 echo "$ZOOS_PRIVATE_IP" > zoos_private #List with zoos private IPs needed on storm and kafka setup scripts
@@ -72,7 +83,7 @@ echo "Setting executable permissions on scripts..."
 find . -regex "^.+.\(sh\|py\)" | xargs chmod a+x
 
 echo "Running setup-slave on master-driver to mount filesystems, etc..."
-/root/spark-euca/setup-mesos-emi-slave.sh
+source /root/spark-euca/setup-mesos-emi-slave.sh
 
 echo "SSH'ing to master machine(s) to approve key(s)..."
 for master in $MASTERS; do
@@ -172,7 +183,7 @@ for node in $ALL_NODES; do
     rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
     echo "Rsyncing custom hadoop configuration to node $node ..."
     rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
-    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes update"
+    ssh -t -t $SSH_OPTS root@$node "apt-get update"
     rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
     ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
 done
