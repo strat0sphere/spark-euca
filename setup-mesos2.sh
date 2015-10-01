@@ -183,7 +183,7 @@ for node in $ALL_NODES; do
     rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/ & sleep 5.0
     echo "Rsyncing custom hadoop configuration to node $node ..."
     rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
-    ssh -t -t $SSH_OPTS root@$node "apt-get update"
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q update"
     rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
     ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
 done
@@ -200,13 +200,13 @@ done
 
 for node in $NAMENODES; do
 echo "Setting up namenode on $node"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-namenode.sh"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-namenode.sh" & sleep 0.3
 done
+wait
 
 for node in $SLAVES; do
 echo "Setting up datanode on $node"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-datanode.sh"
+ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh; source /root/spark-euca/cloudera-hdfs/setup-datanode.sh" & sleep 0.3
 done
 
 ########
@@ -255,7 +255,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
         #Creating zookeeper configuration directories
 	## empty emi ##
     echo "Installing zookeeper-server..."
-	ssh -t -t $SSH_OPTS root@$zoo "apt-get --yes --force-yes -o Dpkg::Options::=--force-confdef install zookeeper-server"
+	ssh -t -t $SSH_OPTS root@$zoo "apt-get -q --yes --force-yes -o Dpkg::Options::=--force-confdef install zookeeper-server"
         ####
 	ssh -t -t $SSH_OPTS root@$zoo "mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run"
         ssh -t -t $SSH_OPTS root@$zoo "service zookeeper-server force-stop" #Zoo on the 1st of the servers cannot be stopped normally.
@@ -348,7 +348,7 @@ echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
     echo "Installing and starting journal node on: $node"
-    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-journalnode; wait"
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes install hadoop-hdfs-journalnode; wait"
     ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-journalnode /etc/default/"
     #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start"
     journals_no=$(($journals_no+1))
@@ -401,7 +401,7 @@ wait
 echo "Starting Zookeeper failover controller on namenodes..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
-    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-hdfs-zkfc; wait"
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes install hadoop-hdfs-zkfc; wait"
     ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-hdfs-zkfc /etc/default/"
     #wait
     #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-zkfc start"
@@ -427,7 +427,7 @@ echo "Removing old non-HA jobtrackers from emi"
 for node in $MASTERS; do
     echo "Removing old job tracker from node $node ..."
     ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker stop"
-    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker"
 done
 
 #sudo -u mapred hadoop mrhaadmin -transitionToActive -forcemanual jt1
@@ -438,12 +438,12 @@ for node in $NAMENODE $STANDBY_NAMENODE; do
     echo "Creating tmp mapred dir..."
     ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh"
     echo "Installing HA jobtracker on node $node ..."
-    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait"
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait"
     ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtrackerha stop"
     ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/"
 
     echo "Installing the failover controller package on node $node ..."
-    ssh -t -t $SSH_OPTS root@$node "apt-get --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait"
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait"
     ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-zkfc stop"
     ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/"
 done
