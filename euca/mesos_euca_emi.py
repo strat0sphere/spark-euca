@@ -22,7 +22,7 @@
 
 """
 #example run
-./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch es1
+./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
 - new not-tested emis:  emi-85763E01 -e emi-44643D7C 
 - for empty emi installation use emi-56CB3EE9 for both masters and slaves
 """
@@ -491,7 +491,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
 
   modules = ["s3cmd", "spark-on-mesos", "hadoop-on-mesos", "storm-on-mesos"] #It is also defined on deploy_templates_mesos
   
-  pkg_mngr = "apt-get -q --yes --force-yes"
+  pkg_mngr = "apt-get -qq --yes --force-yes"
   #ssh(master, opts, pkg_mngr + " install wget")
   
   ssh(master, opts, pkg_mngr + " install git")
@@ -529,13 +529,14 @@ def setup_spark_standalone_cluster(master, opts):
     print "Ganglia started at http://%s:5080/ganglia" % master
 
 def setup_mesos_cluster(master, opts):
-  pkg_mngr = "apt-get -q --yes --force-yes"
+  pkg_mngr = "apt-get -qq --yes --force-yes"
   ssh(master, opts, pkg_mngr + " update")
   
-  if opts.os_type == "ubuntu":
-      ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
-      ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
-  elif opts.os_type == "centos":
+  
+  ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
+  ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
+  
+  if opts.os_type == "centos":
       ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
       ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64/ /usr/lib/jvm/java-1.7.0/")
       ssh(master, opts, pkg_mngr + " install wget")
@@ -550,7 +551,7 @@ def setup_mesos_cluster(master, opts):
   ssh(master, opts, "echo PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment")
   #   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
   ssh(master, opts, "echo LD_LIBRARY_PATH='/root/mesos/build/src/.libs/' >> /etc/environment")
-  ssh(master, opts, "apt-get -q --yes --force-yes install pssh")
+  ssh(master, opts, "apt-get -qq --yes --force-yes install pssh")
 
   ssh(master, opts, "chmod u+x spark-euca/setup-mesos2.sh")
   ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.os_type)
@@ -566,7 +567,7 @@ def setup_mesos_emi_cluster(master, opts):
     ssh(master, opts, "echo PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/root/scala/bin:/usr/lib/jvm/java-1.7.0/bin' >> /etc/environment")
     #   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
     ssh(master, opts, "echo LD_LIBRARY_PATH='/root/mesos/build/src/.libs/' >> /etc/environment")
-    ssh(master, opts, "apt-get -q --yes --force-yes install pssh")
+    ssh(master, opts, "apt-get -qq --yes --force-yes install pssh")
     ssh(master, opts, "chmod u+x spark-euca/setup-mesos-emi.sh")
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))

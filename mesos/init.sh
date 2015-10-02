@@ -18,5 +18,6 @@ echo "Unpacking Mesos"
 tar xvzf mesos-$MESOS_SETUP_VERSION.tar.gz > /tmp/spark-euca_mesos.log
 rm mesos-$MESOS_SETUP_VERSION.tar.gz
 #mv mesos-$MESOS_SETUP_VERSION/ mesos/
+echo "Done!"
 
 popd

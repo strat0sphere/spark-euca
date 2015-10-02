@@ -33,5 +33,6 @@ cd /root #make sure you are on root dir
 #pack to be ready to upload to HDFS
 echo "Packing hadoop-on-mesos..."
 tar czf hadoop-2.3.0-cdh5.1.2-mesos.0.21.1.tar.gz hadoop-2.3.0-cdh5.1.2
+mv hadoop-2.3.0-cdh5.1.2-mesos.0.21.1.tar.gz /executor_tars
 
 

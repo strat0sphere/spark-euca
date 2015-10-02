@@ -1,7 +1,6 @@
 #!/bin/bash
 apt-get update
 apt-get --yes --force-yes install build-essential
-apt-get --yes --force-yes install openjdk-6-jdk
 apt-get --yes --force-yes install python-dev python-boto
 apt-get --yes --force-yes install libcurl4-nss-dev
 apt-get --yes --force-yes install libsasl2-dev
@@ -31,11 +30,14 @@ cd /root/mesos-$MESOS_SETUP_VERSION
 mkdir /root/mesos-installation/
 mkdir build
 cd build
+echo "Running configure..."
 ../configure --prefix=/root/mesos-installation/
+echo "Running make..."
 make -j 2
 
 # Install (***Optional***).
 
+echo "Installing...""
 make -j 2 install
 
 #TODO: SET LD_LIBRARY_PATH CORRECTLY ON EMI
@@ -43,6 +45,7 @@ make -j 2 install
 sed -i '/LD_LIBRARY_PATH=/d'  /etc/environment
 echo "LD_LIBRARY_PATH=/root/mesos-installation/lib" >> /etc/environment
 export LD_LIBRARY_PATH=/root/mesos-installation/lib/
+echo "Done!"
 
 # Run test suite -- Also builds example frameworks
 #make check #Run make check at the end because some tests fail (VERSION 0.18.1)
