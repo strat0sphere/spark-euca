@@ -92,6 +92,7 @@ for master in $MASTERS; do
     echo "Seding previous PUBLIC_DNS value..."
     ssh $SSH_OPTS $master "sed -i '/PUBLIC_DNS=/d' /etc/environment; echo 'PUBLIC_DNS=$master' >> /etc/environment; echo -n &" & sleep 0.3
 done
+wait
 
 ssh $SSH_OPTS localhost echo -n &
 ssh $SSH_OPTS `hostname` echo -n &
@@ -133,8 +134,8 @@ done
 echo "RSYNC'ing /root/spark-euca to other cluster nodes..."
 for node in $INSTANCES; do
     echo $node
-    rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root &
-    scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh &
+    rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root
+    scp $SSH_OPTS ~/.ssh/id_rsa $node:.ssh
 done
 wait
 
@@ -153,8 +154,13 @@ echo "Running slave setup script on other cluster nodes..."
 for node in $SLAVES; do
     echo $node
     ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/setup-mesos-emi-slave.sh; /root/spark-euca/setup-mesos-emi-slave.sh" & sleep 0.3
+# pids[${node}]=$!;
 done
 wait
+
+# for pid in ${pids[*]}; do wait $pid; done;
+
+
 
 echo "Setting up Cluster..."
 ### empty emi ###
@@ -174,6 +180,8 @@ echo "Creating local config files..."
 
 echo "Sending new cloudera-csh5.list file, running apt-get update and setting env variables to other nodes..."
 
+echo "All nodes: $ALL_NODES"
+
 for node in $ALL_NODES; do
     echo "Running on $node ..."
     rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/
@@ -184,13 +192,14 @@ wait
 
 # TODO: Is any update necessary?
 for node in $ALL_NODES; do
-ssh -t -t $SSH_OPTS root@$node "apt-get -qq update" & sleep 0.3
+echo "Running update on $node"
+ssh -t -t $SSH_OPTS root@$node "apt-get -q update" & sleep 0.3
 done
 wait
 
 for node in $ALL_NODES; do
 rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
-ssh -t -t $SSH_OPTS root@$node "source /etc/environment"
+ssh -t -t $SSH_OPTS root@$node "source /etc/environment" & sleep 0.3
 done
 wait
 
@@ -251,7 +260,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
     for zoo in $ZOOS; do
 	## empty emi ##
     echo "Installing zookeeper-server..."
-	ssh -t -t $SSH_OPTS root@$zoo "apt-get -qq --yes --force-yes -o Dpkg::Options::=--force-confdef install zookeeper-server; wait; mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run; service zookeeper-server force-stop; cp /etc/default-custom/zookeeper /etc/default/; rm -rf /var/log/zookeeper/zookeeper.log; rm -rf /var/log/zookeeper/zookeeper.out" & sleep 0.3
+	ssh -t -t $SSH_OPTS root@$zoo "apt-get -q --yes --force-yes install zookeeper-server; mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run; service zookeeper-server force-stop; cp /etc/default-custom/zookeeper /etc/default/; rm -rf /var/log/zookeeper/zookeeper.log; rm -rf /var/log/zookeeper/zookeeper.out" & sleep 0.3
     done
     wait
 
@@ -329,14 +338,14 @@ wait
 
 #Initialize the HA state - run the command in one of the namenodes
 echo "Initializing the HA state on zookeeper from $NAMENODE..."
-ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK"  & sleep 0.3
+ssh -t -t $SSH_OPT root@$NAMENODE "hdfs zkfc -formatZK"
 wait
 
 echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
     echo "Installing and starting journal node on: $node"
-    ssh -t -t $SSH_OPTS root@$node "apt-get -qq --yes --force-yes install hadoop-hdfs-journalnode; wait; cp /etc/default-custom/hadoop-hdfs-journalnode /etc/default/" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes install hadoop-hdfs-journalnode; cp /etc/default-custom/hadoop-hdfs-journalnode /etc/default/" & sleep 0.3
     #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start"
     journals_no=$(($journals_no+1))
 done
@@ -362,7 +371,7 @@ ssh -t -t $SSH_OPTS root@$NAMENODE "sudo -u hdfs hdfs namenode -format -force"
 wait
 
 echo "Starting namenode $NAMENODE..."
-ssh -t -t $SSH_OPTS root@$NAMENODE "cp /etc/default-custom/hadoop-hdfs-namenode /etc/default/; service hadoop-hdfs-namenode start" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$NAMENODE "cp /etc/default-custom/hadoop-hdfs-namenode /etc/default/; service hadoop-hdfs-namenode start"
 
 echo "Formatting and starting standby namenode $STANDBY_NAMENODE..."
 #Run only for the standby namenode
@@ -379,7 +388,7 @@ wait
 echo "Starting Zookeeper failover controller on namenodes..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
-    ssh -t -t $SSH_OPTS root@$node "apt-get -qq --yes --force-yes install hadoop-hdfs-zkfc; wait; cp /etc/default-custom/hadoop-hdfs-zkfc /etc/default/" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes install hadoop-hdfs-zkfc; wait; cp /etc/default-custom/hadoop-hdfs-zkfc /etc/default/" & sleep 0.3
 done
 wait
 
@@ -401,7 +410,7 @@ sudo -u mapred hadoop fs -mkdir -p hdfs://$CLUSTER_NAME/jobtracker/jobsinfo
 echo "Removing old non-HA jobtrackers from emi"
 for node in $MASTERS; do
     echo "Removing old job tracker from node $node ..."
-    ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker stop; apt-get -qq --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker; wait" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker stop; apt-get -q --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker;" & sleep 0.3
 done
 
 #sudo -u mapred hadoop mrhaadmin -transitionToActive -forcemanual jt1
@@ -410,7 +419,7 @@ echo "Adding HA on the jobtracker..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
     echo "Creating tmp mapred dir..."
-    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; wait; apt-get -qq --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -qq --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; wait; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
 done
 wait
 
