@@ -221,7 +221,7 @@ wait
 
 for node in $SLAVES; do
 echo "Setting up datanode on $node"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh; wait; source /root/spark-euca/cloudera-hdfs/setup-datanode.sh" & sleep 0.3
+ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh; source /root/spark-euca/cloudera-hdfs/setup-datanode.sh" & sleep 0.3
 done
 wait
 
@@ -388,7 +388,7 @@ wait
 echo "Starting Zookeeper failover controller on namenodes..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
-    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes install hadoop-hdfs-zkfc; wait; cp /etc/default-custom/hadoop-hdfs-zkfc /etc/default/" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "apt-get -q --yes --force-yes install hadoop-hdfs-zkfc; cp /etc/default-custom/hadoop-hdfs-zkfc /etc/default/" & sleep 0.3
 done
 wait
 
@@ -419,7 +419,7 @@ echo "Adding HA on the jobtracker..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
     echo "Creating tmp mapred dir..."
-    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; wait; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; wait; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-zkfc; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
 done
 wait
 
@@ -494,7 +494,6 @@ for node in $OTHER_MASTERS; do
 
         if [[ -e /etc/$module ]]; then
             rsync -e "ssh $SSH_OPTS" -az /etc/$module $node:/etc
-            wait
         fi
 
     done
@@ -509,7 +508,7 @@ wait
 for module in $MODULES; do
     for node in $MASTERS; do
         echo "Installing $module on node $node ..."
-        ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh; wait; source /root/spark-euca/$module/setup.sh; wait; source /root/spark-euca/$module/startup.sh; cd /root/spark-euca" & sleep 0.3
+        ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh; source /root/spark-euca/$module/setup.sh; source /root/spark-euca/$module/startup.sh; cd /root/spark-euca" & sleep 0.3
     done
 wait
 done
