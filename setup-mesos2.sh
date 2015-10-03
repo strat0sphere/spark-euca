@@ -333,7 +333,7 @@ echo "Installing journal nodes..."
 journals_no=1
 for node in $MASTERS; do
     echo "Installing and starting journal node on: $node"
-    ssh -t -t $SSH_OPTS root@$node "apt-get -qq --yes --force-yes install hadoop-hdfs-journalnode; cp /etc/default-custom/hadoop-hdfs-journalnode /etc/default/" $ sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "apt-get -qq --yes --force-yes install hadoop-hdfs-journalnode; cp /etc/default-custom/hadoop-hdfs-journalnode /etc/default/" & sleep 0.3
     #ssh -t -t $SSH_OPTS root@$node "service hadoop-hdfs-journalnode start"
     journals_no=$(($journals_no+1))
 done
@@ -407,7 +407,7 @@ echo "Adding HA on the jobtracker..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
     echo "Creating tmp mapred dir..."
-    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; apt-get -qq --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -qq --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; wait; apt-get -qq --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -qq --yes --force-yes install hadoop-0.20-mapreduce-zkfc; wait; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
 done
 wait
 
@@ -453,6 +453,8 @@ echo "Initializing mesos done!"
 echo "Building and installing mesos at `hostname`..."
 source /root/spark-euca/mesos/setup.sh
 echo "Mesos installation done!"
+done
+wait
 
 
 ############
