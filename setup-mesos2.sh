@@ -163,6 +163,7 @@ for node in $SLAVES $OTHER_MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/environment-setup/setup.sh; /root/spark-euca/environment-setup/setup.sh" & sleep 0.3
 done
+wait
 
 ##########
 
@@ -201,6 +202,7 @@ for node in $MASTERS; do
 echo $node
 ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh" & sleep 0.3
 done
+wait
 
 for node in $NAMENODES; do
 echo "Setting up namenode on $node"
@@ -210,8 +212,9 @@ wait
 
 for node in $SLAVES; do
 echo "Setting up datanode on $node"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh; source /root/spark-euca/cloudera-hdfs/setup-datanode.sh" & sleep 0.3
+ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh; wait; source /root/spark-euca/cloudera-hdfs/setup-datanode.sh" & sleep 0.3
 done
+wait
 
 ########
 
@@ -415,15 +418,15 @@ echo "Initialize the HA State in Zookeeper"...
 #service hadoop-0.20-mapreduce-zkfc init
 sudo -u mapred hadoop mrzkfc -formatZK -force
 
-for node in $MASTERS; do
-    echo "Building modules on node $node ..."
-    for module in $MODULES; do
+for module in $MODULES; do
+    for node in $MASTERS; do
         if [[ -e $module/build.sh ]]; then
-            echo "Building $module"
-            ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/build.sh"
+            echo "Building $module on $node"
+            ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/build.sh" & sleep 0.3
         fi
     cd /root/spark-euca
     done
+    wait
 done
 
 echo "Starting jobtracker HA services..."
@@ -497,7 +500,7 @@ wait
 for module in $MODULES; do
     for node in $MASTERS; do
         echo "Installing $module on node $node ..."
-        ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh; source /root/spark-euca/$module/setup.sh; source /root/spark-euca/$module/startup.sh; cd /root/spark-euca" & sleep 0.3
+        ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh; wait; source /root/spark-euca/$module/setup.sh; wait; source /root/spark-euca/$module/startup.sh; cd /root/spark-euca" & sleep 0.3
     done
 wait
 done
