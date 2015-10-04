@@ -87,6 +87,7 @@ template_vars = {
   "namenode_prv_ip": os.getenv("NAMENODE_PRV_IP"),
   "standby_namenode_prv_ip": os.getenv("STANDBY_NAMENODE_PRV_IP"),
   "journal_url": os.getenv("JOURNAL_URL"),
+  "journal_url_prv": os.getenv("JOURNAL_URL_PRV"),
   "cluster_url": os.getenv("CLUSTER_URL"),
   "cluster_url_private_ip": os.getenv("CLUSTER_URL_PRIVATE_IP"),
   "masters_dns_mappings": os.getenv("MASTERS_DNS_MAPPINGS"),

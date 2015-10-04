@@ -694,10 +694,15 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
         
         journal_string =";".join(
         ["%s:8485" % i.public_dns_name for i in master_nodes])
+        
+        journal_string_prv =";".join(
+        ["%s:8485" % i.private_dns_name for i in master_nodes])
     
     cluster_url = "zk://" + zoo_string + "/mesos"    
     cluster_url_private_ip = "zk://" + zoo_string_private_ip + "/mesos"
     journal_url = "qjournal://" + journal_string #will be concatenated on the configuration files with the cluster_name
+    journal_url_prv = "qjournal://" + journal_string_prv
+    
 
     # print "zoo_list_private_dns_name" + zoo_list_private_dns_name 
     

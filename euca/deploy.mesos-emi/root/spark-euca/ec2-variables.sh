@@ -37,6 +37,7 @@ export NAMENODE_PRV_IP="{{namenode_prv_ip}}"
 export STANDBY_NAMENODE="{{standby_namenode}}"
 export STANDBY_NAMENODE_PRV_IP="{{standby_namenode_prv_ip}}"
 export JOURNAL_URL="{{journal_url}}"
+export JOURNAL_URL_PRV="{{journal_url_prv}}"
 export NODES_NUMBER="{{nodes_number}}" #total number of master and slave nodes - used for mpdboot command
 export HDFS_DATA_DIRS="{{hdfs_data_dirs}}"
 export MAPRED_LOCAL_DIRS="{{mapred_local_dirs}}"

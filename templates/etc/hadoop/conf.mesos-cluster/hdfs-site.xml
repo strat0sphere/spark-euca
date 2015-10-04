@@ -44,7 +44,7 @@
 	</property>
 	<property>
 	  <name>dfs.namenode.shared.edits.dir</name>
-	  <value>{{journal_url}}/{{cluster_name}}</value>
+	  <value>{{journal_url_prv}}/{{cluster_name}}</value>
 	</property>
 	<property>
 	  <name>dfs.journalnode.edits.dir</name>
