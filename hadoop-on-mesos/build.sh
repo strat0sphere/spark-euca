@@ -1,9 +1,11 @@
 #!/bin/bash
 
+rm hadoop-2.3.0-cdh5.1.2.tar.gz
 wget http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.3.0-cdh5.1.2.tar.gz
 tar zxf hadoop-2.3.0-cdh5.1.2.tar.gz
 
 echo "Cloning Hadoop-on-mesos..."
+rm hadoopOnMesos
 git clone https://github.com/strat0sphere/hadoop.git hadoopOnMesos
 cd hadoopOnMesos
 mvn package

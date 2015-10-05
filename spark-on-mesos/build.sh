@@ -3,6 +3,10 @@
 mkdir /executor_tars
 chown -R hdfs:hadoop /executor_tars
 
+rm -rf /root/spark-1.2.1
+rm -rf spark
+rm spark-1.2.1.tgz
+
 wget http://d3kbcqa49mib13.cloudfront.net/spark-1.2.1.tgz
 tar zxfv spark-1.2.1.tgz
 pushd /root/spark-1.2.1
