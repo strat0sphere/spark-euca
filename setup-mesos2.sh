@@ -201,16 +201,13 @@ wait
 for node in $ALL_NODES; do
 rsync -e "ssh $SSH_OPTS" -az /etc/environment $node:/etc/
 ssh -t -t $SSH_OPTS root@$node "source /etc/environment" & sleep 0.3
-done
-wait
-
-chmod a+x /root/spark-euca/copy-dir
 
 echo "Deploying all /etc/hadoop configuration to slaves..."
-/root/spark-euca/copy-dir /etc/hadoop
-
+rsync -e "ssh $SSH_OPTS" -az /etc/hadoop $node:/etc/
 echo "Deploying hosts-configuration to slaves..."
-/root/spark-euca/copy-dir /etc/hosts
+rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc/
+done
+wait
 
 ### empty emi ###
 echo "Setting up HDFS on host..."
