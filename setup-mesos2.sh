@@ -65,7 +65,7 @@ fi
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=5"
 
 if [[ "x$JAVA_HOME" == "x" ]] ; then
-    echo "Expected JAVA_HOME to be set in .bash_profile!"
+    echo "Expected JAVA_HOME to be set!"
 exit 1
 fi
 
@@ -165,7 +165,7 @@ wait
 echo "Setting up Cluster..."
 ### empty emi ###
 echo "Setting up environment for node:"
-for node in $SLAVES $OTHER_MASTERS; do
+for node in $MASTERS $SLAVES; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/environment-setup/setup.sh; /root/spark-euca/environment-setup/setup.sh" & sleep 0.3
 done
