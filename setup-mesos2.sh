@@ -188,8 +188,6 @@ for node in $ALL_NODES; do
     echo "Rsyncing custom hadoop configuration to node $node ..."
     rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
 
-    echo "Copying bigtop-utils to $node ..."
-    ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/bigtop-utils /etc/default/"
 done
 wait
 
@@ -267,6 +265,11 @@ if [[ $NUM_ZOOS != 0 ]]; then
     wait
 
 fi
+
+for node in $ALL_NODES; do
+echo "Copying bigtop-utils to $node ..."
+ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/bigtop-utils /etc/default/"
+done
 
 #Ungly hack because zookeeper is on the emi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
