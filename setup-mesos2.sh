@@ -187,6 +187,9 @@ for node in $ALL_NODES; do
     rsync -e "ssh $SSH_OPTS" -az /etc/apt/sources.list.d/cloudera-cdh5.list $node:/etc/apt/sources.list.d/
     echo "Rsyncing custom hadoop configuration to node $node ..."
     rsync -e "ssh $SSH_OPTS" -az /etc/default-custom $node:/etc/
+
+    echo "Copying bigtop-utils to $node ..."
+    ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/bigtop-utils /etc/default/"
 done
 wait
 
@@ -418,7 +421,8 @@ echo "Adding HA on the jobtracker..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
     echo "Creating tmp mapred dir..."
-    ssh -t -t $SSH_OPTS root@$node "/root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-zkfc; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
+
+    ssh -t -t $SSH_OPTS root@$node "rm /etc/default/hadoop-0.20-mapreduce-jobtrackerha; rm /etc/default/hadoop-0.20-mapreduce-zkfc; /root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-zkfc; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
 done
 wait
 
