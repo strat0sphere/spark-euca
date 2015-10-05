@@ -204,6 +204,7 @@ ssh -t -t $SSH_OPTS root@$node "source /etc/environment" & sleep 0.3
 
 echo "Deploying all /etc/hadoop configuration to slaves..."
 rsync -e "ssh $SSH_OPTS" -az /etc/hadoop $node:/etc/
+
 echo "Deploying hosts-configuration to slaves..."
 rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc/
 done
