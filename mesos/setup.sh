@@ -1,4 +1,5 @@
 #!/bin/bash
+MESOS_SETUP_VERSION='0.21.1'
 apt-get update
 apt-get --yes --force-yes install build-essential
 apt-get --yes --force-yes install python-dev python-boto
@@ -37,7 +38,7 @@ make -j 2
 
 # Install (***Optional***).
 
-echo "Installing...""
+echo "Installing..."
 make -j 2 install
 
 #TODO: SET LD_LIBRARY_PATH CORRECTLY ON EMI
