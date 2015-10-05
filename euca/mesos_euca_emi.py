@@ -748,6 +748,7 @@ def deploy_files(conn, root_dir, opts, master_nodes, slave_nodes, zoo_nodes, mod
     "standby_namenode": standby_namenode,
     "standby_namenode_prv_ip": standby_namenode_prv_ip,
     "journal_url": journal_url,
+    "journal_url_prv": journal_url_prv,
     "cluster_url": cluster_url,
     "cluster_url_private_ip": cluster_url_private_ip,
     "zoo_string": zoo_string,
