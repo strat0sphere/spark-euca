@@ -165,7 +165,7 @@ wait
 echo "Setting up Cluster..."
 ### empty emi ###
 echo "Setting up environment for node:"
-for node in $MASTERS $SLAVES; do
+for node in $SLAVES $OTHER_MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/environment-setup/setup.sh; /root/spark-euca/environment-setup/setup.sh" & sleep 0.3
 done
