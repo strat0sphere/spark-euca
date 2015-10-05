@@ -462,12 +462,12 @@ wait
 
 for node in $ALL_NODES; do
     echo "Initializing mesos at $node..."
-source /root/spark-euca/mesos/init.sh
-echo "Initializing mesos done!"
+    source /root/spark-euca/mesos/init.sh
+    echo "Initializing mesos done!"
 
-echo "Building and installing mesos at `hostname`..."
-source /root/spark-euca/mesos/setup.sh
-echo "Mesos installation done!"
+    echo "Building and installing mesos at `hostname`..."
+    source /root/spark-euca/mesos/setup.sh
+    echo "Mesos installation done!"
 done
 wait
 
