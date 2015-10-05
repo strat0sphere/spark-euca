@@ -205,6 +205,12 @@ wait
 
 chmod a+x /root/spark-euca/copy-dir
 
+echo "Deploying all /etc/hadoop configuration to slaves..."
+/root/spark-euca/copy-dir /etc/hadoop
+
+echo "Deploying hosts-configuration to slaves..."
+/root/spark-euca/copy-dir /etc/hosts
+
 ### empty emi ###
 echo "Setting up HDFS on host..."
 for node in $MASTERS; do
@@ -226,13 +232,6 @@ done
 wait
 
 ########
-
-
-echo "Deploying all /etc/hadoop configuration to slaves..."
-/root/spark-euca/copy-dir /etc/hadoop
-
-echo "Deploying hosts-configuration to slaves..."
-/root/spark-euca/copy-dir /etc/hosts
 
 
 echo "Creating HDFS directories on master..."
@@ -260,7 +259,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
     for zoo in $ZOOS; do
 	## empty emi ##
     echo "Installing zookeeper-server..."
-	ssh -t -t $SSH_OPTS root@$zoo "apt-get -q --yes --force-yes install zookeeper-server; mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run; service zookeeper-server force-stop; cp /etc/default-custom/zookeeper /etc/default/; rm -rf /var/log/zookeeper/zookeeper.log; rm -rf /var/log/zookeeper/zookeeper.out" & sleep 0.3
+	ssh -t -t $SSH_OPTS root@$zoo "apt-get -q --yes --force-yes install zookeeper-server; mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run; service zookeeper-server force-stop; cp /etc/default-custom/zookeeper /etc/default/; rm -rf /var/log/zookeeper/zookeeper.log; rm -rf /var/log/zookeeper/zookeeper.out; chmod +x /etc/init.d/zookeeper-server; update-rc.d -f zookeeper-server defaults" & sleep 0.3
     done
     wait
 
