@@ -214,19 +214,19 @@ wait
 echo "Setting up HDFS on host..."
 for node in $MASTERS; do
 echo $node
-ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh" & sleep 0.3
 done
 wait
 
 for node in $NAMENODES; do
 echo "Setting up namenode on $node"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-namenode.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/setup-namenode.sh" & sleep 0.3
 done
 wait
 
 for node in $SLAVES; do
 echo "Setting up datanode on $node"
-ssh $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh; source /root/spark-euca/cloudera-hdfs/setup-datanode.sh" & sleep 0.3
+ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh; source /root/spark-euca/cloudera-hdfs/setup-datanode.sh" & sleep 0.3
 done
 wait
 
@@ -462,13 +462,10 @@ wait
 
 
 for node in $ALL_NODES; do
-    echo "Initializing mesos at $node..."
-    source /root/spark-euca/mesos/init.sh
+    echo "Initializing, building and installing mesos at $node..."
+    ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/mesos/init.sh; source /root/spark-euca/mesos/setup.sh" & sleep 0.3
     echo "Initializing mesos done!"
 
-    echo "Building and installing mesos at `hostname`..."
-    source /root/spark-euca/mesos/setup.sh
-    echo "Mesos installation done!"
 done
 wait
 
@@ -478,7 +475,7 @@ wait
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 for node in $MASTERS; do
     echo $node
-    ssh $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-master.sh; cd /etc/init.d/; ln -s /root/mesos-installation/mesos-master.sh mesos-master; update-rc.d mesos-master defaults; service mesos-master start" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "chmod +x /root/mesos-installation/mesos-master.sh; cd /etc/init.d/; ln -s /root/mesos-installation/mesos-master.sh mesos-master; update-rc.d mesos-master defaults; service mesos-master start" & sleep 0.3
 done
 wait
 
@@ -486,7 +483,7 @@ wait
 echo "Adding slave startup script to /etc/init.d and starting Mesos-slave..."
 for node in $SLAVES; do
     echo $node
-    ssh $SSH_OPTS root@$node "export LD_LIBRARY_PATH=/root/mesos-installation/lib/; chmod +x /root/mesos-installation/mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/mesos-slave.sh mesos-slave; update-rc.d mesos-slave defaults; service mesos-slave start" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "export LD_LIBRARY_PATH=/root/mesos-installation/lib/; chmod +x /root/mesos-installation/mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/mesos-slave.sh mesos-slave; update-rc.d mesos-slave defaults; service mesos-slave start" & sleep 0.3
 done
 wait
 
@@ -504,15 +501,16 @@ for node in $OTHER_MASTERS; do
     wait
 
     #Env variables required for installation
-    source /etc/environment
+    ssh -t -t $SSH_OPTS root@$node  "source /etc/environment"
 done
 wait
 
+source /etc/environment
 
 for module in $MODULES; do
     for node in $MASTERS; do
         echo "Installing $module on node $node ..."
-        ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh; source /root/spark-euca/$module/setup.sh; source /root/spark-euca/$module/startup.sh; cd /root/spark-euca" & sleep 0.3
+        ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/$module/init.sh; source /root/spark-euca/$module/setup.sh; source /root/spark-euca/$module/startup.sh; cd /root/spark-euca" & sleep 0.3
     done
 wait
 done
@@ -555,13 +553,13 @@ source /root/spark-euca/monit/startup.sh
 
 echo "Setting up monit for other masters..."
 for node in $OTHER_MASTERS; do
-    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh; source /root/spark-euca/monit/setup.sh other-master; source /root/spark-euca/monit/startup.sh" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh; source /root/spark-euca/monit/setup.sh other-master; source /root/spark-euca/monit/startup.sh" & sleep 0.3
 done
 wait
 
 echo "Setting up monit for slaves..."
 for node in $SLAVES; do
-    ssh $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh; source /root/spark-euca/monit/setup.sh slave; source /root/spark-euca/monit/startup.sh" & sleep 0.3
+    ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh; source /root/spark-euca/monit/setup.sh slave; source /root/spark-euca/monit/startup.sh" & sleep 0.3
 done
 wait
 
@@ -600,19 +598,19 @@ echo "Checking if services are up..."
 for node in $MASTERS; do
 echo $node
 echo "Running ps -ef | grep storm on node $node ..."
-ssh $SSH_OPTS root@$node "ps -ef | grep storm"
+ssh -t -t $SSH_OPTS root@$node "ps -ef | grep storm"
 
 echo "Running ps -ef | grep kafka on node $node ..."
-ssh $SSH_OPTS root@$node "ps -ef | grep kafka"
+ssh -t -t $SSH_OPTS root@$node "ps -ef | grep kafka"
 
 echo "Running ps -ef | grep zoo on node $node ..."
-ssh $SSH_OPTS root@$node "ps -ef | grep zoo"
+ssh -t -t $SSH_OPTS root@$node "ps -ef | grep zoo"
 
 echo "Running ps -ef | grep mesos on node $node ..."
-ssh $SSH_OPTS root@$node "ps -ef | grep mesos"
+ssh -t -t $SSH_OPTS root@$node "ps -ef | grep mesos"
 
 echo "Running jps on node $node ..."
-ssh $SSH_OPTS root@$node "jps"
+ssh -t -t $SSH_OPTS root@$node "jps"
 done
 
 #for node in $MASTERS; do
