@@ -535,6 +535,13 @@ def setup_mesos_cluster(master, opts):
   
   ssh(master, opts, pkg_mngr + " install openjdk-7-jdk")
   ssh(master, opts, "mv /usr/lib/jvm/java-7-openjdk-amd64/ /usr/lib/jvm/java-1.7.0/")
+  ssh(master, opts, "update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.7.0/jre/bin/java 2")
+  ssh(master, opts, "update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-1.7.0/bin/javac 2")
+  
+  ssh(master, opts, pkg_mngr + " install openjdk-6-jdk")
+  ssh(master, opts, "mv /usr/lib/jvm/java-6-openjdk-amd64/ /usr/lib/jvm/java-1.6.0/")
+  ssh(master, opts, "update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.6.0/jre/bin/java 1")
+  ssh(master, opts, "update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-1.6.0/bin/javac 2")
   
   if opts.os_type == "centos":
       ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
