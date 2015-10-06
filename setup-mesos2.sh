@@ -435,9 +435,8 @@ for module in $MODULES; do
     for node in $MASTERS; do
         if [[ -e $module/build.sh ]]; then
             echo "Building $module on $node"
-            ssh $SSH_OPTS root@$node "source /root/spark-euca/$module/build.sh" & sleep 0.3
+            ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/$module/build.sh; cd /root/spark-euca" & sleep 0.3
         fi
-    cd /root/spark-euca
     done
     wait
 done
