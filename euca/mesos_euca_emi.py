@@ -562,7 +562,7 @@ def setup_mesos_cluster(master, opts):
   ssh(master, opts, pkg_mngr + " install pssh")
 
   ssh(master, opts, "chmod u+x spark-euca/setup-mesos2.sh")
-  ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.os_type)
+  ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
 
   print "Mesos cluster started at http://%s:5050" % master
 

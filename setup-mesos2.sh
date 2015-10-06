@@ -522,13 +522,13 @@ done
 echo "Starting Storm on driving master"
 source /root/spark-euca/storm-on-mesos/startup-on-master.sh
 
-    cd /root/spark-euca/
+cd /root/spark-euca/
 
-    # Test modules
+# Test modules
 
-    echo "Testing modules..."
-    #echo "run_tests=$run_tests"
-    if [ "$run_tests" == "True" ]; then
+echo "Testing modules..."
+echo "run_tests=$run_tests"
+if [[ "x$run_tests" == "xTrue" ]]; then
 
     # Add test code
     for module in $MODULES; do
@@ -539,7 +539,7 @@ source /root/spark-euca/storm-on-mesos/startup-on-master.sh
         fi
         cd /root/spark-euca  # guard against setup-test.sh changing the cwd
     done
-    fi
+fi
 
 
 echo "Installing monit to every node..."
