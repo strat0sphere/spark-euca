@@ -2,11 +2,10 @@
 
 service storm-nimbus start
 sleep 10.0
-echo "Executing 'ps -ef | grep storm'..."; sleep 0.3
+echo "Executing ps -ef | grep storm..."
 ps -ef | grep storm
-echo "Printing nimbus.out..."; sleep 0.3
+echo "Printing nimbus.out..."
 cat /mnt/storm-logs/nimbus.out
-sleep 0.3
 service storm-ui start
 sleep 10.0
 echo "Printing ui.out..."
