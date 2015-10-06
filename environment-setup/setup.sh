@@ -13,6 +13,8 @@ mv /usr/lib/jvm/java-6-openjdk-amd64 /usr/lib/jvm/java-1.6.0
 update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.6.0/jre/bin/java 1
 update-alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-1.6.0/bin/javac 2
 
+update-alternatives --install /usr/bin/jps jps /usr/lib/jvm/java-1.7.0/bin/jps 1
+
 wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz
 tar xvf scala-2.11.1.tgz
 mv scala-2.11.1 scala

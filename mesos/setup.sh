@@ -25,12 +25,12 @@ cd build
 echo "Running configure..."
 ../configure --prefix=/root/mesos-installation/
 echo "Running make..."
-make -j 8
+make -j 2
 
 # Install (***Optional***).
 
 echo "Installing..."
-make -j 8 install
+make -j 2 install
 
 #TODO: SET LD_LIBRARY_PATH CORRECTLY ON EMI
 #delete previous LD_LIBRARY_PATH
@@ -43,4 +43,10 @@ rm -rf /root/mesos-0.21.1
 echo "Done!"
 # Run test suite -- Also builds example frameworks
 #make check #Run make check at the end because some tests fail (VERSION 0.18.1)
+
+echo "Copy mesos-config"
+cp /root/mesos-config/* /root/mesos-installation/
+
+echo "Removing mesos-config directory..."
+rm -rf /root/mesos-config
 

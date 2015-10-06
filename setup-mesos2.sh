@@ -266,8 +266,9 @@ fi
 
 for node in $ALL_NODES; do
 echo "Copying bigtop-utils to $node ..."
-ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/bigtop-utils /etc/default/"
+ssh -t -t $SSH_OPTS root@$node "cp /etc/default-custom/bigtop-utils /etc/default/" & sleep 0.3
 done
+wait
 
 #Ungly hack because zookeeper is on the emi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
@@ -307,7 +308,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
     echo $node
     rsync -e "ssh $SSH_OPTS" -az /root/spark $node:/root
     rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root
-    rsync -e "ssh $SSH_OPTS" -az /root/mesos-installation $node:/root
+    rsync -e "ssh $SSH_OPTS" -az /root/mesos-config $node:/root
     rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc
     rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc
     rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc
@@ -466,11 +467,10 @@ wait
 for node in $ALL_NODES; do
     echo "Initializing, building and installing mesos at $node..."
     ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/mesos/init.sh; source /root/spark-euca/mesos/setup.sh" & sleep 0.3
-    echo "Initializing mesos done!"
-
 done
 wait
 
+echo "Initializing mesos done!"
 
 ############
 
@@ -517,6 +517,7 @@ for module in $MODULES; do
     done
 wait
 done
+wait
 
 
 # Separately start storm only for driving master
