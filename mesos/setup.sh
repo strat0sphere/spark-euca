@@ -37,6 +37,9 @@ make -j 8 install
 sed -i '/LD_LIBRARY_PATH=/d'  /etc/environment
 echo "LD_LIBRARY_PATH=/root/mesos-installation/lib" >> /etc/environment
 export LD_LIBRARY_PATH=/root/mesos-installation/lib/
+
+echo "Removing mesos-0.21.1"
+rm -rf /root/mesos-0.21.1
 echo "Done!"
 # Run test suite -- Also builds example frameworks
 #make check #Run make check at the end because some tests fail (VERSION 0.18.1)

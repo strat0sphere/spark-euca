@@ -7,3 +7,6 @@ wget http://archive.cloudera.com/cdh5/one-click-install/precise/amd64/cdh5-repos
 
 echo "Running dpkg --force-confdef -i cdh5-repository_1.0_all.deb"
 dpkg --force-confdef -i cdh5-repository_1.0_all.deb
+
+echo "Removing cdh5-repository_1.0_all.deb"
+rm cdh5-repository_1.0_all.deb
