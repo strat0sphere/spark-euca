@@ -7,19 +7,8 @@ apt-get -qq --yes --force-yes install libcurl4-nss-dev
 apt-get -qq --yes --force-yes install libsasl2-dev
 apt-get -qq --yes --force-yes install maven
 apt-get -qq --yes --force-yes install build-essential
-
-if [[ "x$MESOS_SETUP_VERSION" == "x0.21.1" ]] ; then
 apt-get -qq --yes --force-yes install libapr1-dev
 apt-get -qq --yes --force-yes install libsvn-dev
-fi
-
-download_method=$1
-if [[ "$DOWNLOAD_METHOD" == "git" ]] ; then
-apt-get -qq --yes --force-yes install autoconf
-apt-get -qq --yes --force-yes install libtool
-fi
-
-
 
 #Building Mesos
 # Change working directory.
