@@ -531,7 +531,7 @@ source /root/spark-euca/storm-on-mesos/startup-on-master.sh
     # Add test code
     for module in $MODULES; do
         echo "Adding test code & running tests for $module"
-        if [[ -e $module/test.sh ]]; then
+        if [ -e $module/test.sh ]; then
             source $module/test.sh
             sleep 1
         fi

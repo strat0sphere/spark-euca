@@ -3,7 +3,7 @@
 mkdir /executor_tars
 chown -R hdfs:hadoop /executor_tars
 
-if [[ -e executor_tars/hadoop-2.3.0-cdh5.1.2-mesos.0.21.1.tar.gz ]]; then
+if [ -e executor_tars/hadoop-2.3.0-cdh5.1.2-mesos.0.21.1.tar.gz ]; then
     echo "Executor tar exists already!"
 else
     echo "Downloading hadoop-on-mesos tar from s3..."
