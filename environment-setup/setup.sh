@@ -1,5 +1,6 @@
 #!/bin/bash
-apt-get -q update/Users/stratos/Development/spark-euca/spark-on-mesos/init.sh
+apt-get -q update
+apt-get -q --yes --force-yes install make
 apt-get -q --yes --force-yes install git
 
 apt-get -q --yes --force-yes install openjdk-7-jdk
