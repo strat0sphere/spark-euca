@@ -1,21 +1,22 @@
 #!/bin/bash
 MESOS_SETUP_VERSION='0.21.1'
-apt-get update
-apt-get --yes --force-yes install build-essential
-apt-get --yes --force-yes install python-dev python-boto
-apt-get --yes --force-yes install libcurl4-nss-dev
-apt-get --yes --force-yes install libsasl2-dev
-apt-get --yes --force-yes install maven
+echo "MESOS_SETUP_VERSION = $MESOS_SETUP_VERSION"
+apt-get -qq --yes --force-yes install build-essential
+apt-get -qq --yes --force-yes install python-dev python-boto
+apt-get -qq --yes --force-yes install libcurl4-nss-dev
+apt-get -qq --yes --force-yes install libsasl2-dev
+apt-get -qq --yes --force-yes install maven
+apt-get -qq --yes --force-yes install build-essential
 
 if [[ "x$MESOS_SETUP_VERSION" == "x0.21.1" ]] ; then
-apt-get --yes --force-yes install libapr1-dev
-apt-get --yes --force-yes install libsvn-dev
+apt-get -qq --yes --force-yes install libapr1-dev
+apt-get -qq --yes --force-yes install libsvn-dev
 fi
 
 download_method=$1
 if [[ "$DOWNLOAD_METHOD" == "git" ]] ; then
-apt-get --yes --force-yes install autoconf
-apt-get --yes --force-yes install libtool
+apt-get -qq --yes --force-yes install autoconf
+apt-get -qq --yes --force-yes install libtool
 fi
 
 
@@ -29,17 +30,18 @@ cd /root/mesos-$MESOS_SETUP_VERSION
 
 # Configure and build.
 mkdir /root/mesos-installation/
+chmod +x /root/mesos-installation/
 mkdir build
 cd build
 echo "Running configure..."
 ../configure --prefix=/root/mesos-installation/
 echo "Running make..."
-make -j 2
+make -j 8
 
 # Install (***Optional***).
 
 echo "Installing..."
-make -j 2 install
+make -j 8 install
 
 #TODO: SET LD_LIBRARY_PATH CORRECTLY ON EMI
 #delete previous LD_LIBRARY_PATH

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+apt-get -qq --yes --force-yes install maven
+
 rm hadoop-2.3.0-cdh5.1.2.tar.gz
 wget http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.3.0-cdh5.1.2.tar.gz
 tar zxf hadoop-2.3.0-cdh5.1.2.tar.gz
@@ -7,7 +9,9 @@ tar zxf hadoop-2.3.0-cdh5.1.2.tar.gz
 echo "Cloning Hadoop-on-mesos..."
 rm hadoopOnMesos
 git clone https://github.com/strat0sphere/hadoop.git hadoopOnMesos
-cd hadoopOnMesos
+cd /root/hadoopOnMesos
+
+echo "Running mvn package..."
 mvn package
 cp target/hadoop-mesos-0.0.8.jar /usr/lib/hadoop-0.20-mapreduce/lib/
 cp target/hadoop-mesos-0.0.8.jar hadoop-2.3.0-cdh5.1.2/share/hadoop/common/lib/
