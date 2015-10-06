@@ -2,6 +2,12 @@
 #TODO: Install s3cmd if not included in modules because it is a dependecy for this script to work
 pushd /root
 
+echo "Copying configuration from spark-config to spark"
+cp /root/spark-config/* spark/
+
+echo "Deleting spark-config"
+rm -rf /root/spark-config
+
 mkdir /executor_tars
 chown -R hdfs:hadoop /executor_tars
 
