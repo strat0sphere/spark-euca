@@ -165,7 +165,7 @@ wait
 echo "Setting up Cluster..."
 ### empty emi ###
 echo "Setting up environment for node:"
-for node in $SLAVES $OTHER_MASTERS; do
+for node in $ALL_NODES; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/environment-setup/setup.sh; /root/spark-euca/environment-setup/setup.sh" & sleep 0.3
 done
@@ -417,13 +417,14 @@ for node in $MASTERS; do
     echo "Removing old job tracker from node $node ..."
     ssh -t -t $SSH_OPTS root@$node "service hadoop-0.20-mapreduce-jobtracker stop; apt-get -q --yes --force-yes remove hadoop-0.20-mapreduce-jobtracker;" & sleep 0.3
 done
+wait
 
 #sudo -u mapred hadoop mrhaadmin -transitionToActive -forcemanual jt1
 
-echo "Adding HA on the jobtracker..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
     echo $node
-    echo "Creating tmp mapred dir..."
+
+    echo "Adding HA on the jobtracker for $node ..."
 
     ssh -t -t $SSH_OPTS root@$node "rm /etc/default/hadoop-0.20-mapreduce-jobtrackerha; rm /etc/default/hadoop-0.20-mapreduce-zkfc; /root/spark-euca/cloudera-hdfs/create-tmp-dir.sh; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-jobtrackerha; service hadoop-0.20-mapreduce-jobtrackerha stop; cp /etc/default-custom/hadoop-0.20-mapreduce-jobtrackerha /etc/default/; apt-get -q --yes --force-yes install hadoop-0.20-mapreduce-zkfc; service hadoop-0.20-mapreduce-zkfc stop; cp /etc/default-custom/hadoop-0.20-mapreduce-zkfc /etc/default/" & sleep 0.3
 done

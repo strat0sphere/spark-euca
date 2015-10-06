@@ -547,12 +547,6 @@ def setup_mesos_cluster(master, opts):
       ssh(master, opts, pkg_mngr + " install java-1.7.0-openjdk")
       ssh(master, opts, "mv /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64/ /usr/lib/jvm/java-1.7.0/")
       ssh(master, opts, pkg_mngr + " install wget")
-      
-  ssh(master, opts, "wget http://downloads.typesafe.com/scala/2.11.1/scala-2.11.1.tgz")
-  ssh(master, opts, "tar xvf scala-2.11.1.tgz")
-  ssh(master, opts, "mv scala-2.11.1 scala")
-  ssh(master, opts, "rm scala-2.11.1.tgz")
-  ssh(master, opts, pkg_mngr + " install make")
   
   ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
   ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")

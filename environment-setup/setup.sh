@@ -20,4 +20,13 @@ rm scala-2.11.1.tgz
 
 apt-get -q --yes --force-yes install libgfortran3
 
+#Add users as they don't exist in case of the empty emi
+echo "Adding users..."
+useradd -G hadoop,mapred mapred
+useradd -G hadoop,hdfs hdfs
+
+usermod -a -G hadoop mapred
+usermod -a -G hadoop hdfs
+usermod -a -G hadoop root
+
 
