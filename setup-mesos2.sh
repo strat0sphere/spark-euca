@@ -307,11 +307,13 @@ if [[ $NUM_ZOOS != 0 ]]; then
     echo $node
     rsync -e "ssh $SSH_OPTS" -az /root/spark $node:/root
     rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root
+    rsync -e "ssh $SSH_OPTS" -az /root/mesos-installation $node:/root
     rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc
     rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc
     rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc
     rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc
     rsync -e "ssh $SSH_OPTS" -az /etc/hadoop $node:/etc
+
     done
     wait
 
@@ -470,6 +472,7 @@ wait
 
 
 ############
+
 
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 for node in $MASTERS; do
