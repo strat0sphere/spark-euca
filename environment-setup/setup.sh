@@ -20,13 +20,13 @@ rm scala-2.11.1.tgz
 
 apt-get -q --yes --force-yes install libgfortran3
 
+echo "Adding groups..."
+groupadd mapred; groupadd hdfs; groupadd hadoop
 #Add users as they don't exist in case of the empty emi
 echo "Adding users..."
-useradd -G hadoop,mapred mapred
-useradd -G hadoop,hdfs hdfs
+useradd -g mapred mapred; useradd -g hdfs hdfs
 
-usermod -a -G hadoop mapred
-usermod -a -G hadoop hdfs
-usermod -a -G hadoop root
+echo "Appending users to groups..."
+usermod -a -G hadoop mapred; usermod -a -G hadoop hdfs; usermod -a -G hadoop,mapred root
 
 
