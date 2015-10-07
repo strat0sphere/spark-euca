@@ -568,11 +568,15 @@ source /root/spark-euca/monit/init.sh
 source /root/spark-euca/monit/setup.sh master
 source /root/spark-euca/monit/startup.sh
 
-echo "Setting up monit for other masters..."
-for node in $OTHER_MASTERS; do
-    ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh; source /root/spark-euca/monit/setup.sh other-master; source /root/spark-euca/monit/startup.sh" & sleep 0.3
-done
-wait
+echo "Setting up monit for standby namenode - master..."
+source /root/spark-euca/monit/init.sh
+source /root/spark-euca/monit/setup.sh second-master
+source /root/spark-euca/monit/startup.sh
+
+echo "Setting up monit for third master..."
+source /root/spark-euca/monit/init.sh
+source /root/spark-euca/monit/setup.sh third-master
+source /root/spark-euca/monit/startup.sh
 
 echo "Setting up monit for slaves..."
 for node in $SLAVES; do

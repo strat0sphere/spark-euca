@@ -176,9 +176,9 @@ set httpd port 2812 and
     #depends on yyyy
     
     
-  check process hadoop-hdfs-namenode with pidfile /var/run/hadoop-hdfs/hadoop-hdfs-namenode.pid
-    start program = "/etc/init.d/hadoop-hdfs-namenode start" with timeout 60 seconds
-    stop program  = "/etc/init.d/hadoop-hdfs-namenode stop"
+  #check process hadoop-hdfs-namenode with pidfile /var/run/hadoop-hdfs/hadoop-hdfs-namenode.pid
+    #start program = "/etc/init.d/hadoop-hdfs-namenode start" with timeout 60 seconds
+    #stop program  = "/etc/init.d/hadoop-hdfs-namenode stop"
     #depends on yyyy
 
     check process hadoop-hdfs-journalnode with pidfile /var/run/hadoop-hdfs/hadoop-hdfs-journalnode.pid
