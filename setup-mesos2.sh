@@ -295,7 +295,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
     done
     wait
 
-    echo "RSYNC'ing config dirs and spark-euca dir to ZOOs and OTHER_MASTERS..."
+    echo "RSYNC'ing config dirs to other nodes..."
     #TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
 
     if [ "$cohost" == "True" ]; then
@@ -305,18 +305,26 @@ if [[ $NUM_ZOOS != 0 ]]; then
     fi
 
     for node in $NODES; do
-    echo $node
-    rsync -e "ssh $SSH_OPTS" -az /root/spark-config $node:/root
+    echo "RSYNC'ing config dirs to $node ..."
     rsync -e "ssh $SSH_OPTS" -az /root/spark-euca $node:/root
-    rsync -e "ssh $SSH_OPTS" -az /root/mesos-config $node:/root
-    rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc
     rsync -e "ssh $SSH_OPTS" -az /etc/kafka $node:/etc
-    rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc
-    rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc
-    rsync -e "ssh $SSH_OPTS" -az /etc/hadoop $node:/etc
 
     done
     wait
+
+    for node in $ALL_NODES; do
+    echo "RSYNC'ing config dirs to $node ..."
+    rsync -e "ssh $SSH_OPTS" -az /etc/hosts $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /etc/crontab $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /etc/hadoop $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /etc/zookeeper $node:/etc
+    rsync -e "ssh $SSH_OPTS" -az /root/mesos-config $node:/root
+    rsync -e "ssh $SSH_OPTS" -az /root/spark-config $node:/root
+
+    done
+    wait
+
+
 
     #Add HDFS backup to S3  to main server
     echo "30 00 	* * *	root 	/root/spark-euca/backup/backup-to-s3.sh" >> /etc/crontab
@@ -463,7 +471,6 @@ wait
 
 ### empty emi ###
 
-
 for node in $ALL_NODES; do
     echo "Initializing, building and installing mesos at $node..."
     ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/mesos/init.sh; source /root/spark-euca/mesos/setup.sh" & sleep 0.3
@@ -473,7 +480,6 @@ wait
 echo "Initializing mesos done!"
 
 ############
-
 
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 for node in $MASTERS; do
@@ -489,7 +495,6 @@ for node in $SLAVES; do
     ssh -t -t $SSH_OPTS root@$node "export LD_LIBRARY_PATH=/root/mesos-installation/lib/; chmod +x /root/mesos-installation/mesos-slave.sh; cd /etc/init.d/; ln -s /root/mesos-installation/mesos-slave.sh mesos-slave; update-rc.d mesos-slave defaults; service mesos-slave start" & sleep 0.3
 done
 wait
-
 
 echo "Setting up installation environment for OTHER_MASTERS ..."
 for node in $OTHER_MASTERS; do
@@ -509,6 +514,14 @@ done
 wait
 
 source /etc/environment
+
+echo "Putting hadoop to hdfs from driver..."
+chmod +x /root/spark-euca/hadoop-on-mesos/add-to-hdfs.sh
+source /root/spark-euca/hadoop-on-mesos/add-to-hdfs.sh
+
+echo "Putting spark to hdfs from driver..."
+chmod +x /root/spark-euca/spark-on-mesos/add-to-hdfs.sh
+source /root/spark-euca/spark-on-mesos/add-to-hdfs.sh
 
 for module in $MODULES; do
     for node in $MASTERS; do

@@ -1,6 +1,7 @@
 #bin/bash
 
 pushd /root
+mkdir test-code
 
 echo "I love UCSB" > /tmp/file0
 chown hdfs:hadoop /tmp/file0
