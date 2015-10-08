@@ -11,11 +11,12 @@ echo $HOSTNAME > /etc/hostname
 echo "Setting up Mesos on `hostname`..."
 
 #Getting arguments
-run_tests=$1
-restore=$2
-cohost=$3
+INSTALLATION_TYPE=$1
+RUN_TESTS=$2
+RESTORE_SESSION=$3
+COHOST=$4
 
-export RESTORE=$restore #If it is a restore session the backup module will restore files from S3
+export RESTORE=$RESTORE_SESSION #If it is a restore session the backup module will restore files from S3
 
 # Set up the masters, slaves, etc files based on cluster env variables
 echo "$MASTERS" > masters
@@ -40,8 +41,8 @@ echo "$ZOOS_PRIVATE_IP" > zoos_private #List with zoos private IPs needed on sto
 echo "$ZOOS_PRIVATE_DNS_NAME" > zoos_private_dns_name #List with zoos private IPs needed on storm and kafka setup scripts
 
 #If instances are co-hosted then masters will also act as Zoos
-if [ "$cohost" == "True" ]; then
-    echo "cohost:$cohost"
+if [ "$COHOST" == "True" ]; then
+    echo "cohost:$COHOST"
 fi
 
 MASTERS=`cat masters`
@@ -105,7 +106,7 @@ wait
 # Try to SSH to each cluster node to approve their key. Since some nodes may
 # be slow in starting, we retry failed slaves up to 3 times.
 
-if [ "$cohost" == "True" ]; then
+if [ "$COHOST" == "True" ]; then
     INSTANCES="$SLAVES $ZOOS"
     ALL_NODES="$MASTERS $SLAVES"
 else
@@ -167,12 +168,14 @@ wait
 
 echo "Setting up Cluster..."
 ### empty emi ###
-echo "Setting up environment for node:"
-for node in $ALL_NODES; do
-echo $node
-ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/environment-setup/setup.sh; /root/spark-euca/environment-setup/setup.sh" & sleep 0.3
-done
-wait
+if [[ "x$INSTALLATION_TYPE" == "xempty-emi" ]]; then
+    echo "Setting up environment for node:"
+    for node in $ALL_NODES; do
+    echo $node
+    ssh -t -t $SSH_OPTS root@$node "chmod u+x /root/spark-euca/environment-setup/setup.sh; /root/spark-euca/environment-setup/setup.sh" & sleep 0.3
+    done
+    wait
+fi
 
 ##########
 
@@ -194,7 +197,7 @@ for node in $ALL_NODES; do
 done
 wait
 
-# TODO: Is any update necessary?
+# TODO: Is any update necessary? --> yes for emi
 for node in $ALL_NODES; do
 echo "Running update on $node"
 ssh -t -t $SSH_OPTS root@$node "apt-get -q update" & sleep 0.3
@@ -214,12 +217,14 @@ done
 wait
 
 ### empty emi ###
+if [[ "x$INSTALLATION_TYPE" == "xempty-emi" ]]; then
 echo "Setting up HDFS on host..."
 for node in $MASTERS; do
 echo $node
 ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/cloudera-hdfs/init.sh" & sleep 0.3
 done
 wait
+fi
 
 for node in $NAMENODES; do
 echo "Setting up namenode on $node"
@@ -259,7 +264,6 @@ wait
 if [[ $NUM_ZOOS != 0 ]]; then
     echo "Stopping old zooKeeper daemons running on emi..."
     for zoo in $ZOOS; do
-	## empty emi ##
     echo "Installing zookeeper-server..."
 	ssh -t -t $SSH_OPTS root@$zoo "apt-get -q --yes --force-yes install zookeeper-server; mkdir -p /mnt/zookeeper/dataDir; mkdir -p /mnt/zookeeper/dataLogDir; mkdir -p /mnt/zookeeper/log mkdir -p /mnt/zookeeper/run; chown -R zookeeper:zookeeper /mnt/zookeeper/; chmod -R g+w /mnt/zookeeper/; chown -R zookeeper:zookeeper /mnt/zookeeper/log; chown -R zookeeper:zookeeper /mnt/zookeeper/run; service zookeeper-server force-stop; cp /etc/default-custom/zookeeper /etc/default/; rm -rf /var/log/zookeeper/zookeeper.log; rm -rf /var/log/zookeeper/zookeeper.out; chmod +x /etc/init.d/zookeeper-server; update-rc.d -f zookeeper-server defaults" & sleep 0.3
     done
@@ -275,7 +279,7 @@ wait
 
 #Ungly hack because zookeeper is on the emi
 #Disable zookeeper service from /etc/init.d if masters are not hosting zookeeper service
-if [ "$cohost" == "False" ]; then
+if [ "$COHOST" == "False" ]; then
     for node in $MASTERS; do
         echo "Removing zookeeper daemon from node: $node"
         ssh -t -t $SSH_OPTS root@$node "update-rc.d -f zookeeper-server remove" & sleep 0.3
@@ -301,7 +305,7 @@ if [[ $NUM_ZOOS != 0 ]]; then
     echo "RSYNC'ing config dirs to other nodes..."
     #TODO: At the moment deploy everything but should clean up later - Probably only dirs: zookeeper, kafka and files: crontab and hosts are needed
 
-    if [ "$cohost" == "True" ]; then
+    if [ "$COHOST" == "True" ]; then
         NODES="$ZOOS"
     else
         NODES="$ZOOS $OTHER_MASTERS"
@@ -449,6 +453,7 @@ echo "Initialize the HA State in Zookeeper for map reduce"...
 #service hadoop-0.20-mapreduce-zkfc init
 sudo -u mapred hadoop mrzkfc -formatZK -force
 
+if [[ "x$INSTALLATION_TYPE" == "xempty-emi" ]]; then
 for module in $MODULES; do
     for node in $MASTERS; do
         if [[ -e $module/build.sh ]]; then
@@ -458,6 +463,7 @@ for module in $MODULES; do
     done
     wait
 done
+fi
 
 echo "Starting jobtracker HA services..."
 for node in $NAMENODE $STANDBY_NAMENODE; do
@@ -476,7 +482,7 @@ done
 wait
 
 ### empty emi ###
-
+if [[ "x$INSTALLATION_TYPE" == "xempty-emi" ]]; then
 for node in $ALL_NODES; do
     echo "Initializing, building and installing mesos at $node..."
     ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/mesos/init.sh; source /root/spark-euca/mesos/setup.sh" & sleep 0.3
@@ -484,8 +490,14 @@ done
 wait
 
 echo "Initializing mesos done!"
-
+fi
 ############
+
+for node in $ALL_NODES; do
+echo "Copy mesos configuration on $node..."
+ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/mesos/config.sh" & sleep 0.3
+done
+wait
 
 echo "Adding master startup script to /etc/init.d and starting Mesos-master..."
 for node in $MASTERS; do
@@ -571,8 +583,8 @@ wait
 # Test modules
 
 echo "Testing modules..."
-echo "run_tests=$run_tests"
-if [[ "x$run_tests" == "xTrue" ]]; then
+echo "RUN_TESTS=$RUN_TESTS"
+if [[ "x$RUN_TESTS" == "xTrue" ]]; then
 
 # Add test code
 for module in $MODULES; do

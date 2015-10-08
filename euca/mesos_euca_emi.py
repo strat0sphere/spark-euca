@@ -24,7 +24,7 @@
 #example run
 ./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
 - new not-tested emis:  emi-85763E01 -e emi-44643D7C 
-- for empty emi installation use emi-56CB3EE9 for both masters and slaves and --installation-type mesos-emi=mesos
+- for empty emi installation use emi-56CB3EE9 for both masters and slaves and --installation-type=empty-emi
 """
 
 #clean master emi: emi-283B3B45
@@ -132,7 +132,7 @@ def parse_args():
   parser.add_option("--os-type", type="string", default="",
       help="Type of the OS (ubuntu/ centos)"),
   parser.add_option("--installation-type", type="string", default="spark-standalone",
-      help="Type of installation (spark-standalone /  mesos)"),
+      help="Type of installation (spark-standalone /  mesos-emi/ empty-emi)"),
   parser.add_option("-f", "--ft", metavar="NUM_MASTERS", default="1", 
       help="Number of masters to run. Default is 1. Greater values " + 
            "make Mesos run in fault-tolerant mode with ZooKeeper."),
@@ -505,7 +505,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   #ssh(master, opts, "echo '****************'; ls -al")
   
   #print "opts.installation_type: " + opts.installation_type
-  if(opts.installation_type == "mesos"):
+  if(opts.installation_type == "empty-emi"):
       setup_mesos_cluster(master, opts)
   elif(opts.installation_type == "mesos-emi"):
       setup_mesos_emi_cluster(master, opts)
@@ -556,7 +556,7 @@ def setup_mesos_cluster(master, opts):
   ssh(master, opts, pkg_mngr + " install pssh")
 
   ssh(master, opts, "chmod u+x spark-euca/setup-mesos2.sh")
-  ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
+  ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.installation_type + " " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
 
   print "Mesos cluster started at http://%s:5050" % master
 
@@ -575,7 +575,9 @@ def setup_mesos_emi_cluster(master, opts):
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
     #print "opts.run_tests: " + opts.run_tests
-    ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
+    ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.installation_type + " " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
+
+    #ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
     #ssh(master, opts, "/root/spark-1.0.0-bin-hadoop1/sbin/start-all.sh")
