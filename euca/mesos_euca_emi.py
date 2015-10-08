@@ -24,7 +24,7 @@
 #example run
 ./mesos-euca-emi -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/vagrant_euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
 - new not-tested emis:  emi-85763E01 -e emi-44643D7C 
-- for empty emi installation use emi-56CB3EE9 for both masters and slaves
+- for empty emi installation use emi-56CB3EE9 for both masters and slaves and --installation-type mesos-emi=mesos
 """
 
 #clean master emi: emi-283B3B45
@@ -563,6 +563,7 @@ def setup_mesos_cluster(master, opts):
 def setup_mesos_emi_cluster(master, opts):
     #ssh(master, opts, "chmod u+x ~/spark-testing/setup.sh")
     #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
+    pkg_mngr = "apt-get -qq --yes --force-yes"
     ssh(master, opts, "rm /etc/environment") # Delete old file that exists on the emi
     ssh(master, opts, "echo JAVA_HOME='/usr/lib/jvm/java-1.7.0'  >> /etc/environment")
     ssh(master, opts, "echo SCALA_HOME='/root/scala' >> /etc/environment")
