@@ -50,6 +50,9 @@ OTHER_MASTERS=`cat masters | sed '1d'`
 echo $OTHER_MASTERS > other_masters
 SLAVES=`cat slaves`
 ZOOS=`cat zoos`
+FIRST_MASTER=`sed '1q;d' masters`
+SECOND_MASTER=`sed '2q;d' masters`
+THIRD_MASTER=`sed '3q;d' masters`
 
 NAMENODES=`head -n 2 masters` #TODO: They should be the same with $NAMENODE and $STANDBY_NAMENODE but check
 echo $NAMENODES > namenodes
@@ -571,15 +574,12 @@ source /root/spark-euca/monit/init.sh
 source /root/spark-euca/monit/setup.sh master
 source /root/spark-euca/monit/startup.sh
 
-echo "Setting up monit for standby namenode - master..."
-source /root/spark-euca/monit/init.sh
-source /root/spark-euca/monit/setup.sh second-master
-source /root/spark-euca/monit/startup.sh
 
-echo "Setting up monit for third master..."
-source /root/spark-euca/monit/init.sh
-source /root/spark-euca/monit/setup.sh third-master
-source /root/spark-euca/monit/startup.sh
+echo "Setting up monit for second master: $SECOND_MASTER ..."
+ssh -t -t $SSH_OPTS root@$SECOND_MASTER "source /root/spark-euca/monit/init.sh; /root/spark-euca/monit/setup.sh second-master; source /root/spark-euca/monit/startup.sh"
+
+echo "Setting up monit for third master: $THIRD_MASTER ..."
+ssh -t -t $SSH_OPTS root@$THIRD_MASTER "source /root/spark-euca/monit/init.sh; source /root/spark-euca/monit/setup.sh third-master; source /root/spark-euca/monit/startup.sh"
 
 echo "Setting up monit for slaves..."
 for node in $SLAVES; do
