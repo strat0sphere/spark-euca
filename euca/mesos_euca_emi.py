@@ -496,7 +496,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   
   ssh(master, opts, pkg_mngr + " install git")
   
-  ssh(master, opts, "rm -rf spark-euca && git clone -b empty_emi https://github.com/strat0sphere/spark-euca.git")
+  ssh(master, opts, "rm -rf spark-euca && git clone -b empty_emi https://github.com/UCSB-CS-RACELab/spark-euca.git")
 
   print "Deploying files to master..."
   deploy_files(conn, "deploy.mesos-emi", opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn)
