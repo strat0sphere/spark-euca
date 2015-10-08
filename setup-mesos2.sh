@@ -445,7 +445,7 @@ for node in $NAMENODE $STANDBY_NAMENODE; do
 done
 wait
 
-echo "Initialize the HA State in Zookeeper"...
+echo "Initialize the HA State in Zookeeper for map reduce"...
 #service hadoop-0.20-mapreduce-zkfc init
 sudo -u mapred hadoop mrzkfc -formatZK -force
 
@@ -545,24 +545,6 @@ source /root/spark-euca/storm-on-mesos/startup-on-master.sh
 
 cd /root/spark-euca/
 
-# Test modules
-
-echo "Testing modules..."
-echo "run_tests=$run_tests"
-if [[ "x$run_tests" == "xTrue" ]]; then
-
-    # Add test code
-    for module in $MODULES; do
-        echo "Adding test code & running tests for $module"
-        if [ -e $module/test.sh ]; then
-            source $module/test.sh
-            sleep 1
-        fi
-        cd /root/spark-euca  # guard against setup-test.sh changing the cwd
-    done
-fi
-
-
 echo "Installing monit to every node..."
 for node in $MASTERS $SLAVES; do
     rsync -e "ssh $SSH_OPTS" -az /etc/monit $node:/etc
@@ -573,7 +555,6 @@ echo "Setting up monit for master..."
 source /root/spark-euca/monit/init.sh
 source /root/spark-euca/monit/setup.sh master
 source /root/spark-euca/monit/startup.sh
-
 
 echo "Setting up monit for second master: $SECOND_MASTER ..."
 ssh -t -t $SSH_OPTS root@$SECOND_MASTER "source /root/spark-euca/monit/init.sh; /root/spark-euca/monit/setup.sh second-master; source /root/spark-euca/monit/startup.sh"
@@ -586,6 +567,23 @@ for node in $SLAVES; do
     ssh -t -t $SSH_OPTS root@$node "source /root/spark-euca/monit/init.sh; source /root/spark-euca/monit/setup.sh slave; source /root/spark-euca/monit/startup.sh" & sleep 0.3
 done
 wait
+
+# Test modules
+
+echo "Testing modules..."
+echo "run_tests=$run_tests"
+if [[ "x$run_tests" == "xTrue" ]]; then
+
+# Add test code
+for module in $MODULES; do
+echo "Adding test code & running tests for $module"
+if [ -e $module/test.sh ]; then
+source $module/test.sh
+sleep 1
+fi
+cd /root/spark-euca  # guard against setup-test.sh changing the cwd
+done
+fi
 
 
 #echo "Transfering module dirs to other masters..."
