@@ -453,6 +453,12 @@ echo "Initialize the HA State in Zookeeper for map reduce"...
 #service hadoop-0.20-mapreduce-zkfc init
 sudo -u mapred hadoop mrzkfc -formatZK -force
 
+for node in $MASTERS; do
+echo "Installing s3cmd to $node ..."
+ssh -t -t $SSH_OPTS root@$node "chmod +x /root/spark-euca/s3cmd/install.sh; source /root/spark-euca/s3cmd/install.sh;" & sleep 0.3
+done
+wait
+
 if [[ "x$INSTALLATION_TYPE" == "xempty-emi" ]]; then
 for module in $MODULES; do
     for node in $MASTERS; do

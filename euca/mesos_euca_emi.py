@@ -489,7 +489,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
       print node.public_dns_name
       ssh_write(node.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
 
-  modules = ["s3cmd", "spark-on-mesos", "hadoop-on-mesos", "storm-on-mesos"] #It is also defined on deploy_templates_mesos
+  modules = ["spark-on-mesos", "hadoop-on-mesos", "storm-on-mesos"] #It is also defined on deploy_templates_mesos
   
   pkg_mngr = "apt-get -qq --yes --force-yes"
   #ssh(master, opts, pkg_mngr + " install wget")
@@ -571,7 +571,6 @@ def setup_mesos_emi_cluster(master, opts):
     #   Fixes error while loading shared libraries: libmesos--.xx.xx.so: cannot open shared object file: No such file or director
     ssh(master, opts, "echo LD_LIBRARY_PATH='/root/mesos/build/src/.libs/' >> /etc/environment")
     ssh(master, opts, pkg_mngr + " install pssh")
-    ssh(master, opts, "chmod u+x spark-euca/setup-mesos-emi.sh")
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
     #print "opts.run_tests: " + opts.run_tests
@@ -579,6 +578,7 @@ def setup_mesos_emi_cluster(master, opts):
     ssh(master, opts, "chmod u+x spark-euca/setup-mesos2.sh")
     ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.installation_type + " " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
 
+    #ssh(master, opts, "chmod u+x spark-euca/setup-mesos-emi.sh")
     #ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
     #ssh(master, opts, "echo 'Starting-all...'")
     #ssh(master, opts, "/root/spark/sbin/start-all.sh")
