@@ -1,4 +1,5 @@
 #!/bin/bash
+cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 apt-get -q update
 apt-get -q --yes --force-yes install make
 apt-get -q --yes --force-yes install git
