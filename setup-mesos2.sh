@@ -375,7 +375,7 @@ fi
 #Checking that journal nodes are up
 for node in $MASTERS; do
     echo "Running jps on node $node ..."
-    ssh -t -t $SSH_OPT root@$node "jps"
+    ssh -t -t $SSH_OPT root@$node "sudo -u hdfs jps"
 done
 wait
 
@@ -408,8 +408,11 @@ wait
 
 #Checking that all services are up
 for node in $MASTERS; do
-    echo "Running jps on node $node ..."
-    ssh -t -t $SSH_OPT root@$node "jps"
+    echo "Running sudo -u mapred jps on node $node ..."
+    ssh -t -t $SSH_OPTS root@$node "sudo -u mapred jps"
+
+    echo "Running sudo -u hdfs jps on node $node ..."
+    ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs jps"
 done
 wait
 
@@ -630,8 +633,11 @@ ssh -t -t $SSH_OPTS root@$node "ps -ef | grep zoo"
 echo "Running ps -ef | grep mesos on node $node ..."
 ssh -t -t $SSH_OPTS root@$node "ps -ef | grep mesos"
 
-echo "Running jps on node $node ..."
-ssh -t -t $SSH_OPTS root@$node "jps"
+echo "Running sudo -u mapred jps on node $node ..."
+ssh -t -t $SSH_OPTS root@$node "sudo -u mapred jps"
+
+echo "Running sudo -u hdfs jps on node $node ..."
+ssh -t -t $SSH_OPTS root@$node "sudo -u hdfs jps"
 done
 
 #for node in $MASTERS; do

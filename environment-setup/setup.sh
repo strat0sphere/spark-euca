@@ -31,4 +31,7 @@ useradd -g mapred mapred; useradd -g hdfs hdfs
 echo "Appending users to groups..."
 usermod -a -G hadoop mapred; usermod -a -G hadoop hdfs; usermod -a -G hadoop,mapred root
 
+echo "Giving +x to all on root..."
+chmod +x /root/
+
 

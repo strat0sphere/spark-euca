@@ -17,7 +17,7 @@ pushd /root/spark-1.2.1
 echo "Setting JAVA_HOME to /usr/lib/jvm/java-1.6.0"
 export JAVA_HOME=/usr/lib/jvm/java-1.6.0
 
-./make-distribution.sh --tgz -Dhadoop.version=2.3.0-mr1-cdh5.1.2
+./make-distribution.sh --tgz -Dhadoop.version=2.3.0-mr1-cdh5.1.2 -Dprotobuf.version=2.5.0 -DskipTests
 
 popd
 

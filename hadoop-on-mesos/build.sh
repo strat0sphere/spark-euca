@@ -43,6 +43,11 @@ rm mapreduce
 ln -s mapreduce1 mapreduce
 popd
 
+echo "Running sed to add MESOS_NATIVE_JAVA_LIBRARY to hadoop-daemon.sh"
+sed '/#!\/usr\/bin\/env bash/a export MESOS_NATIVE_JAVA_LIBRARY=\/usr\/local\/lib\/libmesos.so' /usr/lib/hadoop-0.20-mapreduce/bin/hadoop-daemon.sh > file.tmp && mv file.tmp /usr/lib/hadoop-0.20-mapreduce/bin/hadoop-daemon.sh
+
+chmod +x /usr/lib/hadoop-0.20-mapreduce/bin/hadoop-daemon.sh
+
 cd /root #make sure you are on root dir
 
 #pack to be ready to upload to HDFS

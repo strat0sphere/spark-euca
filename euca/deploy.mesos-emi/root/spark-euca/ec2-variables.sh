@@ -52,7 +52,6 @@ export ACTIVE_MASTER_PRIVATE="{{active_master_private}}"
 sed -i '/ACTIVE_MASTER_PRIVATE=/d' /etc/environment
 echo "ACTIVE_MASTER_PRIVATE=$ACTIVE_MASTER_PRIVATE" >> /etc/environment #Need this to startup mesos scripts on reboot
 
-#TODO LD_LIBRARY_PATH should be set correctly to emi and not hardcoded here
 echo "Seding previous LD_LIBRARY_PATH value..."
 sed -i '/LD_LIBRARY_PATH=/d' /etc/environment
 echo 'LD_LIBRARY_PATH=/root/mesos-installation/lib/' >> /etc/environment
@@ -72,8 +71,8 @@ export WALRUS_IP="{{walrus_ip}}"
 
 #MPI on Mesos specific variables
 #TODO: Its OK to be hardcoded for the emi version but for building from scratch they have to be configurable
-export MESOS_SOURCE_DIR="/root/mesos-0.20.0" #"{{mesos_source_dir}}"
-export MESOS_BUILD_DIR="/root/mesos-0.20.0/build" #"{{mesos_build_dir}}"
+export MESOS_SOURCE_DIR="/root/mesos-0.21.1" #"{{mesos_source_dir}}"
+export MESOS_BUILD_DIR="/root/mesos-0.21.1/build" #"{{mesos_build_dir}}"
 export PYTHON_PATH="/usr/bin/python" #"{{python_path}}" - (which python)
 export PYTHON_EGG_POSTFIX="py2.7-linux-x86_64" #"{{python_egg_postfix}}"
 export PYTHON_EGG_PUREPY_POSTFIX="py2.7" #"{{python_egg_purepy_postfix}}"
@@ -86,6 +85,8 @@ echo KAFKA_SCALA_BINARY=$KAFKA_SCALA_BINARY >> /etc/environment
 echo "HADOOP_MAPRED_HOME=/usr/lib/hadoop-0.20-mapreduce/" >> /etc/environment
 echo "HADOOP_HOME=/usr/lib/hadoop-0.20-mapreduce/" >> /etc/environment
 echo "HADOOP_LIBEXEC_DIR=/usr/lib/hadoop/libexec/" >> /etc/environment
+echo "HADOOP_MAPRED_HOME=/usr/lib/hadoop-0.20-mapreduce" >> /etc/environment
+echo "MESOS_NATIVE_LIBRARY=/root/mesos-installation/lib/libmesos.so" >> /etc/environment
 
 export DEBIAN_FRONTEND="noninteractive"
 
