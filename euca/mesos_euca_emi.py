@@ -575,6 +575,8 @@ def setup_mesos_emi_cluster(master, opts):
     #Define configuration files - Set masters and slaves in order to call cluster scripts and automatically sstart the cluster
     #ssh(master, opts, "spark-euca/setup %s %s %s %s" % (opts.os, opts.download, opts.branch, opts.swap))
     #print "opts.run_tests: " + opts.run_tests
+    
+    ssh(master, opts, "chmod u+x spark-euca/setup-mesos2.sh")
     ssh(master, opts, "spark-euca/setup-mesos2.sh " + opts.installation_type + " " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
 
     #ssh(master, opts, "spark-euca/setup-mesos-emi.sh " + opts.run_tests + " " + opts.restore + " " + str(opts.cohost))
