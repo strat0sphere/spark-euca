@@ -488,6 +488,11 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
     for node in master_nodes + slave_nodes + zoo_nodes:
       print node.public_dns_name
       ssh_write(node.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
+      
+     
+      
+    
+    
 
   modules = ["spark-on-mesos", "hadoop-on-mesos", "storm-on-mesos"] #It is also defined on deploy_templates_mesos
   
@@ -496,7 +501,13 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   
   ssh(master, opts, pkg_mngr + " install git")
   
-  ssh(master, opts, "rm -rf spark-euca && git clone -b empty_emi https://github.com/UCSB-CS-RACELab/spark-euca.git")
+  ssh(master, opts, "rm -rf spark-euca")
+  
+  os.system("git clone -b empty_emi https://github.com/MAYHEM-Lab/spark-euca.git tmp-git-repo")
+  os.system("scp -i "+opts.identity_file+" -r tmp-git-repo root@"+master+":/root/")
+  ssh(master, opts, "mv /root/tmp-git-repo /root/spark-euca")
+  os.system("rm -rf tmp-git-repo")
+  #ssh(master, opts, "rm -rf spark-euca && git clone -b empty_emi https://github.com/MAYHEM-Lab/spark-euca.git")
 
   print "Deploying files to master..."
   deploy_files(conn, "deploy.mesos-emi", opts, master_nodes, slave_nodes, zoo_nodes, modules, s3conn)
