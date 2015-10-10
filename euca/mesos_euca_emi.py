@@ -130,20 +130,22 @@ def parse_args():
   parser.add_option("--user-data-file", type="string", default="",
       help="User data-file to pass to the instances created")
   parser.add_option("--os-type", type="string", default="",
-      help="Type of the OS (ubuntu/ centos)"),
+      help="Type of the OS (ubuntu/ centos)")
   parser.add_option("--installation-type", type="string", default="spark-standalone",
-      help="Type of installation (spark-standalone /  mesos-emi/ empty-emi)"),
+      help="Type of installation (spark-standalone /  mesos-emi/ empty-emi)")
   parser.add_option("-f", "--ft", metavar="NUM_MASTERS", default="1", 
       help="Number of masters to run. Default is 1. Greater values " + 
-           "make Mesos run in fault-tolerant mode with ZooKeeper."),
+           "make Mesos run in fault-tolerant mode with ZooKeeper.")
   parser.add_option("--zoo-num", metavar="NUM_ZOOS", default="3", 
-      help="Size of zookeeper quorum. Default is 3. This should be an odd number."),
+      help="Size of zookeeper quorum. Default is 3. This should be an odd number.")
   parser.add_option("--run-tests", type="string", default="False", 
       help="Set True if you want to run module tests")
   parser.add_option("--restore", type="string", default="False",  
       help="Restore HDFS from previous backup")
   parser.add_option("--cohost", action="store_true", default=True,
   help="Host mesos and Zoo on the same nodes")
+  parser.add_option("--cluster-type", type="string", default="euca_00",
+  help="Chose between euca_00 - euca_eci")
 
 
   (opts, args) = parser.parse_args()
@@ -911,11 +913,11 @@ def real_main():
   opts.cluster_name = cluster_name #set cluster name
   
   try:
-    euca_ec2_host="128.111.179.130"  
+    euca_ec2_host=os.getenv('WALRUS_IP') 
     #euca_ec2_host="eucalyptus.race.cs.ucsb.edu" #TODO: Replace with opts.euca-ec2-host
     euca_id=os.getenv('AWS_ACCESS_KEY')
     euca_key=os.getenv('AWS_SECRET_KEY')
-    walrus_ip="128.111.179.130" # os.getenv('WALRUS_IP') no longer works. 150923
+    walrus_ip=os.getenv('WALRUS_IP')# os.getenv('WALRUS_IP') no longer works. 150923
     euca_region = RegionInfo(name="eucalyptus", endpoint=euca_ec2_host)
     
     #Parameters needed for S3 connection
