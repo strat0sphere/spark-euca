@@ -13,7 +13,48 @@ This repository contains the set of scripts used to setup:
 
 In both cases I am assuming you already have a running eucalyptus cluster. The scripts require that Eycaluptus is already installed and then create the instances to run your cluster according to the EMI you specify.
 
-### Usage
+# Environment setup
+- If you haven't done alreyady when setting up your eucalyptus environment you will need to create an ssh key in order to be able to ssh without password to the instances. This key will be on your -i and -k options used on the deployment code.
+euca-create-keypair keyname.key > keyname.key
+(or for older versions of eucalyptus: euca-add-keypair keyname.key > keyname.key)
+chmod 600 keyname.key
+
+- You need to source a eucarc file that looks like the following:
+
+EUCA_KEY_DIR=$(cd $(dirname ${BASH_SOURCE:-$0}); pwd -P)
+export WALRUS_IP=[WALRUS_IP]
+export EC2_URL=http://[WALRUS_IP]:8773/services/Eucalyptus
+export S3_URL=http://[WALRUS_IP]:8773/services/Walrus
+export EUARE_URL=http://[WALRUS_IP]:8773/services/Euare
+export TOKEN_URL=http://[WALRUS_IP]:8773/services/Tokens
+export AWS_AUTO_SCALING_URL=http://[WALRUS_IP]:8773/services/AutoScaling
+export AWS_CLOUDWATCH_URL=http://[WALRUS_IP]:8773/services/CloudWatch
+export AWS_ELB_URL=http://[WALRUS_IP]:8773/services/LoadBalancing
+export EUSTORE_URL=http://emis.eucalyptus.com/
+export EC2_PRIVATE_KEY=${EUCA_KEY_DIR}/euca2-admin-cd349995-pk.pem
+export EC2_CERT=${EUCA_KEY_DIR}/euca2-admin-cd349995-cert.pem
+export EC2_JVM_ARGS=-Djavax.net.ssl.trustStore=${EUCA_KEY_DIR}/jssecacerts
+export EUCALYPTUS_CERT=${EUCA_KEY_DIR}/cloud-cert.pem
+export EC2_ACCOUNT_NUMBER='[YOUR_NUMBER]'
+export EC2_ACCESS_KEY='[YOUR_ACCESS_KEY]'
+export EC2_SECRET_KEY='[YOUR_SECRET_KEY]'
+export AWS_ACCESS_KEY='[YOUR_ACCESS_KEY]'
+export AWS_SECRET_KEY='[YOUR_SECRET_KEY]'
+export AWS_ACCESS_KEY_ID='[YOUR_ACCESS_KEY]'
+export AWS_SECRET_ACCESS_KEY='[YOUR_SECRET_KEY]'
+export AWS_CREDENTIAL_FILE=${EUCA_KEY_DIR}/iamrc
+export EC2_USER_ID='[YOUR_USER_ID]'
+alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_PRIVATE_KEY} --user ${EC2_ACCOUNT_NUMBER} --ec2cert ${EUCALYPTUS_CERT}"
+alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL}"
+
+
+- Modify /etc/ssh_config on a mac (or /etc/ssh/ssh_config on ubuntu) uncomment or add:
+StrictHostKeyChecking no
+UserKnownHostsFile=/dev/null
+
+- Make sure boto is installed.
+
+# Usage
 
 To install Spark Standalone all you need to do is run something like this: 
 ./spark-euca 
@@ -50,7 +91,7 @@ You could use the mesos-euca-emi to also install a Spark Standalone cluster by s
 -- on euca00: --emi-master emi-283B3B45 -e emi-35E93896
 -- on euca eci: TBD
 
-#### EXAMPLES
+# Examples
 - example for installation from a preconfigured emi on euca00: ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
 
 - example for installation from am empty emi on euca00: ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
@@ -59,7 +100,7 @@ You could use the mesos-euca-emi to also install a Spark Standalone cluster by s
 
 *Check scripts for more options*
 
-### Details
+# Details
 
 
 The Spark cluster setup is guided by the values set in `ec2-variables.sh`.`setup.sh`
