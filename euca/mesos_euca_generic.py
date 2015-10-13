@@ -22,7 +22,7 @@
 
 """
 #example run
-./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 6 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file ~/spark-euca/euca/clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
+./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
 - new not-tested emis:  emi-85763E01 -e emi-44643D7C 
 - for empty emi installation use --installation-type=empty-emi and:
     -- on euca00 cluster: use emi-56CB3EE9 for both masters and slaves 
