@@ -56,7 +56,7 @@ UserKnownHostsFile=/dev/null
 
 # Usage
 
-To install Spark Standalone all you need to do is run something like this: 
+- To install Spark Standalone all you need to do is run something like this: 
 ./spark-euca 
 -i xxxx.pem 
 -k xxxx 
@@ -68,7 +68,7 @@ To install Spark Standalone all you need to do is run something like this:
 --user-data zzzz.sh  
 launch spark-test
 
-To install a mesos cluster all you need to do is run something like this:
+- To install a mesos cluster all you need to do is run something like this:
 ./mesos-euca-emi -i xxxx.pem.pem
 -k xxxx 
 -s n
@@ -84,12 +84,12 @@ launch mesos-cluster-emi
 
 You could use the mesos-euca-emi to also install a Spark Standalone cluster by specifying the correct arguments but the spark-euca script will work just fine for Spark-standalone
 
-..* To install from an empty Ubuntu 12.04 precise emi use the option --installation-type=empty-emi and:
--- on euca00 cluster: use emi-56CB3EE9 for both masters and slaves 
--- on euca eci cluster: use emi-DF913965 for both masters and slaves
-- for installation starting from an emi with pre-installed hdfs, mesos, hadoop and spark use the option --installation-type=mesos-emi and:
--- on euca00: --emi-master emi-283B3B45 -e emi-35E93896
--- on euca eci: TBD
+  * To install from an empty Ubuntu 12.04 precise emi use the option --installation-type=empty-emi and:
+   on euca00 cluster: use emi-56CB3EE9 for both masters and slaves 
+   on euca eci cluster: use emi-DF913965 for both masters and slaves
+  * for installation starting from an emi with pre-installed hdfs, mesos, hadoop and spark use the option --installation-type=mesos-emi and:
+   on euca00: --emi-master emi-283B3B45 -e emi-35E93896
+   on euca eci: TBD
 
 # Examples
 - example for installation from a preconfigured emi on euca00: ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
