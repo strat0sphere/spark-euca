@@ -45,6 +45,7 @@ import time
 import urllib2
 from optparse import OptionParser
 from sys import stderr
+
 import boto
 from boto.ec2.blockdevicemapping import BlockDeviceMapping, EBSBlockDeviceType
 from boto import ec2
@@ -157,8 +158,13 @@ def parse_args():
   # Boto config check
   # http://boto.cloudhackers.com/en/latest/boto_config_tut.html
   home_dir = os.getenv('HOME')
+  
+  print "home dir: " + home_dir
+  print "boto version: " + boto.Version
+  
   if home_dir == None or not os.path.isfile(home_dir + '/.boto'):
     if not os.path.isfile('/etc/boto.cfg'):
+      print "boto.cgf not in path..."
       if os.getenv('AWS_ACCESS_KEY_ID') == None:
         print >> stderr, ("ERROR: The environment variable AWS_ACCESS_KEY_ID " +
                           "must be set")
@@ -314,7 +320,7 @@ def launch_cluster(conn, opts, cluster_name):
   try:
     image_master = conn.get_all_images(image_ids=[opts.emi_master])[0]
   except:
-    print >> stderr, "Could not find emi " + opts.emi_master
+    print >> stderr, "Could not find emi for master: " + opts.emi_master
     sys.exit(1)
   
   # Launch additional ZooKeeper nodes if required - ex: if mesos masters specified are 2 and the zoo_num=3 (default)
@@ -335,7 +341,7 @@ def launch_cluster(conn, opts, cluster_name):
       try:
         image_zoo = conn.get_all_images(image_ids=[emi_zoo])[0]
       except:
-        print >> stderr, "Could not find emi " + emi_zoo
+        print >> stderr, "Could not find emi for zoo " + emi_zoo
         sys.exit(1)
        
 
@@ -485,7 +491,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
     """
     ssh(master, opts, key_setup)
     dot_ssh_tar = ssh_read(master, opts, ['tar', 'c', '.ssh'])
-        
+         
     print "Transferring cluster's SSH key to masters, slaves, and zoos..."
     for node in master_nodes + slave_nodes + zoo_nodes:
       print node.public_dns_name
@@ -865,6 +871,7 @@ def ssh_read(host, opts, command):
 
 def ssh_write(host, opts, command, input):
   tries = 0
+
   while True:
     proc = subprocess.Popen(
         ssh_command(opts) + ['%s@%s' % (opts.user, host), stringify_command(command)],
