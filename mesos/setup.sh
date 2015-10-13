@@ -44,9 +44,3 @@ echo "Done!"
 # Run test suite -- Also builds example frameworks
 #make check #Run make check at the end because some tests fail (VERSION 0.18.1)
 
-echo "Copy mesos-config"
-cp /root/mesos-config/* /root/mesos-installation/
-
-echo "Removing mesos-config directory..."
-rm -rf /root/mesos-config
-
