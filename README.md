@@ -20,7 +20,7 @@ euca-create-keypair keyname.key > keyname.key
 chmod 600 keyname.key
 
 - You need to source a eucarc file that looks like the following:
-
+```
 EUCA_KEY_DIR=$(cd $(dirname ${BASH_SOURCE:-$0}); pwd -P)
 export WALRUS_IP=[WALRUS_IP]
 export EC2_URL=http://[WALRUS_IP]:8773/services/Eucalyptus
@@ -46,6 +46,7 @@ export AWS_CREDENTIAL_FILE=${EUCA_KEY_DIR}/iamrc
 export EC2_USER_ID='[YOUR_USER_ID]'
 alias ec2-bundle-image="ec2-bundle-image --cert ${EC2_CERT} --privatekey ${EC2_PRIVATE_KEY} --user ${EC2_ACCOUNT_NUMBER} --ec2cert ${EUCALYPTUS_CERT}"
 alias ec2-upload-bundle="ec2-upload-bundle -a ${EC2_ACCESS_KEY} -s ${EC2_SECRET_KEY} --url ${S3_URL}"
+```
 
 
 - Modify /etc/ssh_config on a mac (or /etc/ssh/ssh_config on ubuntu) uncomment or add:
@@ -57,6 +58,7 @@ UserKnownHostsFile=/dev/null
 # Usage
 
 - To install Spark Standalone all you need to do is run something like this: 
+```
 ./spark-euca 
 -i xxxx.pem 
 -k xxxx 
@@ -67,8 +69,10 @@ UserKnownHostsFile=/dev/null
 --os-type ubuntu
 --user-data zzzz.sh  
 launch spark-test
+```
 
 - To install a mesos cluster all you need to do is run something like this:
+```
 ./mesos-euca-emi -i xxxx.pem.pem
 -k xxxx 
 -s n
@@ -81,6 +85,7 @@ launch spark-test
 --installation-type mesos-emi
 --run-tests True
 launch mesos-cluster-emi
+```
 
 You could use the mesos-euca-emi to also install a Spark Standalone cluster by specifying the correct arguments but the spark-euca script will work just fine for Spark-standalone
 
@@ -92,9 +97,15 @@ You could use the mesos-euca-emi to also install a Spark Standalone cluster by s
    on euca eci: TBD
 
 ## Examples
-- example for installation from a preconfigured emi on euca00: ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
+- example for installation from a preconfigured emi on euca00: 
+```
+./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-name
+```
 
-- example for installation from am empty emi on euca00: ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
+- example for installation from am empty emi on euca00: 
+```
+./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-name
+```
 
 
 
@@ -119,6 +130,7 @@ and can be used to install any pre-requisites.
   The path of the file determines where the configured file will be copied to. Right now
   the set of variables that can be used in a template are
   
+```
       {{master_list}}
       {{active_master}}
       {{slave_list}}
@@ -131,6 +143,7 @@ and can be used to install any pre-requisites.
       {{spark_worker_instances}}
       {{spark_worker_cores}}
       {{spark_master_opts}}
+```
       
    You can add new variables by modifying `deploy_templates.py`
    
