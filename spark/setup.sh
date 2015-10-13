@@ -1,3 +1,3 @@
 #!/bin/bash
 
-/root/spark-euca/copy-dir /root/spark
+/root/spark-euca/copy-dir-generic /root/spark other_masters

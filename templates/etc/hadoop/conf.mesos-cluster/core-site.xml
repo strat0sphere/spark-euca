@@ -18,9 +18,15 @@
         <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
+       <!-- 
     <property>
         <name>fs.defaultFS</name>
         <value>hdfs://{{active_master_private}}:9000</value>
+    </property>
+      -->
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://{{cluster_name}}</value>
     </property>
     <!--
     <property>
@@ -36,6 +42,12 @@
         <name>dfs.client.file-block-storage-locations.timeout</name>
         <value>3000</value>
     </property>
+    
+    <!--  Automatic failover -->
+    <property>
+  <name>ha.zookeeper.quorum</name>
+  <value>{{zoo_string_private_ip}}</value>
+</property>
     
     <!--  jets3t properties to be used with hadoop distcp command -->
 <!-- 

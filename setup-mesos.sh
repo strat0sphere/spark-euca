@@ -4,7 +4,7 @@
 cd /root/spark-euca
 
 # Load the environment variables specific to this AMI
-source /root/.bash_profile
+source /root/.bash_profile #TODO: DELETE
 
 # Load the cluster variables set by the deploy script
 source ec2-variables.sh
