@@ -511,7 +511,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   
   ssh(master, opts, "rm -rf spark-euca")
   
-  os.system("git clone -b empty_emi https://github.com/MAYHEM-Lab/spark-euca.git tmp-git-repo")
+  os.system("git clone https://github.com/MAYHEM-Lab/spark-euca.git tmp-git-repo")
   os.system("scp -i "+opts.identity_file+" -r tmp-git-repo root@"+master+":/root/")
   ssh(master, opts, "mv /root/tmp-git-repo /root/spark-euca")
   os.system("rm -rf tmp-git-repo")
