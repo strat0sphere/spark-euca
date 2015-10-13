@@ -1,6 +1,6 @@
 Scripts on this repo are under current development and constantly change - Might not work for your system!
 
-Has been tested with boto version 2.31.1
+Has been tested with boto version 2.31.1 and 2.38
 Eucalyptus private cloud is API compatible with Amazon EC2. The scripts on this repo are a modified version of the spark-ec2 tools that you can find here: https://github.com/mesos/spark-ec2. The scipts can be used unmodified with Eucalyptus. If you want to use Amazon you should copy the connector from the spark-ec2 repo. 
 The current git repo might contain code from the original spark tools that is not currently used for the installation to Eucalyptus.
 
@@ -8,14 +8,14 @@ spark-euca
 =========
 
 This repository contains the set of scripts used to setup:
-1) A Spark standalone cluster from scratch (emi or ami with Ubuntu 12.0.4) or 
-2) A Mesos cluster with Spark, Spark-Streaming, MapReduce, Storm, Kafka and Hama running on Eucalyptus. The scripts require an emi (or similar an AWS ami) that has HDFS and Zookeeper pre-installed as long as compiled versions of Spark and Hadoop for Mesos. In the future I will extend the scripts to install all these with an empty emi as well.
+1. A Spark standalone cluster from scratch (emi or ami with Ubuntu 12.0.4) or 
+2. A Mesos cluster with Spark, Spark-Streaming, MapReduce, Storm, Kafka and Hama running on Eucalyptus. The deployment code supports installation both from a completely empty Ubunt 12.04 precise emi (Needs around 2-3 hours to deploy depending on the type of instance you use) or from a preconfigured emi with hdfs, mesos, hadoop and spark already installed.
 
 In both cases I am assuming you already have a running eucalyptus cluster. The scripts require that Eycaluptus is already installed and then create the instances to run your cluster according to the EMI you specify.
 
 ### Usage
 
-For case 1) all you need to do is run something like this: 
+To install Spark Standalone all you need to do is run something like this: 
 ./spark-euca 
 -i xxxx.pem 
 -k xxxx 
@@ -27,7 +27,7 @@ For case 1) all you need to do is run something like this:
 --user-data zzzz.sh  
 launch spark-test
 
-For case 2) all you need to do is run something like this:
+To install a mesos cluster all you need to do is run something like this:
 ./mesos-euca-emi -i xxxx.pem.pem
 -k xxxx 
 -s n
@@ -41,7 +41,21 @@ For case 2) all you need to do is run something like this:
 --run-tests True
 launch mesos-cluster-emi
 
-Basically you could use the mesos-euca-emi to also install a Spark Standalone cluster by specifying the correct arguments but the spark-euca script will work just fine for Spark-standalone
+You could use the mesos-euca-emi to also install a Spark Standalone cluster by specifying the correct arguments but the spark-euca script will work just fine for Spark-standalone
+
+..* To install from an empty Ubuntu 12.04 precise emi use the option --installation-type=empty-emi and:
+-- on euca00 cluster: use emi-56CB3EE9 for both masters and slaves 
+-- on euca eci cluster: use emi-DF913965 for both masters and slaves
+- for installation starting from an emi with pre-installed hdfs, mesos, hadoop and spark use the option --installation-type=mesos-emi and:
+-- on euca00: --emi-master emi-283B3B45 -e emi-35E93896
+-- on euca eci: TBD
+
+#### EXAMPLES
+- example for installation from a preconfigured emi on euca00: ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
+
+- example for installation from am empty emi on euca00: ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
+
+
 
 *Check scripts for more options*
 
