@@ -23,7 +23,7 @@
 """
 #example run
 ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
-- new not-tested emis:  emi-85763E01 -e emi-44643D7C 
+- new not-tested emis:  emi-85763E01 -e emi-44643D7C  (from empty: emi-344D3C5C -e emi-8D0A40C4)
 - for empty emi installation use --installation-type=empty-emi and:
     -- on euca00 cluster: use emi-56CB3EE9 for both masters and slaves 
     -- on euca eci cluster: use emi-DF913965 for both masters and slaves
@@ -307,8 +307,7 @@ def launch_cluster(conn, opts, cluster_name):
   # Check if instances are already running in our groups
   # Grouped instances are instances that run on the same security group in order to allow communication
   # using private IPs and without DNS resolving
-  existing_masters, existing_slaves, existing_zoos, existing_grouped = get_existing_cluster(conn, opts, cluster_name,
-                                                           die_on_error=False)
+  existing_masters, existing_slaves, existing_zoos, existing_grouped = get_existing_cluster(conn, opts, cluster_name, die_on_error=False)
   if existing_slaves or (existing_masters and not opts.use_existing_master) or existing_grouped:
     print >> stderr, ("ERROR: There are already instances running in " +
         "group %s or %s or %s" % (master_group.name, slave_group.name, zoo_group.name))
@@ -515,7 +514,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
   
   ssh(master, opts, "rm -rf spark-euca")
   
-  os.system("git clone -b eci https://github.com/MAYHEM-Lab/spark-euca.git tmp-git-repo")
+  os.system("git clone https://github.com/MAYHEM-Lab/spark-euca.git tmp-git-repo")
   os.system("scp -i "+opts.identity_file+" -r tmp-git-repo root@"+master+":/root/")
   ssh(master, opts, "mv /root/tmp-git-repo /root/spark-euca")
   os.system("rm -rf tmp-git-repo")
