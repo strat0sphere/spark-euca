@@ -539,6 +539,7 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
 def setup_spark_standalone_cluster(master, opts):
   #ssh(master, opts, "chmod u+x ~/spark-testing/setup.sh")
   #ssh(master, opts, "~/spark-testing/setup.sh") #Run everything needed to prepare the slaves instances
+  
   ssh(master, opts, "chmod u+x spark-euca/setup.sh")
   ssh(master, opts, "spark-euca/setup.sh " + opts.os_type)
   ssh(master, opts, "echo 'Starting-all...'")
@@ -959,6 +960,14 @@ def real_main():
     if opts.resume:
       (master_nodes, slave_nodes, zoo_nodes, grouped_nodes) = get_existing_cluster(
           conn, opts, cluster_name)
+	if grouped_nodes != []:
+          for i in grouped_nodes:
+            if i.instance_type == opts.master_instance_type:
+                master_nodes.append(i)
+            elif i.instance_type == opts.instance_type:
+                slave_nodes.append(i)
+            else:
+                print "Instance type" + i.instance_type + " should be a master or a slave!"
     else:
       (master_nodes, slave_nodes, zoo_nodes) = launch_cluster(conn, opts, cluster_name)
       wait_for_cluster(conn, opts.wait, master_nodes, slave_nodes, zoo_nodes)
