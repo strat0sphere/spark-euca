@@ -173,6 +173,17 @@
     <!-- The properties below indicate the amount of resources that are allocated
         to a Hadoop slot (i.e., map/reduce task) by Mesos. -->
     <property>
+        <name>mapred.mesos.tasktracker.cpus</name>
+        <value>0.5</value>
+        <description>CPU for tasktracker itself</description>
+    </property>
+<property>
+        <name>mapred.mesos.tasktracker.mem</name>
+        <value>512</value>
+        <description>memory for tasktracker itself</description>
+    </property>
+        
+    <property>
         <name>mapred.mesos.slot.cpus</name>
         <value>0.5</value>
         <description>This is the amount of CPU share allocated per slot. This number may be fractional (i.e., 0.5).</description>
@@ -185,7 +196,7 @@
     </property>
     <property>
         <name>mapred.mesos.slot.mem</name>
-        <value>512</value>
+        <value>796</value>
         <description>
             This is the total memory required for JVM overhead (10% of this value)
             and the heap (-Xmx) of the task. The value is in MiB.

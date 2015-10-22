@@ -9,6 +9,9 @@ export HADOOP_CONF_DIR=/etc/hadoop/conf.mesos-cluster/
 
 export HADOOP_HOME=/usr/lib/hadoop
 
+# export SPARK_MEM=10g
+# export SPARK_WORKER_CORES=6
+# export SPARK_WORKER_MEMORY=10g
 
 #Addressing warning for hadoop native library issue - None of the bellow work!
 #export SPARK_DAEMON_JAVA_OPTS=-Djava.library.path=$HADOOP_HOME/lib/native/
