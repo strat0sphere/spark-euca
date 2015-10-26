@@ -501,8 +501,9 @@ def setup_cluster(conn, master_nodes, slave_nodes, zoo_nodes, opts, deploy_ssh_k
 
     for node in master_nodes + slave_nodes + zoo_nodes:
       print node.public_dns_name
-      ssh(node.public_dns_name, opts, "locale-gen en_US")
-      ssh(node.public_dns_name, opts, "cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime")
+      ssh(node.public_dns_name, opts, "locale-gen en_US")  
+      ssh(node.public_dns_name, opts, "rm -f /etc/localtime")
+      ssh(node.public_dns_name, opts, "ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime")
       ssh_write(node.public_dns_name, opts, ['tar', 'x'], dot_ssh_tar)
 
   modules = ["spark-on-mesos", "hadoop-on-mesos", "storm-on-mesos"] #It is also defined on deploy_templates_mesos
