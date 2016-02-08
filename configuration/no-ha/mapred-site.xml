@@ -1,0 +1,286 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+	 <property>
+        <name>mapred.local.dir</name>
+        <value>/mnt/hadoop-mapred</value>
+    </property>
+    <property>
+        <name>hadoop.log.dir</name>
+        <value>/mnt/hadoop/log/hadoop-0.20-mapreduce/</value>
+    </property>
+    <!-- Hadoop on Mesos configuration -->
+    <property>
+        <name>mapred.jobtracker.taskScheduler</name>
+        <value>org.apache.hadoop.mapred.MesosScheduler</value>
+    </property>
+    <property>
+        <name>mapred.mesos.taskScheduler</name>
+        <value>org.apache.hadoop.mapred.JobQueueTaskScheduler</value>
+    </property>
+    <property>
+        <name>mapred.mesos.master</name>
+        <value>10.2.221.173:5050</value>
+    </property>
+    <!-- TODO: Change tar.gz to be configurable-->
+    <property>
+        <name>mapred.mesos.executor.uri</name>
+        <value>hdfs://10.2.221.173:9000/hadoop-2.3.0-cdh5.1.2-mesos.0.21.1.tar.gz</value>
+    </property>
+
+	 <property>
+        <name>mapred.job.tracker</name>
+        <value>10.2.221.173:9001</value>
+    </property>
+    <!--<property>
+        <name>hadoop.skip.worker.version.check</name>
+        <value>true</value>
+      </property>
+    -->
+    
+    <!--  HA Properties -->
+<!--
+    <property>
+        <name>mapred.job.tracker</name>
+        <value>thunder-eci-jt</value>
+        <description>In an HA setup, the logical name of the JobTracker active-standby pair. In a non-HA setup mapred.job.tracker is a host:port string specifying the JobTracker's RPC address, but in an HA configuration the logical name must not include a port number.
+            </description>
+    </property>
+    <property>
+        <name>mapred.jobtracker.restart.recover</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>mapred.job.tracker.persist.jobstatus.active</name>
+        <value>true</value>
+        <description>Whether to make job status persistent in HDFS. Must be set to true for JobTracker HA.</description>
+    </property>
+    <property>
+        <name>mapred.job.tracker.persist.jobstatus.hours</name>
+        <value>1</value>
+        <description>The number of hours job status information is retained in HDFS. Must be greater than zero for JobTracker HA.</description>
+    </property>
+    <property>
+        <name>mapred.job.tracker.persist.jobstatus.dir</name>
+        <value>/jobtracker/jobsInfo</value>
+        <description>The HDFS directory in which job status information is kept persistently. The directory must exist and be owned by the mapred user.</description>
+    </property>
+  
+   
+  <property>
+    <name>mapred.jobtrackers.thunder-eci-jt</name>
+    <value>jt1,jt2</value>
+    <description>Comma-separated list of JobTracker IDs.</description>
+  </property>
+  <property>
+    <name>mapred.jobtracker.rpc-address.thunder-eci-jt.jt1</name>
+    <value>10.2.221.173:8021</value>
+  </property>
+  <property>
+    <name>mapred.jobtracker.rpc-address.thunder-eci-jt.jt2</name>
+    <value>10.2.221.181:8021</value>
+  </property>
+  <property>
+    <name>mapred.job.tracker.http.address.thunder-eci-jt.jt1</name>
+    <value>0.0.0.0:50030</value>
+  </property>
+  <property>
+    <name>mapred.job.tracker.http.address.thunder-eci-jt.jt2</name>
+    <value>0.0.0.0:50030</value>
+  </property>
+  <property>
+    <name>mapred.ha.jobtracker.rpc-address.thunder-eci-jt.jt1</name>
+    <value>10.2.221.173:8023</value>
+  </property>
+  <property>
+    <name>mapred.ha.jobtracker.rpc-address.thunder-eci-jt.jt2</name>
+    <value>10.2.221.181:8023</value>
+  </property>
+  <property>
+    <name>mapred.ha.jobtracker.http-redirect-address.thunder-eci-jt.jt1</name>
+    <value>euca-128-111-84-244.eucalyptus.cloud.eci.ucsb.edu:50030</value>
+  </property>
+  <property>
+    <name>mapred.ha.jobtracker.http-redirect-address.thunder-eci-jt.jt2</name>
+    <value>euca-128-111-84-238.eucalyptus.cloud.eci.ucsb.edu:50030</value>
+  </property>
+  <property>
+    <name>mapred.client.failover.proxy.provider.thunder-eci-jt</name>
+    <value>org.apache.hadoop.mapred.ConfiguredFailoverProxyProvider</value>
+  </property>
+  <property>
+    <name>mapred.client.failover.max.attempts</name>
+    <value>15</value>
+  </property>
+  <property>
+    <name>mapred.client.failover.sleep.base.millis</name>
+    <value>500</value>
+  </property>
+  <property>
+    <name>mapred.client.failover.sleep.max.millis</name>
+    <value>1500</value>
+  </property>
+ <property>
+    <name>mapred.client.failover.connection.retries</name>
+    <value>0</value>
+  </property>
+ <property>
+    <name>mapred.client.failover.connection.retries.on.timeouts</name>
+    <value>0</value>
+  </property>
+  <property>
+    <name>mapred.ha.fencing.methods</name>
+    <value>shell(/bin/true)</value>
+  </property>
+  
+  <property>
+    <name>mapred.ha.automatic-failover.enabled</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>mapred.ha.zkfc.port</name>
+    <value>8018</value>
+  </property>
+  -->
+  <!-- ***************************************** -->
+    
+    <!--
+  <property>
+    <name>mapred.tasktracker.map.tasks.maximum</name>
+    <value>4</value>
+    <description>The maximum number of map tasks that will be run
+    simultaneously by a task tracker.
+    </description>
+  </property>
+
+  <property>
+    <name>mapred.tasktracker.reduce.tasks.maximum</name>
+    <value>2</value>
+    <description>The maximum number of reduce tasks that will be run
+    simultaneously by a task tracker.
+    </description>
+  </property>
+-->
+    <!-- The properties below indicate the amount of resources that are allocated
+        to a Hadoop slot (i.e., map/reduce task) by Mesos. -->
+<property>
+        <name>mapred.mesos.tasktracker.cpus</name>
+        <value>0.5</value>
+        <description>CPU for tasktracker itself</description>
+    </property>
+<property>
+        <name>mapred.mesos.tasktracker.mem</name>
+        <value>512</value>
+        <description>memory for tasktracker itself</description>
+    </property>
+  
+  <property>
+        <name>mapred.mesos.slot.cpus</name>
+        <value>0.5</value>
+        <description>This is the amount of CPU share allocated per slot. This number may be fractional (i.e., 0.5).</description>
+    </property>
+ <property>
+        <name>mapred.mesos.slot.mem</name>
+        <value>768</value>
+        <description>
+            This is the total memory required for JVM overhead (10% of this value)
+            and the heap (-Xmx) of the task. The value is in MiB.
+        </description>
+    </property>
+<property>
+        <name>mapred.mesos.slot.disk</name>
+        <value>1024</value>
+        <description>This is the disk space required per slot. The value is in
+            MiB.</description>
+    </property>
+
+    <!-- Resource policies -->
+    <property>
+        <name>mapred.mesos.total.map.slots.minimum</name>
+        <value>0</value>
+        <description>
+            Mesos will attempt to make at least this many number of map slots
+            available at a given time. This does not necessarily mean the slots will
+            be idle, and this does not guarantee these slots will be available.
+        </description>
+    </property>
+    <property>
+        <name>mapred.mesos.total.reduce.slots.minimum</name>
+        <value>0</value>
+        <description>
+            Mesos will attempt to make at least this many number of reduce slots
+            available at a given time. This does not necessarily mean the slots will
+            be idle, and this does not guarantee these slots will be available.
+        </description>
+    </property>
+    <property>
+        <name>mapred.tasktracker.map.tasks.maximum</name>
+        <value>50</value>
+        <description>
+            This is the maximum number of tasks per task tracker. If you use the
+            fixed resource policy, Mesos will always allocate this many slots per
+            task tracker.
+        </description>
+    </property>
+
+    <property>
+        <name>mapred.tasktracker.reduce.tasks.maximum</name>
+        <value>50</value>
+        <description>
+            This is the maximum number of tasks per task tracker. If you use the
+            fixed resource policy, Mesos will always allocate this many slots per
+            task tracker.
+        </description>
+    </property>
+    <property>
+        <name>mapred.mesos.scheduler.policy.fixed</name>
+        <value>false</value>
+        <description>
+            If this is set to true, Mesos will always allocate a fixed number of
+            slots per task tracker based on the maximum map/reduce slot
+            specification. If a resource offer is not large enough for the number of
+            slots specified, that resource offer will be declined.
+        </description>
+    </property>
+    <!-- Additional Mesos parameters -->
+    <property>
+        <name>mapred.mesos.checkpoint</name>
+        <value>false</value>
+        <description>
+            This value enables/disables checkpointing for this framework.
+        </description>
+    </property>
+    <property>
+        <name>mapred.mesos.role</name>
+        <value>*</value>
+        <description>
+            This is the Mesos framework role. This can be used in conjunction with
+            Mesos reservations. Consult the Mesos documentation for details.
+        </description>
+    </property>
+
+
+    <!-- If you're using a custom Mesos Containerizer -->
+    <!--
+      <property>
+        <name>mapred.mesos.container.image</name>
+        <value>docker:///ubuntu</value>
+        <description>
+          If you're using a custom Mesos Containerizer (like the External Containerizer)
+          that uses images, you can set this option to cause Hadoop TaskTrackers to
+          be launched within this container image.
+        </description>
+      </property>
+      <property>
+    <name>mapred.mesos.container.options</name>
+    <value></value>
+    <description>
+      Comma separated list of options to pass to the containerizer. The meaning
+      of this entirely depends on the containerizer in use.
+    </description>
+  </property>-
+-->
+</configuration>
