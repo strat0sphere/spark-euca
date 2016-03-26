@@ -1,11 +1,12 @@
 #!/bin/bash
-MESOS_SETUP_VERSION='0.27.2'
-MESOS_LOCATION='/mnt'
-echo "MESOS_SETUP_VERSION = $MESOS_SETUP_VERSION"
 apt-get update
 apt-get install -y autoconf libtool
 apt-get -y install build-essential python-dev python-boto libcurl4-nss-dev libsasl2-dev libsasl2-modules maven libapr1-dev libsvn-dev
-
+chmod +x install-modules-prereq.sh
+./install-modules-prereq.sh
+MESOS_SETUP_VERSION='0.27.2'
+MESOS_LOCATION="/mnt"
+echo "MESOS_SETUP_VERSION = $MESOS_SETUP_VERSION"
 #apt-get -qq --yes --force-yes install build-essential
 #apt-get -qq --yes --force-yes install python-dev python-boto
 #apt-get -qq --yes --force-yes install libcurl4-nss-dev
@@ -28,7 +29,8 @@ chmod +x /root/mesos-installation/
 mkdir build
 cd build
 echo "Running configure..."
-../configure --prefix=/root/mesos-installation/
+../configure --with-glog=/usr/local --with-protobuf=/usr --with-boost=/usr/local --prefix=/root/mesos-installation --disable-python
+
 echo "Running make..."
 make -j 4 V=0
 
