@@ -25,9 +25,14 @@
 ./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-names1
 - new not-tested emis:  emi-85763E01 -e emi-44643D7C  (from empty: emi-344D3C5C -e emi-8D0A40C4)
 - for empty emi installation use --installation-type=empty-emi and:
+    -For Ubuntu precice 12.04:
     -- on euca00 cluster: use emi-56CB3EE9 for both masters and slaves 
     -- on euca eci cluster: use emi-DF913965 for both masters and slaves
+    -For Ubuntu trusty 14.04:
+    -- on euca eci cluster: use emi-CF65C654 for both masters and slaves 
+    -- on euca eci cluster
 - for installation starting from an emi with pre-installed hdfs, mesos, hadoop and spark use:
+    -For Ubuntu precice 12.04:
     -- on euca00: --emi-master emi-283B3B45 -e emi-35E93896
     -- on euca eci: TBD
 """
@@ -93,7 +98,7 @@ def parse_args():
       help="Github repo from which to checkout supplied commit hash")
   parser.add_option("--hadoop-major-version", default="1",
       help="Major version of Hadoop (default: 0.20.0)")
-  parser.add_option("--mesos-setup-version", default="0.21.1",
+  parser.add_option("--mesos-setup-version", default="0.27.1",
       help="Major version of Hadoop (default: 1)")
   parser.add_option("-D", metavar="[ADDRESS:]PORT", dest="proxy_port",
       help="Use SSH dynamic port forwarding to create a SOCKS proxy at " +
