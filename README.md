@@ -1,7 +1,7 @@
-Scripts on this repo are under current development and constantly change - Might not work for your system!
+*Please read bellow to make sure these tools will work with your system*
 
 Has been tested with boto version 2.31.1 and 2.38
-Eucalyptus private cloud is API compatible with Amazon EC2. The scripts on this repo are a modified version of the spark-ec2 tools that you can find here: https://github.com/mesos/spark-ec2. The scipts can be used unmodified with Eucalyptus. If you want to use Amazon you should copy the connector from the spark-ec2 repo. 
+Eucalyptus private cloud is API compatible with Amazon EC2. The scripts on this repo are a modified version of the spark-ec2 tools that you can find here: https://github.com/mesos/spark-ec2. The scripts can be used unmodified with Eucalyptus. If you want to use Amazon you should copy the connector from the spark-ec2 repo. 
 The current git repo might contain code from the original spark tools that is not currently used for the installation to Eucalyptus.
 
 spark-euca
@@ -9,12 +9,12 @@ spark-euca
 
 This repository contains the set of scripts used to setup:
 1. A Spark standalone cluster from scratch (emi or ami with Ubuntu 12.0.4) or 
-2. A Mesos cluster with Spark, Spark-Streaming, MapReduce, Storm, Kafka and Hama running on Eucalyptus. The deployment code supports installation both from a completely empty Ubunt 12.04 precise emi (Needs around 2-3 hours to deploy depending on the type of instance you use) or from a preconfigured emi with hdfs, mesos, hadoop and spark already installed.
+2. A Mesos cluster with Spark, Spark-Streaming, MapReduce, Storm, Kafka and Hama running on Eucalyptus. The deployment code supports installation both from a completely empty Ubuntu 12.04 precise emi or from a preconfigured emi with hdfs, mesos, hadoop and spark already installed.
 
 In both cases I am assuming you already have a running eucalyptus cluster. The scripts require that Eycaluptus is already installed and then create the instances to run your cluster according to the EMI you specify.
 
 # Environment setup
-- If you haven't done alreyady when setting up your eucalyptus environment you will need to create an ssh key in order to be able to ssh without password to the instances. This key will be on your -i and -k options used on the deployment code.
+- If you haven't done already when setting up your eucalyptus environment you will need to create an ssh key in order to be able to ssh without password to the instances. This key will be on your -i and -k options used on the deployment code.
 euca-create-keypair keyname.key > keyname.key
 (or for older versions of eucalyptus: euca-add-keypair keyname.key > keyname.key)
 chmod 600 keyname.key
