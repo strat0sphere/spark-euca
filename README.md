@@ -1,6 +1,7 @@
 *Please read bellow to make sure these tools will work with your system*
 
-Has been tested with boto version 2.31.1 and 2.38
+Has been tested with boto version 2.31.1 and 2.38.
+
 Eucalyptus private cloud is API compatible with Amazon EC2. The scripts on this repo are a modified version of the spark-ec2 tools that you can find here: https://github.com/mesos/spark-ec2. The scripts can be used unmodified with Eucalyptus. If you want to use Amazon you should copy the connector from the spark-ec2 repo. 
 The current git repo might contain code from the original spark tools that is not currently used for the installation to Eucalyptus.
 
