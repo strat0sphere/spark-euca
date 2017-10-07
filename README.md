@@ -2,7 +2,7 @@
 
 Has been tested with boto version 2.31.1 and 2.38.
 
-Eucalyptus private cloud is API compatible with Amazon EC2. The scripts on this repo are a modified version of the spark-ec2 tools that you can find here: https://github.com/mesos/spark-ec2. The scripts can be used unmodified with Eucalyptus. If you want to use Amazon you should copy the connector from the spark-ec2 repo. 
+Eucalyptus private cloud is API compatible with Amazon EC2. The scripts on this repo are extending the spark-ec2 tools to deploy Spark in standalone mode in a Eucalyptus cluster but also Mesos, Spark, Hadoop, Storm, Hama and others in a cluster managed by Mesos. You can find the original scripts to deploy Spark on AWS here: https://github.com/mesos/spark-ec2. The scripts can be used unmodified with Eucalyptus. If you want to use Amazon you should copy the connector from the spark-ec2 repo. 
 The current git repo might contain code from the original spark tools that is not currently used for the installation to Eucalyptus.
 
 spark-euca
@@ -90,22 +90,18 @@ launch mesos-cluster-emi
 
 You could use the mesos-euca-emi to also install a Spark Standalone cluster by specifying the correct arguments but the spark-euca script will work just fine for Spark-standalone
 
-  * To install from an empty Ubuntu 12.04 precise emi use the option --installation-type=empty-emi and:
-   on euca00 cluster: use emi-56CB3EE9 for both masters and slaves 
-   on euca eci cluster: use emi-DF913965 for both masters and slaves
-  * for installation starting from an emi with pre-installed hdfs, mesos, hadoop and spark use the option --installation-type=mesos-emi and:
-   on euca00: --emi-master emi-283B3B45 -e emi-35E93896
-   on euca eci: TBD
+  * To install from an empty Ubuntu 12.04 precise emi use the option --installation-type=empty-emi
+  * for installation starting from an emi with pre-installed hdfs, mesos, hadoop and spark use the option --installation-type=mesos-emi and select the appropriate emi name (e.g., emi-283B3B45)
 
 ## Examples
-- example for installation from a preconfigured emi on euca00: 
+- example for installation from a preconfigured emi on eucalyptus: 
 ```
-./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-name
+./mesos-euca-generic -i ~/pem_dir/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-name
 ```
 
-- example for installation from am empty emi on euca00: 
+- example for installation from am empty emi on eucalyptus: 
 ```
-./mesos-euca-generic -i ~/vagrant_euca/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-name
+./mesos-euca-generic -i ~/pem_dir/stratos.pem -k stratos --ft 3 -s 2 --emi-master emi-283B3B45 -e emi-35E93896 -t m2.2xlarge --no-ganglia --user-data-file clear-key-ubuntu.sh --installation-type mesos-emi --run-tests True --cohost --swap 4096 launch cluster-name
 ```
 
 
